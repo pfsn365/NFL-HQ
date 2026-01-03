@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 
 import { getCurrentPlayers, getAlltimePlayersPublic, PlayerData } from '@/data/players/index';
 import { getAllTeams } from '@/data/teams';
-import NBATeamsSidebar from '@/components/NBATeamsSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { CURRENT_TOP_100_IDS } from '@/data/player-rankings/current-top-100';
 import { ALLTIME_TOP_100_IDS } from '@/data/player-rankings/alltime-top-100';
 import toast, { Toaster } from 'react-hot-toast';
@@ -1472,12 +1472,12 @@ export default function PlayerRankingsClient() {
       />
       {/* Sidebar */}
       <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-        <NBATeamsSidebar />
+        <NFLTeamsSidebar />
       </aside>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-        <NBATeamsSidebar isMobile={true} />
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
       {/* Main Content */}

@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { getAllTeams, TeamData } from '@/data/teams';
-import NBATeamsSidebar from '@/components/NBATeamsSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 
 const DRAFT_YEAR = 2026;
 
@@ -129,12 +129,12 @@ export default function DraftOrderClient() {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-        <NBATeamsSidebar />
+        <NFLTeamsSidebar />
       </aside>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-        <NBATeamsSidebar isMobile={true} />
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
       {/* Main Content */}

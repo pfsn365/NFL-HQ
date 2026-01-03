@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 import { getAllTeams } from '@/data/teams';
-import NBATeamsSidebar from '@/components/NBATeamsSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 
 // Map API team slugs to our team IDs
 const teamSlugMapping: Record<string, string> = {
@@ -295,13 +295,13 @@ export default function SchedulePage() {
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <div className="fixed top-0 left-0 w-64 h-screen z-10">
-          <NBATeamsSidebar />
+          <NFLTeamsSidebar />
         </div>
       </div>
 
       {/* Mobile sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
-        <NBATeamsSidebar isMobile={true} />
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
       {/* Main content */}

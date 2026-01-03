@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getAllTeams, TeamData } from '@/data/teams';
-import NBATeamsSidebar from '@/components/NBATeamsSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import Link from 'next/link';
 
 
@@ -187,12 +187,12 @@ export default function TeamsClient() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:block w-64 fixed left-0 top-0 bottom-0 z-10">
-        <NBATeamsSidebar />
+        <NFLTeamsSidebar />
       </aside>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
-        <NBATeamsSidebar isMobile={true} />
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
       {/* Main Content */}

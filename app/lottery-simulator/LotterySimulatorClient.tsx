@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getAllTeams } from '@/data/teams';
-import NBATeamsSidebar from '@/components/NBATeamsSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import LotterySimulator from '@/components/LotterySimulator';
 import { lotterySimulator } from '@/lib/lotterySimulator';
 import { ArrowRight } from 'lucide-react';
@@ -77,12 +77,12 @@ export default function LotterySimulatorClient() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-        <NBATeamsSidebar />
+        <NFLTeamsSidebar />
       </aside>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-        <NBATeamsSidebar isMobile={true} />
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
       {/* Main Content */}

@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { getAllTeams } from '@/data/teams';
 import Link from 'next/link';
-import NBATeamsSidebar from '@/components/NBATeamsSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 
 interface StandingData {
   teamId: string;
@@ -408,12 +408,12 @@ export default function StandingsClient() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-        <NBATeamsSidebar />
+        <NFLTeamsSidebar />
       </aside>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-        <NBATeamsSidebar isMobile={true} />
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
       {/* Main Content */}
