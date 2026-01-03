@@ -9,6 +9,7 @@ interface TeamWithRecord extends TeamData {
   liveRecord?: string;
   wins?: number;
   losses?: number;
+  conferenceRank?: string;
 }
 
 interface TeamStats {
