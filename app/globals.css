@@ -235,3 +235,18 @@ img {
     scroll-behavior: auto;
   }
 }
+
+/* Video Player Styles */
+#video-player-container {
+  position: fixed;
+  z-index: 10;
+  left: 10px;
+  bottom: 60px;
+}
+
+@media (max-width: 768px) {
+  #video-player-container {
+    left: 50%;
+    bottom: 45px;
+  }
+}

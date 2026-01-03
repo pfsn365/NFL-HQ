@@ -12,18 +12,18 @@ export default function RaptiveScript() {
           __html: `
             window.adthrive = window.adthrive || {};
             window.adthrive.cmd = window.adthrive.cmd || [];
-            window.adthrive.plugin = 'adthrive-ads-3.9.0';
+            window.adthrive.plugin = 'adthrive-ads-manual';
             window.adthrive.host = 'ads.adthrive.com';
-            window.adthrive.siteId = '5e163f2211916d4860b8f332';
           `,
         }}
       />
       <Script
         id="raptive-loader"
-        src="https://ads.adthrive.com/sites/5e163f2211916d4860b8f332/ads.min.js"
+        src={`https://ads.adthrive.com/sites/5e163f2211916d4860b8f332/ads.min.js?referrer=${typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : ''}&cb=${Math.floor(Math.random() * 100) + 1}`}
         strategy="afterInteractive"
         async
         defer
+        referrerPolicy="no-referrer-when-downgrade"
       />
     </>
   )

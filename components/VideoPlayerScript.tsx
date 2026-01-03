@@ -4,15 +4,15 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
+    gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
+    googletag?: {
+      apiReady?: boolean;
+    };
     adthrive?: {
       cmd: Array<() => void>;
       plugin: string;
       host: string;
     };
-    googletag?: {
-      apiReady?: boolean;
-    };
-    gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
   }
 }
 
@@ -41,6 +41,12 @@ function getOrCreateSegment(): number {
   const newV = Math.floor(Math.random() * 100) + 1;
   setVideoPlayerCookie(COOKIE_NAME, String(newV), COOKIE_DAYS);
   return newV;
+}
+
+function removeClass(element: HTMLElement | null, className: string) {
+  if (element && element.classList.contains(className)) {
+    element.classList.remove(className);
+  }
 }
 
 function loadAdThrive(): Promise<void> {
@@ -94,7 +100,9 @@ function loadSTN(target: HTMLElement) {
   window.addEventListener('load', () => {
     if (typeof window.gtag === 'function') {
       console.log('gtag triggered for stn');
-      window.gtag('event', 'STN_Player_Segment', { 'page_url': window.location.href });
+      window.gtag('event', 'STN_Player_Segment', {
+        'page_url': window.location.href,
+      });
     }
   });
   console.log('stn player loaded');
@@ -112,10 +120,12 @@ function loadSTN(target: HTMLElement) {
   target.appendChild(s);
 }
 
-function loadPrimis(target?: HTMLElement) {
+function loadPrimis(target?: HTMLElement | null) {
   window.addEventListener('load', () => {
     if (typeof window.gtag === 'function') {
-      window.gtag('event', 'Primis_Player_Segment', { page_url: window.location.href });
+      window.gtag('event', 'Primis_Player_Segment', {
+        'page_url': window.location.href,
+      });
     }
   });
 
@@ -130,29 +140,31 @@ function loadPrimis(target?: HTMLElement) {
   }
 }
 
-function initVideoPlayer() {
-  const target = document.getElementById('video-player-container');
-  if (!target) return;
-
-  target.classList.remove('hidden');
-
-  const segmentValue = getOrCreateSegment();
-  const isDesktop = window.innerWidth > 768;
-
-  if (segmentValue <= 50) {
-    loadSTN(target);
-  } else {
-    if (isDesktop) {
-      loadPrimis(target);
-    } else {
-      loadPrimis();
-      target.remove();
-    }
-  }
+function isDesktop(): boolean {
+  return window.innerWidth >= 768;
 }
 
 export default function VideoPlayerScript() {
   useEffect(() => {
+    const initVideoPlayer = () => {
+      const target = document.getElementById('video-player-container');
+      if (!target) return;
+
+      removeClass(target, 'hidden');
+
+      const segmentValue = getOrCreateSegment();
+      if (segmentValue <= 50) {
+        loadSTN(target);
+      } else {
+        if (isDesktop()) {
+          loadPrimis(target);
+        } else {
+          loadPrimis();
+          target.remove();
+        }
+      }
+    };
+
     // Execute in sequence: AdThrive → Wait for GPT → Video Player
     loadAdThrive()
       .then(() => waitForGPT())
@@ -166,5 +178,7 @@ export default function VideoPlayerScript() {
       .catch((err) => console.error('Script loading error:', err));
   }, []);
 
-  return <div id="video-player-container" className="hidden"></div>;
+  return (
+    <div id="video-player-container" className="hidden"></div>
+  );
 }
