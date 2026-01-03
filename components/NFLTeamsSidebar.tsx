@@ -5,16 +5,16 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getAllTeams, TeamData } from '@/data/teams';
 
-interface NBATeamsSidebarProps {
+interface NFLTeamsSidebarProps {
   currentTeam?: TeamData;
   currentTab?: string;
   isMobile?: boolean;
 }
 
-const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentTab = 'overview', isMobile = false }) => {
+const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentTab = 'overview', isMobile = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTeamsExpanded, setIsTeamsExpanded] = useState(false);
-  const [isNBAToolsExpanded, setIsNBAToolsExpanded] = useState(true);
+  const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
   const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(true);
   const allTeams = getAllTeams();
   const pathname = usePathname();
@@ -30,7 +30,7 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
     return `/nfl-hq/teams/${teamId}/${currentTab}`;
   };
 
-  const nbaTools = [
+  const nflTools = [
     { title: 'NFL Schedule', url: '/nfl-hq/schedule', external: false },
     { title: 'NFL Stat Leaders', url: '/nfl-hq/stats', external: false },
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
@@ -89,7 +89,7 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
               />
             </a>
 
-            <span className="text-white font-semibold text-sm">NBA Hub</span>
+            <span className="text-white font-semibold text-sm">NFL HQ</span>
           </div>
 
           {/* Dropdown arrow - clickable */}
@@ -142,13 +142,13 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
               </div>
             </div>
 
-            {/* NBA TEAMS Section */}
+            {/* NFL TEAMS Section */}
             <div className="px-4 py-2 border-b border-gray-800">
               <div
                 className="flex items-center justify-between mb-2 cursor-pointer"
                 onClick={() => setIsTeamsExpanded(!isTeamsExpanded)}
               >
-                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">NBA Teams</div>
+                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">NFL Teams</div>
                 <svg
                   className={`w-4 h-4 text-[#0050A0] transform transition-transform ${isTeamsExpanded ? 'rotate-180' : ''}`}
                   fill="none"
@@ -188,15 +188,15 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
               )}
             </div>
 
-            {/* NBA TOOLS Section */}
+            {/* NFL TOOLS Section */}
             <div className="px-4 py-2 border-b border-gray-800">
               <div
                 className="flex items-center justify-between mb-2 cursor-pointer"
-                onClick={() => setIsNBAToolsExpanded(!isNBAToolsExpanded)}
+                onClick={() => setIsNFLToolsExpanded(!isNFLToolsExpanded)}
               >
-                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">NBA Tools</div>
+                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">NFL Tools</div>
                 <svg
-                  className={`w-4 h-4 text-[#0050A0] transform transition-transform ${isNBAToolsExpanded ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-[#0050A0] transform transition-transform ${isNFLToolsExpanded ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -209,9 +209,9 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
                   />
                 </svg>
               </div>
-              {isNBAToolsExpanded && (
+              {isNFLToolsExpanded && (
                 <div className="grid grid-cols-1 gap-1">
-                  {nbaTools.map((tool) => {
+                  {nflTools.map((tool) => {
                     const normalizedPathname = normalizePath(pathname);
                     const normalizedUrl = normalizePath(tool.url);
                     const isActive = !tool.external && normalizedPathname === normalizedUrl;
@@ -355,14 +355,14 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
             </a>
           </li>
 
-          {/* NBA Teams Section */}
+          {/* NFL Teams Section */}
           <li className="mb-2">
             <div className="px-3 mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-0.5 w-3 bg-gray-600 rounded"></div>
                   <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    NBA Teams {currentTab && `- ${currentTab.replace('-', ' ').toUpperCase()}`}
+                    NFL Teams {currentTab && `- ${currentTab.replace('-', ' ').toUpperCase()}`}
                   </span>
                 </div>
                 <div className="flex-1 ml-3 h-px bg-gradient-to-r from-gray-800 to-transparent"></div>
@@ -422,19 +422,19 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
             </li>
           )}
 
-          {/* NBA Tools Section */}
+          {/* NFL Tools Section */}
           <li className="mb-2 pt-2">
             <div className="px-3 mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-0.5 w-3 bg-gray-600 rounded"></div>
-                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">NBA Tools</span>
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">NFL Tools</span>
                 </div>
                 <div className="flex-1 ml-3 h-px bg-gradient-to-r from-gray-800 to-transparent"></div>
               </div>
             </div>
           </li>
-          {nbaTools.map((tool) => {
+          {nflTools.map((tool) => {
             const normalizedPathname = normalizePath(pathname);
             const normalizedUrl = normalizePath(tool.url);
             const isActive = !tool.external && normalizedPathname === normalizedUrl;
@@ -526,4 +526,4 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
   );
 };
 
-export default NBATeamsSidebar;
+export default NFLTeamsSidebar;
