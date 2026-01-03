@@ -1,1026 +1,1143 @@
-export interface RetiredNumber {
-  number: string;
-  name: string;
-  position: string;
-  years: string;
-}
-
-export interface HallOfFamer {
-  name: string;
-  yearInducted: string;
-  category: string; // Player, Coach, Contributor, Referee, Team
-  role?: string; // Position for players, or specific role
-  yearsWithTeam?: string; // Years associated with this team
-}
-
-export interface TeamInfo {
+export interface TeamInfoData {
   founded: string;
+  stadium: string;
   capacity: string;
+  location: string;
   owner: string;
-  championships: string;
-  championshipYears?: string[];
-  conferenceChampionships: string;
-  mostRecentConferenceChampionship?: string;
-  divisionTitles: string;
-  mostRecentDivisionTitle?: string;
-  playoffAppearances: string;
-  mostRecentPlayoffAppearance?: string;
-  retiredNumbers: RetiredNumber[];
-  hallOfFamers: HallOfFamer[];
+  conference: string;
+  division: string;
+  superbowlWins: number;
+  superbowlAppearances: string[];
+  conferenceChampionships: number;
+  divisionTitles: number;
+  playoffAppearances: number;
+  retiredNumbers: Array<{
+    number: string;
+    name: string;
+    position: string;
+    years: string;
+  }>;
+  stadiumHistory: Array<{
+    name: string;
+    years: string;
+    description?: string;
+    isCurrent?: boolean;
+  }>;
+  achievements: Array<{
+    title: string;
+    description: string;
+    count?: number;
+  }>;
 }
 
-export const teamInfo: Record<string, TeamInfo> = {
-  'atlanta-hawks': {
-    founded: '1946',
-    capacity: '16,600',
-    owner: 'Tony Ressler',
-    championships: '1',
-    championshipYears: ['1958'],
-    conferenceChampionships: '4',
-    mostRecentConferenceChampionship: '2021',
-    divisionTitles: '9',
-    mostRecentDivisionTitle: '2015',
-    playoffAppearances: '49',
-    mostRecentPlayoffAppearance: '2023',
+export const teamInfoData: Record<string, TeamInfoData> = {
+  'arizona-cardinals': {
+    founded: '1898',
+    stadium: 'State Farm Stadium',
+    capacity: '63,400',
+    location: 'Glendale, AZ',
+    owner: 'Michael Bidwill',
+    conference: 'NFC',
+    division: 'NFC West',
+    superbowlWins: 0,
+    superbowlAppearances: ['2008 (XLIII)'],
+    conferenceChampionships: 1,
+    divisionTitles: 2,
+    playoffAppearances: 10,
     retiredNumbers: [
-      { number: '9', name: 'Bob Pettit', position: 'F/C', years: '1954-1965' },
-      { number: '21', name: 'Dominique Wilkins', position: 'F', years: '1982-1994' },
-      { number: '23', name: 'Lou Hudson', position: 'F/G', years: '1966-1977' },
-      { number: '44', name: 'Pete Maravich', position: 'G', years: '1970-1974' },
-      { number: '55', name: 'Dikembe Mutombo', position: 'C', years: '1996-2001' }
+      { number: '8', name: 'Larry Wilson', position: 'Safety', years: '1960-1972' },
+      { number: '40', name: 'Pat Tillman', position: 'Safety', years: '1998-2001' },
+      { number: '77', name: 'Stan Mauldin', position: 'Offensive Line', years: '1946-1953' },
+      { number: '88', name: 'J.V. Cain', position: 'Tight End', years: '1974-1979' },
+      { number: '99', name: 'Marshall Goldberg', position: 'Halfback', years: '1939-1943, 1946-1948' }
     ],
-    hallOfFamers: [
-      { name: "Bob Pettit", yearInducted: "1971", category: "Player", role: "F/C", yearsWithTeam: "1954-1965" },
-      { name: "Dominique Wilkins", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1982-1994" },
-      { name: "Lou Hudson", yearInducted: "2022", category: "Player", role: "F/G", yearsWithTeam: "1966-1977" },
-      { name: "Cliff Hagan", yearInducted: "1978", category: "Player", role: "F", yearsWithTeam: "1956-1966" },
-      { name: "Slater Martin", yearInducted: "1982", category: "Player", role: "G", yearsWithTeam: "1956-1960" },
-      { name: "Clyde Lovellette", yearInducted: "1988", category: "Player", role: "C", yearsWithTeam: "1958-1962" },
-      { name: "Walt Bellamy", yearInducted: "1993", category: "Player", role: "C", yearsWithTeam: "1970-1974" },
-      { name: "Pete Maravich", yearInducted: "1987", category: "Player", role: "G", yearsWithTeam: "1970-1974" },
-      { name: "Lenny Wilkens", yearInducted: "1989", category: "Player", role: "G", yearsWithTeam: "1960-1968" },
-      { name: "Lenny Wilkens", yearInducted: "1998", category: "Coach", role: "Head Coach", yearsWithTeam: "1993-2000" },
-      { name: "Dikembe Mutombo", yearInducted: "2015", category: "Player", role: "C", yearsWithTeam: "1996-2001" },
-      { name: "Bob Houbregs", yearInducted: "1987", category: "Player", role: "C", yearsWithTeam: "1953-1955" },
-      { name: "Ed Macauley", yearInducted: "1960", category: "Player", role: "F/C", yearsWithTeam: "1956-1959" },
-      { name: "Moses Malone", yearInducted: "2001", category: "Player", role: "C", yearsWithTeam: "1988-1991" }
+    stadiumHistory: [
+      { name: 'Normal Park', years: '1898–1921', description: 'Original home in Chicago' },
+      { name: 'Comiskey Park & Wrigley Field', years: '1922–1959', description: 'Comiskey: 1922–1925, 1929–1930, 1939–1959; Wrigley: 1931–1938' },
+      { name: 'Busch Stadiums Era', years: '1960–1987', description: 'Busch Stadium: 1960–1965; Busch Memorial Stadium: 1966–1987' },
+      { name: 'Sun Devil Stadium', years: '1988–2005', description: '18 seasons in Tempe' },
+      { name: 'State Farm Stadium', years: '2006–present', description: 'State-of-the-art facility in Glendale • Retractable roof • Hosted Super Bowl XLII & XLIX', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: '1 Super Bowl appearance (2008)', count: 0 },
+      { title: 'NFC Championships', description: '2008 NFC Champions', count: 1 },
+      { title: 'Division Titles', description: 'NFC West: 2008, 2009', count: 2 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2021', count: 10 }
     ]
   },
-  'boston-celtics': {
-    founded: '1946',
-    capacity: '19,156',
-    owner: 'Wyc Grousbeck',
-    championships: '18',
-    championshipYears: ['1957', '1959', '1960', '1961', '1962', '1963', '1964', '1965', '1966', '1968', '1969', '1974', '1976', '1981', '1984', '1986', '2008', '2024'],
-    conferenceChampionships: '23',
-    mostRecentConferenceChampionship: '2024',
-    divisionTitles: '32',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '62',
-    mostRecentPlayoffAppearance: '2025',
+
+  'dallas-cowboys': {
+    founded: '1960',
+    stadium: 'AT&T Stadium',
+    capacity: '80,000',
+    location: 'Arlington, TX',
+    owner: 'Jerry Jones',
+    conference: 'NFC',
+    division: 'NFC East',
+    superbowlWins: 5,
+    superbowlAppearances: ['1970 (V)', '1971 (VI)', '1975 (X)', '1977 (XII)', '1978 (XIII)', '1992 (XXVII)', '1993 (XXVIII)', '1995 (XXX)'],
+    conferenceChampionships: 8,
+    divisionTitles: 24,
+    playoffAppearances: 35,
     retiredNumbers: [
-      { number: '00', name: 'Robert Parish', position: 'C', years: '1980-1994' },
-      { number: '1', name: 'Walter Brown', position: 'Founder', years: '1946-1964' },
-      { number: '2', name: 'Red Auerbach', position: 'Coach', years: '1950-1966' },
-      { number: '6', name: 'Bill Russell', position: 'C', years: '1956-1969' },
-      { number: '10', name: 'Jo Jo White', position: 'G', years: '1969-1979' },
-      { number: '14', name: 'Bob Cousy', position: 'G', years: '1950-1963' },
-      { number: '15', name: 'Tom Heinsohn', position: 'F', years: '1956-1965' },
-      { number: '16', name: 'Satch Sanders', position: 'F', years: '1960-1973' },
-      { number: '17', name: 'John Havlicek', position: 'F/G', years: '1962-1978' },
-      { number: '18', name: 'Dave Cowens', position: 'C', years: '1970-1980' },
-      { number: '19', name: 'Don Nelson', position: 'F', years: '1965-1976' },
-      { number: '21', name: 'Bill Sharman', position: 'G', years: '1951-1961' },
-      { number: '22', name: 'Ed Macauley', position: 'C', years: '1950-1956' },
-      { number: '23', name: 'Frank Ramsey', position: 'F', years: '1954-1964' },
-      { number: '24', name: 'Sam Jones', position: 'G', years: '1957-1969' },
-      { number: '25', name: 'K.C. Jones', position: 'G', years: '1958-1967' },
-      { number: '31', name: 'Cedric Maxwell', position: 'F', years: '1977-1985' },
-      { number: '32', name: 'Kevin McHale', position: 'F', years: '1980-1993' },
-      { number: '33', name: 'Larry Bird', position: 'F', years: '1979-1992' },
-      { number: '34', name: 'Paul Pierce', position: 'F', years: '1998-2013' },
-      { number: '35', name: 'Reggie Lewis', position: 'F', years: '1987-1993' },
-      { number: 'LOSCY', name: 'Jim Loscutoff', position: 'F', years: '1955-1964' }
+      { number: '8', name: 'Troy Aikman', position: 'Quarterback', years: '1989-2000' },
+      { number: '12', name: 'Roger Staubach', position: 'Quarterback', years: '1969-1979' },
+      { number: '22', name: 'Emmitt Smith', position: 'Running Back', years: '1990-2002' },
+      { number: '74', name: 'Bob Lilly', position: 'Defensive Tackle', years: '1961-1974' }
     ],
-    hallOfFamers: [
-      { name: "Bill Russell", yearInducted: "1975", category: "Player", role: "C", yearsWithTeam: "1956-1969" },
-      { name: "Bill Russell", yearInducted: "2021", category: "Coach", role: "Head Coach", yearsWithTeam: "1966-1969" },
-      { name: "Bob Cousy", yearInducted: "1971", category: "Player", role: "G", yearsWithTeam: "1950-1963" },
-      { name: "Larry Bird", yearInducted: "1998", category: "Player", role: "F", yearsWithTeam: "1979-1992" },
-      { name: "John Havlicek", yearInducted: "1984", category: "Player", role: "F/G", yearsWithTeam: "1962-1978" },
-      { name: "Tom Heinsohn", yearInducted: "1986", category: "Player", role: "F", yearsWithTeam: "1956-1965" },
-      { name: "Tom Heinsohn", yearInducted: "2015", category: "Coach", role: "Head Coach", yearsWithTeam: "1969-1978" },
-      { name: "Sam Jones", yearInducted: "1984", category: "Player", role: "G", yearsWithTeam: "1957-1969" },
-      { name: "Kevin McHale", yearInducted: "1999", category: "Player", role: "F", yearsWithTeam: "1980-1993" },
-      { name: "Robert Parish", yearInducted: "2003", category: "Player", role: "C", yearsWithTeam: "1980-1994" },
-      { name: "Dave Cowens", yearInducted: "1991", category: "Player", role: "C", yearsWithTeam: "1970-1980" },
-      { name: "Dennis Johnson", yearInducted: "2010", category: "Player", role: "G", yearsWithTeam: "1983-1990" },
-      { name: "K.C. Jones", yearInducted: "1989", category: "Player", role: "G", yearsWithTeam: "1958-1967" },
-      { name: "Jo Jo White", yearInducted: "2015", category: "Player", role: "G", yearsWithTeam: "1969-1979" },
-      { name: "Bill Sharman", yearInducted: "1976", category: "Player", role: "G", yearsWithTeam: "1951-1961" },
-      { name: "Ed Macauley", yearInducted: "1960", category: "Player", role: "F/C", yearsWithTeam: "1950-1956" },
-      { name: "Frank Ramsey", yearInducted: "1982", category: "Player", role: "F/G", yearsWithTeam: "1954-1964" },
-      { name: "Bailey Howell", yearInducted: "1997", category: "Player", role: "F", yearsWithTeam: "1966-1970" },
-      { name: "Paul Pierce", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "1998-2013" },
-      { name: "Ray Allen", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "2007-2012" },
-      { name: "Kevin Garnett", yearInducted: "2020", category: "Player", role: "F", yearsWithTeam: "2007-2013" },
-      { name: "Arnie Risen", yearInducted: "1998", category: "Player", role: "C", yearsWithTeam: "1955-1958" },
-      { name: "Red Auerbach", yearInducted: "1969", category: "Coach", role: "Head Coach", yearsWithTeam: "1950-1966" },
-      { name: "Tom Sanders", yearInducted: "2011", category: "Contributor", role: "Player", yearsWithTeam: "1960-1973" },
-      { name: "Dave Bing", yearInducted: "1990", category: "Player", role: "G", yearsWithTeam: "1977-1978" },
-      { name: "Pete Maravich", yearInducted: "1987", category: "Player", role: "G", yearsWithTeam: "1980" },
-      { name: "Bill Walton", yearInducted: "1993", category: "Player", role: "C", yearsWithTeam: "1985-1987" }
+    stadiumHistory: [
+      { name: 'Cotton Bowl', years: '1960–1971', description: 'Original home in Dallas' },
+      { name: 'Texas Stadium', years: '1971–2008', description: 'Iconic venue in Irving with hole in the roof' },
+      { name: 'AT&T Stadium', years: '2009–present', description: 'State-of-the-art facility in Arlington • Retractable roof • Largest HD video board', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'VI, XII, XXVII, XXVIII, XXX', count: 5 },
+      { title: 'NFC Championships', description: '8 NFC Championship titles', count: 8 },
+      { title: 'Division Titles', description: 'Most recent: 2023', count: 24 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 35 }
     ]
   },
-  'brooklyn-nets': {
-    founded: '1967',
-    capacity: '17,732',
-    owner: 'Joe Tsai',
-    championships: '0',
-    conferenceChampionships: '2',
-    mostRecentConferenceChampionship: '2003',
-    divisionTitles: '5',
-    mostRecentDivisionTitle: '2006',
-    playoffAppearances: '27',
-    mostRecentPlayoffAppearance: '2023',
+
+  'kansas-city-chiefs': {
+    founded: '1960',
+    stadium: 'Arrowhead Stadium',
+    capacity: '76,416',
+    location: 'Kansas City, MO',
+    owner: 'Hunt Family',
+    conference: 'AFC',
+    division: 'AFC West',
+    superbowlWins: 4,
+    superbowlAppearances: ['1966 (I)', '1969 (IV)', '2019 (LIV)', '2022 (LVII)', '2023 (LVIII)'],
+    conferenceChampionships: 6,
+    divisionTitles: 16,
+    playoffAppearances: 25,
     retiredNumbers: [
-      { number: '3', name: 'Drazen Petrovic', position: 'G', years: '1991-1993' },
-      { number: '5', name: 'Jason Kidd', position: 'G', years: '2001-2008' },
-      { number: '15', name: 'Vince Carter', position: 'G/F', years: '2004-2009' },
-      { number: '23', name: 'John Williamson', position: 'G', years: '1973-1980' },
-      { number: '25', name: 'Bill Melchionni', position: 'G', years: '1969-1976' },
-      { number: '32', name: 'Julius Erving', position: 'F', years: '1973-1976' },
-      { number: '52', name: 'Buck Williams', position: 'F', years: '1981-1989' }
+      { number: '3', name: 'Jan Stenerud', position: 'Kicker', years: '1967-1979' },
+      { number: '16', name: 'Len Dawson', position: 'Quarterback', years: '1962-1975' },
+      { number: '18', name: 'Emmitt Thomas', position: 'Cornerback', years: '1966-1978' },
+      { number: '28', name: 'Abner Haynes', position: 'Running Back', years: '1960-1964' },
+      { number: '33', name: 'Stone Johnson', position: 'Running Back', years: '1963' },
+      { number: '36', name: 'Mack Lee Hill', position: 'Running Back', years: '1964-1965' },
+      { number: '58', name: 'Derrick Thomas', position: 'Linebacker', years: '1989-1999' },
+      { number: '63', name: 'Willie Lanier', position: 'Linebacker', years: '1967-1977' },
+      { number: '78', name: 'Bobby Bell', position: 'Linebacker', years: '1963-1974' },
+      { number: '86', name: 'Buck Buchanan', position: 'Defensive Tackle', years: '1963-1975' }
     ],
-    hallOfFamers: [
-      { name: "Julius Erving", yearInducted: "1993", category: "Player", role: "F", yearsWithTeam: "1973-1976" },
-      { name: "Rick Barry", yearInducted: "1987", category: "Player", role: "F", yearsWithTeam: "1970-1972" },
-      { name: "Drazen Petrovic", yearInducted: "2002", category: "Player", role: "G", yearsWithTeam: "1991-1993" },
-      { name: "Jason Kidd", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "2001-2008" },
-      { name: "Vince Carter", yearInducted: "2024", category: "Player", role: "G/F", yearsWithTeam: "2004-2009" },
-      { name: "Kevin Garnett", yearInducted: "2020", category: "Player", role: "F", yearsWithTeam: "2013-2015" },
-      { name: "Paul Pierce", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "2013-2014" }
+    stadiumHistory: [
+      { name: 'Municipal Stadium', years: '1963–1971', description: 'Shared with Kansas City Athletics' },
+      { name: 'Arrowhead Stadium', years: '1972–present', description: 'Home of the loudest crowd in the NFL • Part of the Truman Sports Complex', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'IV, LIV, LVII, LVIII', count: 4 },
+      { title: 'AFC Championships', description: 'Most recent: 2023', count: 6 },
+      { title: 'Division Titles', description: 'Most recent: 2023', count: 16 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 25 }
     ]
   },
-  'charlotte-hornets': {
-    founded: '1988',
-    capacity: '19,077',
-    owner: 'Rick Schnall & Gabe Plotkin',
-    championships: '0',
-    conferenceChampionships: '0',
-    divisionTitles: '0',
-    playoffAppearances: '10',
-    mostRecentPlayoffAppearance: '2016',
+
+  'green-bay-packers': {
+    founded: '1919',
+    stadium: 'Lambeau Field',
+    capacity: '81,441',
+    location: 'Green Bay, WI',
+    owner: 'Public Corporation',
+    conference: 'NFC',
+    division: 'NFC North',
+    superbowlWins: 4,
+    superbowlAppearances: ['1966 (I)', '1967 (II)', '1996 (XXXI)', '2010 (XLV)'],
+    conferenceChampionships: 11,
+    divisionTitles: 22,
+    playoffAppearances: 36,
     retiredNumbers: [
-      { number: '13', name: 'Bobby Phills', position: 'G', years: '1997-2000' }
+      { number: '3', name: 'Tony Canadeo', position: 'Running Back', years: '1941-1944, 1946-1952' },
+      { number: '4', name: 'Brett Favre', position: 'Quarterback', years: '1992-2007' },
+      { number: '12', name: 'Aaron Rodgers', position: 'Quarterback', years: '2005-2022' },
+      { number: '14', name: 'Don Hutson', position: 'End', years: '1935-1945' },
+      { number: '15', name: 'Bart Starr', position: 'Quarterback', years: '1956-1971' },
+      { number: '66', name: 'Ray Nitschke', position: 'Linebacker', years: '1958-1972' },
+      { number: '92', name: 'Reggie White', position: 'Defensive End', years: '1993-1998' }
     ],
-    hallOfFamers: [
-      { name: "Alonzo Mourning", yearInducted: "2014", category: "Player", role: "C", yearsWithTeam: "1992-1995" },
-      { name: "Robert Parish", yearInducted: "2003", category: "Player", role: "C", yearsWithTeam: "1994-1996" }
+    stadiumHistory: [
+      { name: 'Hagemeister Park', years: '1919–1922', description: 'Original home venue' },
+      { name: 'Bellevue Park', years: '1923–1924', description: 'Early home in Green Bay' },
+      { name: 'City Stadium', years: '1925–1956', description: 'First proper stadium' },
+      { name: 'Lambeau Field', years: '1957–present', description: 'The Frozen Tundra • Historic venue named after founder Curly Lambeau', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'I, II, XXXI, XLV', count: 4 },
+      { title: 'NFL Championships', description: '13 total championships (pre-Super Bowl era)', count: 13 },
+      { title: 'NFC Championships', description: 'Most recent: 2010', count: 5 },
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 22 }
     ]
   },
-  'chicago-bulls': {
-    founded: '1966',
-    capacity: '20,917',
-    owner: 'Jerry Reinsdorf',
-    championships: '6',
-    championshipYears: ['1991', '1992', '1993', '1996', '1997', '1998'],
-    conferenceChampionships: '6',
-    mostRecentConferenceChampionship: '2011',
-    divisionTitles: '9',
-    mostRecentDivisionTitle: '2012',
-    playoffAppearances: '35',
-    mostRecentPlayoffAppearance: '2022',
+
+  'new-england-patriots': {
+    founded: '1960',
+    stadium: 'Gillette Stadium',
+    capacity: '65,878',
+    location: 'Foxborough, MA',
+    owner: 'Robert Kraft',
+    conference: 'AFC',
+    division: 'AFC East',
+    superbowlWins: 6,
+    superbowlAppearances: ['1985 (XX)', '1996 (XXXI)', '2001 (XXXVI)', '2003 (XXXVIII)', '2004 (XXXIX)', '2007 (XLII)', '2011 (XLVI)', '2014 (XLIX)', '2016 (LI)', '2017 (LII)', '2018 (LIII)'],
+    conferenceChampionships: 13,
+    divisionTitles: 22,
+    playoffAppearances: 31,
     retiredNumbers: [
-      { number: '4', name: 'Jerry Sloan', position: 'G', years: '1966-1976' },
-      { number: '10', name: 'Bob Love', position: 'F', years: '1968-1976' },
-      { number: '23', name: 'Michael Jordan', position: 'G', years: '1984-1998' },
-      { number: '33', name: 'Scottie Pippen', position: 'F', years: '1987-1998' }
+      { number: '12', name: 'Tom Brady', position: 'Quarterback', years: '2000-2019' },
+      { number: '20', name: 'Gino Cappelletti', position: 'Wide Receiver/Kicker', years: '1960-1970' },
+      { number: '40', name: 'Mike Haynes', position: 'Cornerback', years: '1976-1982' },
+      { number: '57', name: 'Steve Nelson', position: 'Linebacker', years: '1974-1987' },
+      { number: '73', name: 'John Hannah', position: 'Guard', years: '1973-1985' },
+      { number: '78', name: 'Bruce Armstrong', position: 'Tackle', years: '1987-2000' },
+      { number: '79', name: 'Jim Lee Hunt', position: 'Defensive Tackle', years: '1960-1971' },
+      { number: '89', name: 'Bob Dee', position: 'Defensive End', years: '1960-1967' }
     ],
-    hallOfFamers: [
-      { name: "Michael Jordan", yearInducted: "2009", category: "Player", role: "G", yearsWithTeam: "1984-1993, 1995-1998" },
-      { name: "Scottie Pippen", yearInducted: "2010", category: "Player", role: "F", yearsWithTeam: "1987-1998, 2003-2004" },
-      { name: "Dennis Rodman", yearInducted: "2011", category: "Player", role: "F", yearsWithTeam: "1995-1998" },
-      { name: "Bob Love", yearInducted: "N/A", category: "Player", role: "F", yearsWithTeam: "1968-1976" },
-      { name: "Jerry Sloan", yearInducted: "2009", category: "Coach", role: "Player", yearsWithTeam: "1966-1976" },
-      { name: "Artis Gilmore", yearInducted: "2011", category: "Player", role: "C", yearsWithTeam: "1976-1982, 1987" },
-      { name: "Dick Motta", yearInducted: "N/A", category: "Coach", role: "Head Coach", yearsWithTeam: "1968-1976" },
-      { name: "Phil Jackson", yearInducted: "2007", category: "Coach", role: "Head Coach", yearsWithTeam: "1989-1998" },
-      { name: "Jerry Krause", yearInducted: "2017", category: "Contributor", role: "GM", yearsWithTeam: "1985-2003" },
-      { name: "Jerry Reinsdorf", yearInducted: "2016", category: "Contributor", role: "Owner", yearsWithTeam: "1985-present" },
-      { name: "Toni Kukoc", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "1993-2000" },
-      { name: "Bob Boozer", yearInducted: "N/A", category: "Player", role: "F", yearsWithTeam: "1966-1969" }
+    stadiumHistory: [
+      { name: 'Boston University Field', years: '1960–1962', description: 'Original home as Boston Patriots' },
+      { name: 'Fenway Park', years: '1963–1968', description: 'Shared with Boston Red Sox' },
+      { name: 'Alumni Stadium', years: '1969', description: 'Boston College campus' },
+      { name: 'Harvard Stadium', years: '1970', description: 'Harvard University venue' },
+      { name: 'Schaefer Stadium/Foxboro Stadium', years: '1971–2001', description: 'First dedicated home in Foxborough' },
+      { name: 'Gillette Stadium', years: '2002–present', description: 'State-of-the-art facility • Home of the Patriots dynasty', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XXXVI, XXXVIII, XXXIX, XLIX, LI, LIII', count: 6 },
+      { title: 'AFC Championships', description: 'Most recent: 2018', count: 13 },
+      { title: 'Division Titles', description: 'Most recent: 2019', count: 22 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2021', count: 31 }
     ]
   },
-  'cleveland-cavaliers': {
-    founded: '1970',
-    capacity: '19,432',
-    owner: 'Dan Gilbert',
-    championships: '1',
-    championshipYears: ['2016'],
-    conferenceChampionships: '5',
-    mostRecentConferenceChampionship: '2018',
-    divisionTitles: '7',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '23',
-    mostRecentPlayoffAppearance: '2025',
+
+  'atlanta-falcons': {
+    founded: '1965',
+    stadium: 'Mercedes-Benz Stadium',
+    capacity: '71,000',
+    location: 'Atlanta, GA',
+    owner: 'Arthur M. Blank',
+    conference: 'NFC',
+    division: 'NFC South',
+    superbowlWins: 0,
+    superbowlAppearances: ['1998 (XXXIII)', '2016 (LI)'],
+    conferenceChampionships: 2,
+    divisionTitles: 6,
+    playoffAppearances: 14,
     retiredNumbers: [
-      { number: '7', name: 'Bingo Smith', position: 'F', years: '1970-1979' },
-      { number: '11', name: 'Zydrunas Ilgauskas', position: 'C', years: '1996-2010' },
-      { number: '22', name: 'Larry Nance', position: 'F', years: '1988-1994' },
-      { number: '25', name: 'Mark Price', position: 'G', years: '1986-1995' },
-      { number: '34', name: 'Austin Carr', position: 'G', years: '1971-1980' },
-      { number: '42', name: 'Nate Thurmond', position: 'C', years: '1975-1977' },
-      { number: '43', name: 'Brad Daugherty', position: 'C', years: '1986-1994' }
+      { number: '10', name: 'Steve Bartkowski', position: 'Quarterback', years: '1975-1985' },
+      { number: '31', name: 'William Andrews', position: 'Running Back', years: '1979-1983' },
+      { number: '57', name: 'Jeff Van Note', position: 'Center', years: '1969-1986' },
+      { number: '58', name: 'Jessie Tuggle', position: 'Linebacker', years: '1987-2000' },
+      { number: '60', name: 'Tommy Nobis', position: 'Linebacker', years: '1966-1976' }
     ],
-    hallOfFamers: [
-      { name: "Nate Thurmond", yearInducted: "1985", category: "Player", role: "C", yearsWithTeam: "1975-1977" },
-      { name: "Walt Frazier", yearInducted: "1987", category: "Player", role: "G", yearsWithTeam: "1977-1979" },
-      { name: "Bill Fitch", yearInducted: "2019", category: "Coach", role: "Head Coach", yearsWithTeam: "1970-1979" },
-      { name: "Lenny Wilkens", yearInducted: "1998", category: "Coach", role: "Head Coach", yearsWithTeam: "1986-1993" },
-      { name: "Shaquille O'Neal", yearInducted: "2016", category: "Player", role: "C", yearsWithTeam: "2009-2010" }
+    stadiumHistory: [
+      { name: 'Atlanta-Fulton County Stadium', years: '1966–1991', description: 'Original home, shared with Atlanta Braves' },
+      { name: 'Georgia Dome', years: '1992–2016', description: '25 seasons in the iconic domed stadium' },
+      { name: 'Mercedes-Benz Stadium', years: '2017–present', description: 'State-of-the-art retractable roof stadium • Hosted Super Bowl LIII', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Appearances', description: 'XXXIII (1998), LI (2016)', count: 2 },
+      { title: 'NFC Championships', description: '1998, 2016', count: 2 },
+      { title: 'Division Titles', description: 'Most recent: 2016', count: 6 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2017', count: 14 }
     ]
   },
-  'dallas-mavericks': {
-    founded: '1980',
-    capacity: '19,200',
-    owner: 'Patrick Dumont & Miriam Adelson',
-    championships: '1',
-    championshipYears: ['2011'],
-    conferenceChampionships: '3',
-    mostRecentConferenceChampionship: '2024',
-    divisionTitles: '5',
-    mostRecentDivisionTitle: '2024',
-    playoffAppearances: '24',
-    mostRecentPlayoffAppearance: '2025',
+
+  'baltimore-ravens': {
+    founded: '1996',
+    stadium: 'M&T Bank Stadium',
+    capacity: '71,008',
+    location: 'Baltimore, MD',
+    owner: 'Steve Bisciotti',
+    conference: 'AFC',
+    division: 'AFC North',
+    superbowlWins: 2,
+    superbowlAppearances: ['2000 (XXXV)', '2012 (XLVII)'],
+    conferenceChampionships: 2,
+    divisionTitles: 6,
+    playoffAppearances: 15,
     retiredNumbers: [
-      { number: '12', name: 'Derek Harper', position: 'G', years: '1983-1997' },
-      { number: '15', name: 'Brad Davis', position: 'G', years: '1980-1992' },
-      { number: '22', name: 'Rolando Blackman', position: 'G', years: '1981-1992' },
-      { number: '24', name: 'Kobe Bryant', position: 'Honorary, Never played for Dallas', years: '' },
-      { number: '41', name: 'Dirk Nowitzki', position: 'F', years: '1999-2019' }
+      { number: '19', name: 'Johnny Unitas', position: 'Quarterback', years: 'Honored Baltimore legend' },
+      { number: '20', name: 'Ed Reed', position: 'Safety', years: '2002-2012' },
+      { number: '52', name: 'Ray Lewis', position: 'Linebacker', years: '1996-2012' },
+      { number: '75', name: 'Jonathan Ogden', position: 'Tackle', years: '1996-2007' }
     ],
-    hallOfFamers: [
-      { name: "Dirk Nowitzki", yearInducted: "2023", category: "Player", role: "F", yearsWithTeam: "1998-2019" },
-      { name: "Jason Kidd", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "1994-1996, 2008-2012" },
-      { name: "Steve Nash", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "1998-2004" },
-      { name: "Dennis Rodman", yearInducted: "2011", category: "Player", role: "F", yearsWithTeam: "2000" }
+    stadiumHistory: [
+      { name: 'Memorial Stadium', years: '1996–1997', description: 'Temporary home while M&T Bank Stadium was built' },
+      { name: 'M&T Bank Stadium', years: '1998–present', description: 'Ravens Stadium • Home of championship teams', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XXXV (2000), XLVII (2012)', count: 2 },
+      { title: 'AFC Championships', description: '2000, 2012', count: 2 },
+      { title: 'Division Titles', description: 'Most recent: 2019', count: 6 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 15 }
     ]
   },
-  'denver-nuggets': {
-    founded: '1967',
-    capacity: '19,520',
-    owner: 'Stan Kroenke',
-    championships: '1',
-    championshipYears: ['2023'],
-    conferenceChampionships: '1',
-    mostRecentConferenceChampionship: '2023',
-    divisionTitles: '11',
-    mostRecentDivisionTitle: '2024',
-    playoffAppearances: '38',
-    mostRecentPlayoffAppearance: '2025',
+
+  'buffalo-bills': {
+    founded: '1960',
+    stadium: 'Highmark Stadium',
+    capacity: '71,608',
+    location: 'Orchard Park, NY',
+    owner: 'Terry and Kim Pegula',
+    conference: 'AFC',
+    division: 'AFC East',
+    superbowlWins: 0,
+    superbowlAppearances: ['1990 (XXV)', '1991 (XXVI)', '1992 (XXVII)', '1993 (XXVIII)'],
+    conferenceChampionships: 4,
+    divisionTitles: 12,
+    playoffAppearances: 22,
     retiredNumbers: [
-      { number: '2', name: 'Alex English', position: 'F', years: '1980-1990' },
-      { number: '12', name: 'Fat Lever', position: 'G', years: '1984-1990' },
-      { number: '33', name: 'David Thompson', position: 'G', years: '1975-1982' },
-      { number: '40', name: 'Byron Beck', position: 'F', years: '1967-1977' },
-      { number: '44', name: 'Dan Issel', position: 'C/F', years: '1975-1985' },
-      { number: '55', name: 'Dikembe Mutombo', position: 'C', years: '1991-1996' },
-      { number: '432', name: 'Doug Moe', position: 'Coach', years: '1980-1990' }
+      { number: '12', name: 'Jim Kelly', position: 'Quarterback', years: '1986-1996' },
+      { number: '34', name: 'Thurman Thomas', position: 'Running Back', years: '1988-1999' },
+      { number: '78', name: 'Bruce Smith', position: 'Defensive End', years: '1985-1999' }
     ],
-    hallOfFamers: [
-      { name: "Alex English", yearInducted: "1997", category: "Player", role: "F", yearsWithTeam: "1980-1990" },
-      { name: "Dan Issel", yearInducted: "1993", category: "Player", role: "F/C", yearsWithTeam: "1975-1985" },
-      { name: "David Thompson", yearInducted: "1996", category: "Player", role: "G/F", yearsWithTeam: "1975-1982" },
-      { name: "Dikembe Mutombo", yearInducted: "2015", category: "Player", role: "C", yearsWithTeam: "1991-1996" },
-      { name: "Carmelo Anthony", yearInducted: "2025", category: "Player", role: "F", yearsWithTeam: "2003-2011" },
-      { name: "Allen Iverson", yearInducted: "2016", category: "Player", role: "G", yearsWithTeam: "2006-2008" },
-      { name: "George Karl", yearInducted: "2022", category: "Coach", role: "Head Coach", yearsWithTeam: "2005-2013" },
-      { name: "Larry Brown", yearInducted: "2002", category: "Coach", role: "Head Coach", yearsWithTeam: "1974-1979" },
-      { name: "Doug Moe", yearInducted: "N/A", category: "Coach", role: "Head Coach", yearsWithTeam: "1980-1990" }
-    ]
-  },
-  'detroit-pistons': {
-    founded: '1941',
-    capacity: '20,332',
-    owner: 'Tom Gores',
-    championships: '3',
-    championshipYears: ['1989', '1990', '2004'],
-    conferenceChampionships: '7',
-    mostRecentConferenceChampionship: '2008',
-    divisionTitles: '11',
-    mostRecentDivisionTitle: '2008',
-    playoffAppearances: '42',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '1', name: 'Chauncey Billups', position: 'G', years: '2002-2008' },
-      { number: '3', name: 'Ben Wallace', position: 'C', years: '2000-2006' },
-      { number: '4', name: 'Joe Dumars', position: 'G', years: '1985-1999' },
-      { number: '10', name: 'Dennis Rodman', position: 'F', years: '1986-1993' },
-      { number: '11', name: 'Isiah Thomas', position: 'G', years: '1981-1994' },
-      { number: '15', name: 'Vinnie Johnson', position: 'G', years: '1981-1991' },
-      { number: '16', name: 'Bob Lanier', position: 'C', years: '1970-1980' },
-      { number: '21', name: 'Dave Bing', position: 'G', years: '1966-1975' },
-      { number: '32', name: 'Richard Hamilton', position: 'G', years: '2002-2011' },
-      { number: '40', name: 'Bill Laimbeer', position: 'C', years: '1982-1993' }
+    stadiumHistory: [
+      { name: 'War Memorial Stadium', years: '1960–1972', description: 'Original home in Buffalo' },
+      { name: 'Rich Stadium', years: '1973–1998', description: 'Moved to Orchard Park suburb' },
+      { name: 'Ralph Wilson Stadium', years: '1999–2015', description: 'Named after founder Ralph Wilson' },
+      { name: 'New Era Field', years: '2016–2019', description: 'Naming rights partnership' },
+      { name: 'Bills Stadium', years: '2020–2022', description: 'Temporary name during pandemic' },
+      { name: 'Highmark Stadium', years: '2023–present', description: 'Current naming rights • New stadium planned for 2026', isCurrent: true }
     ],
-    hallOfFamers: [
-      { name: "Isiah Thomas", yearInducted: "2000", category: "Player", role: "G", yearsWithTeam: "1981-1994" },
-      { name: "Joe Dumars", yearInducted: "2006", category: "Player", role: "G", yearsWithTeam: "1985-1999" },
-      { name: "Dennis Rodman", yearInducted: "2011", category: "Player", role: "F", yearsWithTeam: "1986-1993" },
-      { name: "Bob Lanier", yearInducted: "1992", category: "Player", role: "C", yearsWithTeam: "1970-1980" },
-      { name: "Dave Bing", yearInducted: "1990", category: "Player", role: "G", yearsWithTeam: "1966-1975" },
-      { name: "Grant Hill", yearInducted: "2018", category: "Player", role: "F", yearsWithTeam: "1994-2000" },
-      { name: "Chuck Daly", yearInducted: "1994", category: "Coach", role: "Head Coach", yearsWithTeam: "1983-1992" },
-      { name: "Dave DeBusschere", yearInducted: "1983", category: "Player", role: "F", yearsWithTeam: "1962-1968" },
-      { name: "Bailey Howell", yearInducted: "1997", category: "Player", role: "F", yearsWithTeam: "1959-1964" },
-      { name: "Bill Davidson", yearInducted: "2008", category: "Contributor", role: "Owner", yearsWithTeam: "1974-2009" },
-      { name: "Ben Wallace", yearInducted: "2021", category: "Player", role: "C/F", yearsWithTeam: "2000-2006, 2009-2012" },
-      { name: "George Yardley", yearInducted: "1996", category: "Player", role: "F", yearsWithTeam: "1953-1959" },
-      { name: "Bob McAdoo", yearInducted: "2000", category: "Player", role: "C/F", yearsWithTeam: "1979-1981" },
-      { name: "Adrian Dantley", yearInducted: "2008", category: "Player", role: "F", yearsWithTeam: "1986-1989" }
+    achievements: [
+      { title: 'AFL Championships', description: '1964, 1965 (pre-Super Bowl)', count: 2 },
+      { title: 'AFC Championships', description: '4 consecutive (1990-1993)', count: 4 },
+      { title: 'Division Titles', description: 'Most recent: 2023', count: 12 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 22 }
     ]
   },
-  'golden-state-warriors': {
-    founded: '1946',
-    capacity: '18,064',
-    owner: 'Joe Lacob & Peter Guber',
-    championships: '7',
-    championshipYears: ['1947', '1956', '1975', '2015', '2017', '2018', '2022'],
-    conferenceChampionships: '12',
-    mostRecentConferenceChampionship: '2022',
-    divisionTitles: '12',
-    mostRecentDivisionTitle: '2022',
-    playoffAppearances: '39',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '9', name: 'Andre Iguodala', position: 'G/F', years: '2013-2019' },
-      { number: '13', name: 'Wilt Chamberlain', position: 'C', years: '1959-1965' },
-      { number: '14', name: 'Tom Meschery', position: 'F', years: '1961-1971' },
-      { number: '16', name: 'Al Attles', position: 'G/Coach', years: '1960-1983' },
-      { number: '17', name: 'Chris Mullin', position: 'F', years: '1985-1997' },
-      { number: '24', name: 'Rick Barry', position: 'F', years: '1965-1978' },
-      { number: '42', name: 'Nate Thurmond', position: 'C', years: '1963-1974' }
-    ],
-    hallOfFamers: [
-      { name: "Wilt Chamberlain", yearInducted: "1979", category: "Player", role: "C", yearsWithTeam: "1959-1965" },
-      { name: "Rick Barry", yearInducted: "1987", category: "Player", role: "F", yearsWithTeam: "1965-1967, 1972-1978" },
-      { name: "Paul Arizin", yearInducted: "1978", category: "Player", role: "F", yearsWithTeam: "1950-1962" },
-      { name: "Joe Fulks", yearInducted: "1978", category: "Player", role: "F", yearsWithTeam: "1946-1954" },
-      { name: "Neil Johnston", yearInducted: "1990", category: "Player", role: "C", yearsWithTeam: "1951-1959" },
-      { name: "Nate Thurmond", yearInducted: "1985", category: "Player", role: "C", yearsWithTeam: "1963-1974" },
-      { name: "Chris Mullin", yearInducted: "2011", category: "Player", role: "F", yearsWithTeam: "1985-1997, 2000-2001" },
-      { name: "Tom Gola", yearInducted: "1976", category: "Player", role: "G/F", yearsWithTeam: "1955-1962" },
-      { name: "Al Attles", yearInducted: "2019", category: "Contributor", role: "Player/Coach", yearsWithTeam: "1960-1983" },
-      { name: "Jamaal Wilkes", yearInducted: "2012", category: "Player", role: "F", yearsWithTeam: "1974-1977" },
-      { name: "Andy Phillip", yearInducted: "1961", category: "Player", role: "G", yearsWithTeam: "1952-1956" },
-      { name: "Robert Parish", yearInducted: "2003", category: "Player", role: "C", yearsWithTeam: "1976-1980" }
-    ]
-  },
-  'houston-rockets': {
-    founded: '1967',
-    capacity: '18,055',
-    owner: 'Tilman Fertitta',
-    championships: '2',
-    championshipYears: ['1994', '1995'],
-    conferenceChampionships: '4',
-    mostRecentConferenceChampionship: '2018',
-    divisionTitles: '8',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '33',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '11', name: 'Yao Ming', position: 'C', years: '2002-2011' },
-      { number: '22', name: 'Clyde Drexler', position: 'G', years: '1995-1998' },
-      { number: '23', name: 'Calvin Murphy', position: 'G', years: '1970-1983' },
-      { number: '24', name: 'Moses Malone', position: 'C', years: '1976-1982' },
-      { number: '34', name: 'Hakeem Olajuwon', position: 'C', years: '1984-2001' },
-      { number: '44', name: 'Elvin Hayes', position: 'F/C', years: '1968-1972' },
-      { number: '45', name: 'Rudy Tomjanovich', position: 'F', years: '1970-1981' }
-    ],
-    hallOfFamers: [
-      { name: "Hakeem Olajuwon", yearInducted: "2008", category: "Player", role: "C", yearsWithTeam: "1984-2001" },
-      { name: "Moses Malone", yearInducted: "2001", category: "Player", role: "C", yearsWithTeam: "1976-1982" },
-      { name: "Clyde Drexler", yearInducted: "2004", category: "Player", role: "G", yearsWithTeam: "1995-1998" },
-      { name: "Elvin Hayes", yearInducted: "1990", category: "Player", role: "F/C", yearsWithTeam: "1968-1972, 1981-1984" },
-      { name: "Calvin Murphy", yearInducted: "1993", category: "Player", role: "G", yearsWithTeam: "1970-1983" },
-      { name: "Yao Ming", yearInducted: "2016", category: "Player", role: "C", yearsWithTeam: "2002-2011" },
-      { name: "Rudy Tomjanovich", yearInducted: "2020", category: "Coach", role: "Head Coach", yearsWithTeam: "1992-2003" },
-      { name: "Tracy McGrady", yearInducted: "2017", category: "Player", role: "F/G", yearsWithTeam: "2004-2010" },
-      { name: "Scottie Pippen", yearInducted: "2010", category: "Player", role: "F", yearsWithTeam: "1998-1999" },
-      { name: "Charles Barkley", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1996-2000" },
-      { name: "Ralph Sampson", yearInducted: "2012", category: "Player", role: "C", yearsWithTeam: "1983-1987" },
-      { name: "Dikembe Mutombo", yearInducted: "2015", category: "Player", role: "C", yearsWithTeam: "2004-2009" },
-      { name: "Steve Nash", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "2004" }
-    ]
-  },
-  'indiana-pacers': {
-    founded: '1967',
-    capacity: '17,923',
-    owner: 'Herbert Simon',
-    championships: '0',
-    conferenceChampionships: '1',
-    mostRecentConferenceChampionship: '2025',
-    divisionTitles: '9',
-    mostRecentDivisionTitle: '2014',
-    playoffAppearances: '28',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '30', name: 'George McGinnis', position: 'F', years: '1971-1982' },
-      { number: '31', name: 'Reggie Miller', position: 'G', years: '1987-2005' },
-      { number: '34', name: 'Mel Daniels', position: 'C', years: '1968-1974' },
-      { number: '35', name: 'Roger Brown', position: 'F', years: '1967-1975' },
-      { number: '529', name: 'Bobby Leonard', position: 'Coach', years: '1968-1980' }
-    ],
-    hallOfFamers: [
-      { name: "Reggie Miller", yearInducted: "2012", category: "Player", role: "G", yearsWithTeam: "1987-2005" },
-      { name: "Mel Daniels", yearInducted: "2012", category: "Player", role: "C/F", yearsWithTeam: "1968-1974" },
-      { name: "George McGinnis", yearInducted: "2017", category: "Player", role: "F", yearsWithTeam: "1971-1975, 1980-1982" },
-      { name: "Roger Brown", yearInducted: "2013", category: "Player", role: "F", yearsWithTeam: "1967-1975" },
-      { name: "Bob Leonard", yearInducted: "2014", category: "Coach", role: "Head Coach", yearsWithTeam: "1968-1980" },
-      { name: "Larry Brown", yearInducted: "2002", category: "Coach", role: "Head Coach", yearsWithTeam: "1993-1997" },
-      { name: "Herb Simon", yearInducted: "2024", category: "Contributor", role: "Owner", yearsWithTeam: "1983-present" },
-      { name: "Jermaine O'Neal", yearInducted: "N/A", category: "Player", role: "F/C", yearsWithTeam: "2000-2008" }
-    ]
-  },
-  'los-angeles-clippers': {
-    founded: '1970',
-    capacity: '18,000',
-    owner: 'Steve Ballmer',
-    championships: '0',
-    conferenceChampionships: '0',
-    divisionTitles: '2',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '18',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [],
-    hallOfFamers: [
-      { name: "Bob McAdoo", yearInducted: "2000", category: "Player", role: "C/F", yearsWithTeam: "1972-1976" },
-      { name: "Tiny Archibald", yearInducted: "1991", category: "Player", role: "G", yearsWithTeam: "1970-1976" },
-      { name: "Gary Payton", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "2002-2003" },
-      { name: "Dominique Wilkins", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1994" },
-      { name: "Adrian Dantley", yearInducted: "2008", category: "Player", role: "F", yearsWithTeam: "1976-1977" }
-    ]
-  },
-  'los-angeles-lakers': {
-    founded: '1947',
-    capacity: '18,997',
-    owner: 'Jeanie Buss',
-    championships: '17',
-    championshipYears: ['1949', '1950', '1952', '1953', '1954', '1972', '1980', '1982', '1985', '1987', '1988', '2000', '2001', '2002', '2009', '2010', '2020'],
-    conferenceChampionships: '32',
-    mostRecentConferenceChampionship: '2020',
-    divisionTitles: '24',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '62',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '8', name: 'Kobe Bryant', position: 'G', years: '1996-2006' },
-      { number: '13', name: 'Wilt Chamberlain', position: 'C', years: '1968-1973' },
-      { number: '16', name: 'Pau Gasol', position: 'F', years: '2008-2014' },
-      { number: '21', name: 'Michael Cooper', position: 'G', years: '1978-1990' },
-      { number: '22', name: 'Elgin Baylor', position: 'F', years: '1958-1972' },
-      { number: '24', name: 'Kobe Bryant', position: 'G', years: '2006-2016' },
-      { number: '25', name: 'Gail Goodrich', position: 'G', years: '1965-1976' },
-      { number: '32', name: 'Magic Johnson', position: 'G', years: '1979-1996' },
-      { number: '33', name: 'Kareem Abdul-Jabbar', position: 'C', years: '1975-1989' },
-      { number: '34', name: 'Shaquille O\'Neal', position: 'C', years: '1996-2004' },
-      { number: '42', name: 'James Worthy', position: 'F', years: '1982-1994' },
-      { number: '44', name: 'Jerry West', position: 'G', years: '1960-1974' },
-      { number: '52', name: 'Jamaal Wilkes', position: 'F', years: '1977-1985' },
-      { number: '99', name: 'George Mikan', position: 'C', years: '1948-1956' }
-    ],
-    hallOfFamers: [
-      { name: "Kareem Abdul-Jabbar", yearInducted: "1995", category: "Player", role: "C", yearsWithTeam: "1975-1989" },
-      { name: "Magic Johnson", yearInducted: "2002", category: "Player", role: "G", yearsWithTeam: "1979-1991, 1996" },
-      { name: "Shaquille O'Neal", yearInducted: "2016", category: "Player", role: "C", yearsWithTeam: "1996-2004" },
-      { name: "Jerry West", yearInducted: "1980", category: "Player", role: "G", yearsWithTeam: "1960-1974" },
-      { name: "Jerry West", yearInducted: "2024", category: "Contributor", role: "Executive", yearsWithTeam: "1982-2002" },
-      { name: "Elgin Baylor", yearInducted: "1977", category: "Player", role: "F", yearsWithTeam: "1958-1971" },
-      { name: "Wilt Chamberlain", yearInducted: "1979", category: "Player", role: "C", yearsWithTeam: "1968-1973" },
-      { name: "James Worthy", yearInducted: "2003", category: "Player", role: "F", yearsWithTeam: "1982-1994" },
-      { name: "Kobe Bryant", yearInducted: "2020", category: "Player", role: "G", yearsWithTeam: "1996-2016" },
-      { name: "Gail Goodrich", yearInducted: "1996", category: "Player", role: "G", yearsWithTeam: "1965-1968, 1970-1976" },
-      { name: "Phil Jackson", yearInducted: "2007", category: "Coach", role: "Head Coach", yearsWithTeam: "1999-2004, 2005-2011" },
-      { name: "Pat Riley", yearInducted: "2008", category: "Coach", role: "Head Coach", yearsWithTeam: "1981-1990" },
-      { name: "Jerry Buss", yearInducted: "2010", category: "Contributor", role: "Owner", yearsWithTeam: "1979-2013" },
-      { name: "Jamaal Wilkes", yearInducted: "2012", category: "Player", role: "F", yearsWithTeam: "1977-1985" },
-      { name: "Gary Payton", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "2003-2004" },
-      { name: "Dennis Rodman", yearInducted: "2011", category: "Player", role: "F", yearsWithTeam: "1999" },
-      { name: "Bob McAdoo", yearInducted: "2000", category: "Player", role: "C/F", yearsWithTeam: "1981-1985" },
-      { name: "Mitch Richmond", yearInducted: "2014", category: "Player", role: "G", yearsWithTeam: "2001-2002" },
-      { name: "Clyde Lovellette", yearInducted: "1988", category: "Player", role: "C", yearsWithTeam: "1953-1957" },
-      { name: "George Mikan", yearInducted: "1959", category: "Player", role: "C", yearsWithTeam: "1948-1956" },
-      { name: "Vern Mikkelsen", yearInducted: "1995", category: "Player", role: "F", yearsWithTeam: "1949-1959" },
-      { name: "Jim Pollard", yearInducted: "1978", category: "Player", role: "F", yearsWithTeam: "1948-1955" },
-      { name: "Slater Martin", yearInducted: "1982", category: "Player", role: "G", yearsWithTeam: "1949-1956" },
-      { name: "Karl Malone", yearInducted: "2010", category: "Player", role: "F", yearsWithTeam: "2003-2004" },
-      { name: "Pau Gasol", yearInducted: "2023", category: "Player", role: "F/C", yearsWithTeam: "2008-2014" },
-      { name: "Dwight Howard", yearInducted: "2025", category: "Player", role: "C", yearsWithTeam: "2012-2013, 2019-2020" }
-    ]
-  },
-  'memphis-grizzlies': {
+
+  'carolina-panthers': {
     founded: '1995',
-    capacity: '17,794',
-    owner: 'Robert Pera',
-    championships: '0',
-    conferenceChampionships: '0',
-    divisionTitles: '3',
-    mostRecentDivisionTitle: '2023',
-    playoffAppearances: '13',
-    mostRecentPlayoffAppearance: '2025',
+    stadium: 'Bank of America Stadium',
+    capacity: '75,523',
+    location: 'Charlotte, NC',
+    owner: 'David Tepper',
+    conference: 'NFC',
+    division: 'NFC South',
+    superbowlWins: 0,
+    superbowlAppearances: ['2003 (XXXVIII)', '2015 (50)'],
+    conferenceChampionships: 2,
+    divisionTitles: 6,
+    playoffAppearances: 8,
     retiredNumbers: [
-      { number: '9', name: 'Tony Allen', position: 'G/F', years: '2010-2017' },
-      { number: '33', name: 'Marc Gasol', position: 'C', years: '2008-2019' },
-      { number: '50', name: 'Zach Randolph', position: 'F', years: '2009-2017' }
+      { number: '51', name: 'Sam Mills', position: 'Linebacker', years: '1995-1997' },
+      { number: '89', name: 'Steve Smith Sr.', position: 'Wide Receiver', years: '2001-2013' }
     ],
-    hallOfFamers: [
-      { name: "Pau Gasol", yearInducted: "2023", category: "Player", role: "F/C", yearsWithTeam: "2001-2008" },
-      { name: "Shareef Abdur-Rahim", yearInducted: "N/A", category: "Player", role: "F", yearsWithTeam: "1996-2001" }
+    stadiumHistory: [
+      { name: 'Memorial Stadium (Clemson)', years: '1995', description: 'Inaugural season while Charlotte stadium was completed' },
+      { name: 'Bank of America Stadium', years: '1996–present', description: 'Panthers permanent home in uptown Charlotte', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Appearances', description: 'XXXVIII (2003), 50 (2015)', count: 2 },
+      { title: 'NFC Championships', description: '2003, 2015', count: 2 },
+      { title: 'Division Titles', description: 'Most recent: 2015', count: 6 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2017', count: 8 }
     ]
   },
-  'miami-heat': {
-    founded: '1988',
-    capacity: '19,600',
-    owner: 'Micky Arison',
-    championships: '3',
-    championshipYears: ['2006', '2012', '2013'],
-    conferenceChampionships: '7',
-    mostRecentConferenceChampionship: '2023',
-    divisionTitles: '16',
-    mostRecentDivisionTitle: '2023',
-    playoffAppearances: '24',
-    mostRecentPlayoffAppearance: '2025',
+
+  'chicago-bears': {
+    founded: '1920',
+    stadium: 'Soldier Field',
+    capacity: '61,500',
+    location: 'Chicago, IL',
+    owner: 'McCaskey Family',
+    conference: 'NFC',
+    division: 'NFC North',
+    superbowlWins: 1,
+    superbowlAppearances: ['1985 (XX)', '2006 (XLI)'],
+    conferenceChampionships: 4,
+    divisionTitles: 19,
+    playoffAppearances: 28,
     retiredNumbers: [
-      { number: '1', name: 'Chris Bosh', position: 'F/C', years: '2010-2016' },
-      { number: '3', name: 'Dwyane Wade', position: 'G', years: '2003-2016' },
-      { number: '10', name: 'Tim Hardaway', position: 'G', years: '1996-2001' },
-      { number: '23', name: 'Michael Jordan', position: 'Honorary, Never played for Heat', years: '' },
-      { number: '32', name: 'Shaquille O\'Neal', position: 'C', years: '2004-2008' },
-      { number: '33', name: 'Alonzo Mourning', position: 'C', years: '1995-2008' },
-      { number: '40', name: 'Udonis Haslem', position: 'F', years: '2003-2023' }
+      { number: '3', name: 'Bronko Nagurski', position: 'Fullback', years: '1930-1937, 1943' },
+      { number: '5', name: 'George McAfee', position: 'Halfback', years: '1940-1941, 1945-1950' },
+      { number: '7', name: 'George Halas', position: 'Founder/Coach', years: '1920-1967' },
+      { number: '28', name: 'Willie Galimore', position: 'Halfback', years: '1957-1963' },
+      { number: '34', name: 'Walter Payton', position: 'Running Back', years: '1975-1987' },
+      { number: '40', name: 'Gale Sayers', position: 'Running Back', years: '1965-1971' },
+      { number: '41', name: 'Brian Piccolo', position: 'Running Back', years: '1966-1969' },
+      { number: '42', name: 'Sid Luckman', position: 'Quarterback', years: '1939-1950' },
+      { number: '51', name: 'Dick Butkus', position: 'Linebacker', years: '1965-1973' },
+      { number: '56', name: 'Bill Hewitt', position: 'End', years: '1932-1936' },
+      { number: '61', name: 'Bill George', position: 'Linebacker', years: '1952-1965' },
+      { number: '66', name: 'Bulldog Turner', position: 'Center', years: '1940-1952' },
+      { number: '77', name: 'Red Grange', position: 'Halfback', years: '1925, 1929-1934' },
+      { number: '89', name: 'Mike Ditka', position: 'Tight End/Coach', years: '1961-1966, 1982-1992' }
     ],
-    hallOfFamers: [
-      { name: "Alonzo Mourning", yearInducted: "2014", category: "Player", role: "C", yearsWithTeam: "1995-2002, 2005-2008" },
-      { name: "Shaquille O'Neal", yearInducted: "2016", category: "Player", role: "C", yearsWithTeam: "2004-2008" },
-      { name: "Gary Payton", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "2005-2007" },
-      { name: "Ray Allen", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "2012-2014" },
-      { name: "Tim Hardaway", yearInducted: "2022", category: "Player", role: "G", yearsWithTeam: "1996-2001" },
-      { name: "Dwyane Wade", yearInducted: "2023", category: "Player", role: "G", yearsWithTeam: "2003-2016, 2018-2019" },
-      { name: "Chris Bosh", yearInducted: "2021", category: "Player", role: "F/C", yearsWithTeam: "2010-2016" },
-      { name: "Micky Arison", yearInducted: "2025", category: "Contributor", role: "Owner", yearsWithTeam: "1995-present" }
+    stadiumHistory: [
+      { name: 'Staley Field', years: '1920', description: 'Original home in Decatur, Illinois' },
+      { name: 'Cubs Park/Wrigley Field', years: '1921–1970', description: 'Primary home for 50 seasons' },
+      { name: 'Soldier Field', years: '1971–present', description: 'Oldest NFL stadium • The oldest stadium in both the NFL and MLS', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'NFL Championships', description: '9 total championships (8 pre-Super Bowl)', count: 9 },
+      { title: 'Super Bowl Championships', description: 'XX (1985)', count: 1 },
+      { title: 'NFC Championships', description: 'Most recent: 2006', count: 4 },
+      { title: 'Division Titles', description: 'Most recent: 2018', count: 19 }
     ]
   },
-  'milwaukee-bucks': {
+
+  'cincinnati-bengals': {
     founded: '1968',
-    capacity: '17,341',
-    owner: 'Marc Lasry, Wes Edens & Jamie Dinan',
-    championships: '2',
-    championshipYears: ['1971', '2021'],
-    conferenceChampionships: '3',
-    mostRecentConferenceChampionship: '2021',
-    divisionTitles: '17',
-    mostRecentDivisionTitle: '2024',
-    playoffAppearances: '37',
-    mostRecentPlayoffAppearance: '2025',
+    stadium: 'Paycor Stadium',
+    capacity: '65,535',
+    location: 'Cincinnati, OH',
+    owner: 'Mike Brown',
+    conference: 'AFC',
+    division: 'AFC North',
+    superbowlWins: 0,
+    superbowlAppearances: ['1981 (XVI)', '1988 (XXIII)', '2021 (LVI)'],
+    conferenceChampionships: 3,
+    divisionTitles: 10,
+    playoffAppearances: 16,
     retiredNumbers: [
-      { number: '1', name: 'Oscar Robertson', position: 'G', years: '1970-1974' },
-      { number: '2', name: 'Junior Bridgeman', position: 'F', years: '1975-1987' },
-      { number: '4', name: 'Sidney Moncrief', position: 'G', years: '1979-1990' },
-      { number: '8', name: 'Marques Johnson', position: 'F', years: '1977-1984' },
-      { number: '10', name: 'Bob Dandridge', position: 'F', years: '1969-1977' },
-      { number: '14', name: 'Jon McGlocklin', position: 'G', years: '1968-1976' },
-      { number: '16', name: 'Bob Lanier', position: 'C', years: '1980-1984' },
-      { number: '32', name: 'Brian Winters', position: 'G', years: '1975-1983' },
-      { number: '33', name: 'Kareem Abdul-Jabbar', position: 'C', years: '1969-1975' }
+      { number: '54', name: 'Bob Johnson', position: 'Center', years: '1968-1979' }
     ],
-    hallOfFamers: [
-      { name: "Kareem Abdul-Jabbar", yearInducted: "1995", category: "Player", role: "C", yearsWithTeam: "1969-1975" },
-      { name: "Oscar Robertson", yearInducted: "1980", category: "Player", role: "G", yearsWithTeam: "1970-1974" },
-      { name: "Bob Lanier", yearInducted: "1992", category: "Player", role: "C", yearsWithTeam: "1980-1984" },
-      { name: "Bob Dandridge", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "1969-1977, 1981-1982" },
-      { name: "Sidney Moncrief", yearInducted: "2019", category: "Player", role: "G", yearsWithTeam: "1979-1989" },
-      { name: "Gary Payton", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "2003" },
-      { name: "Ray Allen", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "1996-2003" },
-      { name: "Moses Malone", yearInducted: "2001", category: "Player", role: "C", yearsWithTeam: "1991-1993" },
-      { name: "Don Nelson", yearInducted: "2012", category: "Coach", role: "Head Coach", yearsWithTeam: "1976-1987" },
-      { name: "Jack Sikma", yearInducted: "2019", category: "Player", role: "C", yearsWithTeam: "1986-1991" }
+    stadiumHistory: [
+      { name: 'Nippert Stadium', years: '1968–1969', description: 'University of Cincinnati campus for first two seasons' },
+      { name: 'Riverfront Stadium', years: '1970–1999', description: 'Shared with Cincinnati Reds baseball team' },
+      { name: 'Paul Brown Stadium/Paycor Stadium', years: '2000–present', description: 'Named after founder Paul Brown', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Appearances', description: 'XVI (1981), XXIII (1988), LVI (2021)', count: 3 },
+      { title: 'AFC Championships', description: '1981, 1988, 2021', count: 3 },
+      { title: 'Division Titles', description: 'Most recent: 2022', count: 10 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2022', count: 16 }
     ]
   },
-  'minnesota-timberwolves': {
-    founded: '1989',
-    capacity: '18,798',
-    owner: 'Glen Taylor & Marc Lore & Alex Rodriguez',
-    championships: '0',
-    conferenceChampionships: '0',
-    divisionTitles: '1',
-    mostRecentDivisionTitle: '2004',
-    playoffAppearances: '11',
-    mostRecentPlayoffAppearance: '2025',
+
+  'cleveland-browns': {
+    founded: '1946',
+    stadium: 'Huntington Bank Field',
+    capacity: '67,431',
+    location: 'Cleveland, OH',
+    owner: 'Jimmy Haslam',
+    conference: 'AFC',
+    division: 'AFC North',
+    superbowlWins: 0,
+    superbowlAppearances: [],
+    conferenceChampionships: 4,
+    divisionTitles: 12,
+    playoffAppearances: 30,
     retiredNumbers: [
-      { number: '2', name: 'Malik Sealy', position: 'G/F', years: '1998-2000' }
+      { number: '14', name: 'Otto Graham', position: 'Quarterback', years: '1946-1955' },
+      { number: '32', name: 'Jim Brown', position: 'Running Back', years: '1957-1965' },
+      { number: '45', name: 'Ernie Davis', position: 'Running Back', years: 'Never played (deceased)' },
+      { number: '46', name: 'Don Fleming', position: 'Defensive Back', years: '1960-1962' },
+      { number: '76', name: 'Lou Groza', position: 'Tackle/Kicker', years: '1946-1959, 1961-1967' }
     ],
-    hallOfFamers: [
-      { name: "Kevin Garnett", yearInducted: "2020", category: "Player", role: "F", yearsWithTeam: "1995-2007, 2015-2016" },
-      { name: "Bill Fitch", yearInducted: "2019", category: "Coach", role: "Head Coach", yearsWithTeam: "1989-1991" }
+    stadiumHistory: [
+      { name: 'Cleveland Municipal Stadium', years: '1946–1995', description: 'Original home for 50 seasons' },
+      { name: 'Huntington Bank Field', years: '1999–present', description: 'Built after franchise returned from Baltimore', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'AAFC Championships', description: '4 consecutive (1946-1949)', count: 4 },
+      { title: 'NFL Championships', description: '1950, 1954, 1955, 1964', count: 4 },
+      { title: 'AFC Championships', description: 'Never reached Super Bowl', count: 0 },
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 12 }
     ]
   },
-  'new-orleans-pelicans': {
+
+  'denver-broncos': {
+    founded: '1960',
+    stadium: 'Empower Field at Mile High',
+    capacity: '76,125',
+    location: 'Denver, CO',
+    owner: 'Walton-Penner Group',
+    conference: 'AFC',
+    division: 'AFC West',
+    superbowlWins: 3,
+    superbowlAppearances: ['1977 (XII)', '1986 (XXI)', '1987 (XXII)', '1989 (XXIV)', '1997 (XXXII)', '1998 (XXXIII)', '2013 (XLVIII)', '2015 (50)'],
+    conferenceChampionships: 8,
+    divisionTitles: 15,
+    playoffAppearances: 22,
+    retiredNumbers: [
+      { number: '7', name: 'John Elway', position: 'Quarterback', years: '1983-1998' },
+      { number: '18', name: 'Peyton Manning', position: 'Quarterback', years: '2012-2015' },
+      { number: '44', name: 'Floyd Little', position: 'Running Back', years: '1967-1975' }
+    ],
+    stadiumHistory: [
+      { name: 'Bears Stadium/Mile High Stadium', years: '1960–2000', description: 'Original home with famous "Mile High Magic"' },
+      { name: 'Empower Field at Mile High', years: '2001–present', description: 'Built adjacent to old Mile High Stadium', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XXXII (1997), XXXIII (1998), 50 (2015)', count: 3 },
+      { title: 'AFC Championships', description: 'Most recent: 2015', count: 8 },
+      { title: 'Division Titles', description: 'Most recent: 2015', count: 15 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2015', count: 22 }
+    ]
+  },
+
+  'detroit-lions': {
+    founded: '1930',
+    stadium: 'Ford Field',
+    capacity: '65,000',
+    location: 'Detroit, MI',
+    owner: 'Sheila Ford Hamp',
+    conference: 'NFC',
+    division: 'NFC North',
+    superbowlWins: 0,
+    superbowlAppearances: [],
+    conferenceChampionships: 4,
+    divisionTitles: 4,
+    playoffAppearances: 18,
+    retiredNumbers: [
+      { number: '7', name: 'Dutch Clark', position: 'Quarterback', years: '1934-1938' },
+      { number: '20', name: 'Barry Sanders', position: 'Running Back', years: '1989-1998' },
+      { number: '22', name: 'Bobby Layne', position: 'Quarterback', years: '1950-1958' },
+      { number: '37', name: 'Doak Walker', position: 'Running Back', years: '1950-1955' },
+      { number: '56', name: 'Joe Schmidt', position: 'Linebacker', years: '1953-1965' },
+      { number: '85', name: 'Chuck Hughes', position: 'Wide Receiver', years: '1970-1971' }
+    ],
+    stadiumHistory: [
+      { name: 'Universal Stadium (Portsmouth)', years: '1930–1933', description: 'Original home as Portsmouth Spartans' },
+      { name: 'University of Detroit Stadium', years: '1934–1937', description: 'First Detroit venue' },
+      { name: 'Briggs Stadium/Tiger Stadium', years: '1938–1974', description: 'Shared with Detroit Tigers baseball' },
+      { name: 'Pontiac Silverdome', years: '1975–2001', description: '27 seasons in suburban Pontiac' },
+      { name: 'Ford Field', years: '2002–present', description: 'Downtown Detroit domed stadium', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'NFL Championships', description: '1935, 1952, 1953, 1957 (pre-Super Bowl)', count: 4 },
+      { title: 'NFC Championships', description: 'Never won (reached conference championship in 1991)', count: 0 },
+      { title: 'Division Titles', description: 'Most recent: 2023', count: 4 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 18 }
+    ]
+  },
+
+  'houston-texans': {
     founded: '2002',
-    capacity: '16,867',
-    owner: 'Gayle Benson',
-    championships: '0',
-    conferenceChampionships: '0',
-    divisionTitles: '1',
-    mostRecentDivisionTitle: '2008',
-    playoffAppearances: '8',
-    mostRecentPlayoffAppearance: '2023',
-    retiredNumbers: [
-      { number: '7', name: 'Pete Maravich', position: 'G', years: '1974-1980' }
+    stadium: 'NRG Stadium',
+    capacity: '71,054',
+    location: 'Houston, TX',
+    owner: 'Janice McNair',
+    conference: 'AFC',
+    division: 'AFC South',
+    superbowlWins: 0,
+    superbowlAppearances: [],
+    conferenceChampionships: 0,
+    divisionTitles: 8,
+    playoffAppearances: 8,
+    retiredNumbers: [],
+    stadiumHistory: [
+      { name: 'NRG Stadium', years: '2002–present', description: 'First NFL stadium with retractable roof', isCurrent: true }
     ],
-    hallOfFamers: [
-      { name: "Chris Paul", yearInducted: "N/A", category: "Player", role: "G", yearsWithTeam: "2005-2011" },
-      { name: "Anthony Davis", yearInducted: "N/A", category: "Player", role: "F/C", yearsWithTeam: "2012-2019" }
+    achievements: [
+      { title: 'Division Titles', description: 'Most recent: 2024', count: 8 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2024', count: 8 },
+      { title: 'Playoff Wins', description: 'Wild Card victories', count: 6 },
+      { title: 'Conference Championships', description: 'Never reached', count: 0 }
     ]
   },
-  'new-york-knicks': {
-    founded: '1946',
-    capacity: '19,812',
-    owner: 'Madison Square Garden Sports',
-    championships: '2',
-    championshipYears: ['1970', '1973'],
-    conferenceChampionships: '8',
-    mostRecentConferenceChampionship: '2025',
-    divisionTitles: '8',
-    mostRecentDivisionTitle: '2013',
-    playoffAppearances: '44',
-    mostRecentPlayoffAppearance: '2025',
+
+  'indianapolis-colts': {
+    founded: '1953',
+    stadium: 'Lucas Oil Stadium',
+    capacity: '67,000',
+    location: 'Indianapolis, IN',
+    owner: 'Jim Irsay',
+    conference: 'AFC',
+    division: 'AFC South',
+    superbowlWins: 2,
+    superbowlAppearances: ['1968 (III)', '1970 (V)', '2006 (XLI)', '2009 (XLIV)'],
+    conferenceChampionships: 7,
+    divisionTitles: 16,
+    playoffAppearances: 27,
     retiredNumbers: [
-      { number: '10', name: 'Walt Frazier', position: 'G', years: '1967-1977' },
-      { number: '12', name: 'Dick Barnett', position: 'G', years: '1965-1974' },
-      { number: '15', name: 'Earl Monroe', position: 'G', years: '1971-1980' },
-      { number: '15', name: 'Dick McGuire', position: 'G', years: '1949-1957' },
-      { number: '19', name: 'Willis Reed', position: 'C', years: '1964-1974' },
-      { number: '22', name: 'Bill Bradley', position: 'F', years: '1967-1977' },
-      { number: '24', name: 'Bill DeBusschere', position: 'F', years: '1968-1974' },
-      { number: '33', name: 'Patrick Ewing', position: 'C', years: '1985-2000' },
-      { number: '613', name: 'Red Holzman', position: 'Coach', years: '1967-1982' }
+      { number: '18', name: 'Peyton Manning', position: 'Quarterback', years: '1998-2011' },
+      { number: '19', name: 'Johnny Unitas', position: 'Quarterback', years: '1956-1972' },
+      { number: '22', name: 'Buddy Young', position: 'Running Back', years: '1953-1955' },
+      { number: '24', name: 'Lenny Moore', position: 'Running Back', years: '1956-1967' },
+      { number: '70', name: 'Art Donovan', position: 'Defensive Tackle', years: '1953-1961' },
+      { number: '77', name: 'Jim Parker', position: 'Guard/Tackle', years: '1957-1967' },
+      { number: '82', name: 'Raymond Berry', position: 'End', years: '1955-1967' },
+      { number: '89', name: 'Gino Marchetti', position: 'Defensive End', years: '1953-1966' }
     ],
-    hallOfFamers: [
-      { name: "Patrick Ewing", yearInducted: "2008", category: "Player", role: "C", yearsWithTeam: "1985-2000" },
-      { name: "Willis Reed", yearInducted: "1982", category: "Player", role: "C/F", yearsWithTeam: "1964-1974" },
-      { name: "Walt Frazier", yearInducted: "1987", category: "Player", role: "G", yearsWithTeam: "1967-1977" },
-      { name: "Dave DeBusschere", yearInducted: "1983", category: "Player", role: "F", yearsWithTeam: "1968-1974" },
-      { name: "Earl Monroe", yearInducted: "1990", category: "Player", role: "G", yearsWithTeam: "1971-1980" },
-      { name: "Bernard King", yearInducted: "2013", category: "Player", role: "F", yearsWithTeam: "1982-1987" },
-      { name: "Bill Bradley", yearInducted: "1983", category: "Player", role: "F", yearsWithTeam: "1967-1977" },
-      { name: "Red Holzman", yearInducted: "1986", category: "Coach", role: "Head Coach", yearsWithTeam: "1967-1977, 1978-1982" },
-      { name: "Dick McGuire", yearInducted: "1993", category: "Player", role: "G", yearsWithTeam: "1949-1957" },
-      { name: "Harry Gallatin", yearInducted: "1991", category: "Player", role: "F/C", yearsWithTeam: "1948-1957" },
-      { name: "Richie Guerin", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "1956-1963" },
-      { name: "Carmelo Anthony", yearInducted: "2025", category: "Player", role: "F", yearsWithTeam: "2011-2017" },
-      { name: "Carl Braun", yearInducted: "2019", category: "Player", role: "G/F", yearsWithTeam: "1947-1962" },
-      { name: "Dick Barnett", yearInducted: "2024", category: "Player", role: "G", yearsWithTeam: "1965-1974" },
-      { name: "Bill Sharman", yearInducted: "1976", category: "Player", role: "G", yearsWithTeam: "1950-1951" }
+    stadiumHistory: [
+      { name: 'Memorial Stadium (Baltimore)', years: '1953–1983', description: 'Baltimore Colts era' },
+      { name: 'Hoosier Dome/RCA Dome', years: '1984–2007', description: 'First 24 seasons in Indianapolis' },
+      { name: 'Lucas Oil Stadium', years: '2008–present', description: 'Retractable roof stadium • Hosted Super Bowl XLVI', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'V (1970), XLI (2006)', count: 2 },
+      { title: 'NFL Championships', description: '1958, 1959, 1968 (Baltimore era)', count: 3 },
+      { title: 'AFC Championships', description: 'Most recent: 2009', count: 4 },
+      { title: 'Division Titles', description: 'Most recent: 2014', count: 16 }
     ]
   },
-  'oklahoma-city-thunder': {
-    founded: '1967',
-    capacity: '18,203',
-    owner: 'Clay Bennett',
-    championships: '1',
-    championshipYears: ['1979'],
-    conferenceChampionships: '4',
-    mostRecentConferenceChampionship: '2025',
-    divisionTitles: '11',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '31',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '1', name: 'Gus Williams', position: 'G', years: '1977-1984' },
-      { number: '4', name: 'Nick Collison', position: 'F', years: '2003-2018' },
-      { number: '10', name: 'Nate McMillan', position: 'G', years: '1986-1998' },
-      { number: '19', name: 'Lenny Wilkens', position: 'G', years: '1968-1972' },
-      { number: '24', name: 'Spencer Haywood', position: 'F', years: '1970-1975' },
-      { number: '32', name: 'Fred Brown', position: 'G', years: '1971-1984' },
-      { number: '43', name: 'Jack Sikma', position: 'C', years: '1977-1986' }
-    ],
-    hallOfFamers: [
-      { name: "Gary Payton", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "1990-2003" },
-      { name: "Lenny Wilkens", yearInducted: "1989", category: "Player", role: "G", yearsWithTeam: "1968-1972" },
-      { name: "Spencer Haywood", yearInducted: "N/A", category: "Player", role: "F/C", yearsWithTeam: "1970-1975" },
-      { name: "Dennis Johnson", yearInducted: "2010", category: "Player", role: "G", yearsWithTeam: "1976-1980" },
-      { name: "Ray Allen", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "2003-2007" },
-      { name: "Jack Sikma", yearInducted: "2019", category: "Player", role: "C", yearsWithTeam: "1977-1986" },
-      { name: "George Karl", yearInducted: "2022", category: "Coach", role: "Head Coach", yearsWithTeam: "1991-1998" },
-      { name: "Nate McMillan", yearInducted: "N/A", category: "Player", role: "G", yearsWithTeam: "1986-1998" }
-    ]
-  },
-  'orlando-magic': {
-    founded: '1989',
-    capacity: '18,846',
-    owner: 'Dan DeVos',
-    championships: '0',
-    conferenceChampionships: '2',
-    mostRecentConferenceChampionship: '2010',
-    divisionTitles: '6',
-    mostRecentDivisionTitle: '2025',
-    playoffAppearances: '17',
-    mostRecentPlayoffAppearance: '2025',
-    retiredNumbers: [
-      { number: '6', name: 'The Sixth Man', position: 'Fans', years: 'Retired 1989' },
-      { number: '32', name: 'Shaquille O\'Neal', position: 'C', years: '1992-1996' }
-    ],
-    hallOfFamers: [
-      { name: "Shaquille O'Neal", yearInducted: "2016", category: "Player", role: "C", yearsWithTeam: "1992-1996" },
-      { name: "Tracy McGrady", yearInducted: "2017", category: "Player", role: "F/G", yearsWithTeam: "2000-2004" },
-      { name: "Grant Hill", yearInducted: "2018", category: "Player", role: "F", yearsWithTeam: "2000-2007" },
-      { name: "Dominique Wilkins", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1999" },
-      { name: "Dwight Howard", yearInducted: "2025", category: "Player", role: "C", yearsWithTeam: "2004-2012" },
-      { name: "Patrick Ewing", yearInducted: "2008", category: "Player", role: "C", yearsWithTeam: "2001-2002" }
-    ]
-  },
-  'philadelphia-76ers': {
-    founded: '1946',
-    capacity: '21,600',
-    owner: 'Josh Harris & David Blitzer',
-    championships: '3',
-    championshipYears: ['1955', '1967', '1983'],
-    conferenceChampionships: '9',
-    mostRecentConferenceChampionship: '2001',
-    divisionTitles: '12',
-    mostRecentDivisionTitle: '2022',
-    playoffAppearances: '53',
-    mostRecentPlayoffAppearance: '2024',
-    retiredNumbers: [
-      { number: '2', name: 'Moses Malone', position: 'C', years: '1982-1994' },
-      { number: '3', name: 'Allen Iverson', position: 'G', years: '1996-2010' },
-      { number: '4', name: 'Dolph Schayes', position: 'F/C', years: '1948-1964' },
-      { number: '6', name: 'Julius Erving', position: 'F', years: '1976-1987' },
-      { number: '10', name: 'Maurice Cheeks', position: 'G', years: '1978-1989' },
-      { number: '13', name: 'Wilt Chamberlain', position: 'C', years: '1965-1968' },
-      { number: '15', name: 'Hal Greer', position: 'G', years: '1958-1973' },
-      { number: '24', name: 'Bobby Jones', position: 'F', years: '1978-1986' },
-      { number: '32', name: 'Billy Cunningham', position: 'F', years: '1965-1976' },
-      { number: '34', name: 'Charles Barkley', position: 'F', years: '1984-1992' }
-    ],
-    hallOfFamers: [
-      { name: "Julius Erving", yearInducted: "1993", category: "Player", role: "F", yearsWithTeam: "1976-1987" },
-      { name: "Wilt Chamberlain", yearInducted: "1979", category: "Player", role: "C", yearsWithTeam: "1965-1968" },
-      { name: "Charles Barkley", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1984-1992" },
-      { name: "Allen Iverson", yearInducted: "2016", category: "Player", role: "G", yearsWithTeam: "1996-2006, 2009-2010" },
-      { name: "Moses Malone", yearInducted: "2001", category: "Player", role: "C", yearsWithTeam: "1982-1986, 1993-1994" },
-      { name: "Dolph Schayes", yearInducted: "1973", category: "Player", role: "F", yearsWithTeam: "1948-1964" },
-      { name: "Hal Greer", yearInducted: "1982", category: "Player", role: "G", yearsWithTeam: "1958-1973" },
-      { name: "Billy Cunningham", yearInducted: "1986", category: "Player", role: "F", yearsWithTeam: "1965-1972, 1974-1976" },
-      { name: "Maurice Cheeks", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "1978-1989" },
-      { name: "Chet Walker", yearInducted: "2012", category: "Player", role: "F", yearsWithTeam: "1969-1975" },
-      { name: "Bobby Jones", yearInducted: "2019", category: "Player", role: "F", yearsWithTeam: "1978-1986" },
-      { name: "Dikembe Mutombo", yearInducted: "2015", category: "Player", role: "C", yearsWithTeam: "2001-2002" },
-      { name: "George McGinnis", yearInducted: "2017", category: "Player", role: "F", yearsWithTeam: "1975-1978" },
-      { name: "Alex Hannum", yearInducted: "1998", category: "Coach", role: "Head Coach", yearsWithTeam: "1966-1968" },
-      { name: "Larry Brown", yearInducted: "2002", category: "Coach", role: "Head Coach", yearsWithTeam: "1997-2003" },
-      { name: "Jack Ramsay", yearInducted: "1992", category: "Coach", role: "Head Coach", yearsWithTeam: "1968-1972" },
-      { name: "Bob McAdoo", yearInducted: "2000", category: "Player", role: "C/F", yearsWithTeam: "1978-1979" },
-      { name: "Chris Webber", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "2005-2007" }
-    ]
-  },
-  'phoenix-suns': {
-    founded: '1968',
-    capacity: '17,071',
-    owner: 'Mat Ishbia',
-    championships: '0',
-    conferenceChampionships: '3',
-    mostRecentConferenceChampionship: '2021',
-    divisionTitles: '9',
-    mostRecentDivisionTitle: '2022',
-    playoffAppearances: '31',
-    mostRecentPlayoffAppearance: '2024',
-    retiredNumbers: [
-      { number: '5', name: 'Dick Van Arsdale', position: 'G/F', years: '1968-1977' },
-      { number: '6', name: 'Walter Davis', position: 'G', years: '1977-1988' },
-      { number: '7', name: 'Kevin Johnson', position: 'G', years: '1988-2000' },
-      { number: '9', name: 'Dan Majerle', position: 'G/F', years: '1988-1995' },
-      { number: '13', name: 'Steve Nash', position: 'G', years: '2004-2012' },
-      { number: '24', name: 'Tom Chambers', position: 'F', years: '1988-1993' },
-      { number: '31', name: 'Shawn Marion', position: 'F', years: '1999-2008' },
-      { number: '32', name: 'Amar\'e Stoudemire', position: 'F/C', years: '2002-2010' },
-      { number: '33', name: 'Alvan Adams', position: 'C', years: '1975-1988' },
-      { number: '34', name: 'Charles Barkley', position: 'F', years: '1992-1996' },
-      { number: '42', name: 'Connie Hawkins', position: 'F', years: '1969-1973' },
-      { number: '44', name: 'Paul Westphal', position: 'G', years: '1975-1984' }
-    ],
-    hallOfFamers: [
-      { name: "Charles Barkley", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1992-1996" },
-      { name: "Steve Nash", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "1996-1998, 2004-2012" },
-      { name: "Jason Kidd", yearInducted: "2018", category: "Player", role: "G", yearsWithTeam: "1996-2001" },
-      { name: "Connie Hawkins", yearInducted: "1992", category: "Player", role: "F", yearsWithTeam: "1969-1973" },
-      { name: "Gail Goodrich", yearInducted: "1996", category: "Player", role: "G", yearsWithTeam: "1968-1970" },
-      { name: "Paul Westphal", yearInducted: "2019", category: "Player", role: "G", yearsWithTeam: "1975-1980, 1983-1984" },
-      { name: "Dennis Johnson", yearInducted: "2010", category: "Player", role: "G", yearsWithTeam: "1980-1983" },
-      { name: "Dick Van Arsdale", yearInducted: "N/A", category: "Player", role: "G/F", yearsWithTeam: "1968-1977" },
-      { name: "Shaquille O'Neal", yearInducted: "2016", category: "Player", role: "C", yearsWithTeam: "2008-2009" },
-      { name: "Grant Hill", yearInducted: "2018", category: "Player", role: "F", yearsWithTeam: "2007-2012" },
-      { name: "Jerry Colangelo", yearInducted: "2004", category: "Contributor", role: "Executive", yearsWithTeam: "1968-2004" }
-    ]
-  },
-  'portland-trail-blazers': {
-    founded: '1970',
-    capacity: '19,393',
-    owner: 'Jody Allen',
-    championships: '1',
-    championshipYears: ['1977'],
-    conferenceChampionships: '3',
-    mostRecentConferenceChampionship: '2019',
-    divisionTitles: '6',
-    mostRecentDivisionTitle: '2018',
-    playoffAppearances: '37',
-    mostRecentPlayoffAppearance: '2020',
-    retiredNumbers: [
-      { number: '13', name: 'Dave Twardzik', position: 'G', years: '1976-1980' },
-      { number: '14', name: 'Lionel Hollins', position: 'G', years: '1975-1980' },
-      { number: '15', name: 'Larry Steele', position: 'G/F', years: '1971-1980' },
-      { number: '20', name: 'Maurice Lucas', position: 'F/C', years: '1976-1980' },
-      { number: '22', name: 'Clyde Drexler', position: 'G', years: '1983-1995' },
-      { number: '30', name: 'Terry Porter', position: 'G', years: '1985-1995' },
-      { number: '32', name: 'Bill Walton', position: 'C', years: '1974-1979' },
-      { number: '36', name: 'Lloyd Neal', position: 'F/C', years: '1972-1979' },
-      { number: '45', name: 'Geoff Petrie', position: 'G', years: '1970-1976' },
-      { number: '77', name: 'Jack Ramsay', position: 'Coach', years: '1976-1986' }
-    ],
-    hallOfFamers: [
-      { name: "Clyde Drexler", yearInducted: "2004", category: "Player", role: "G", yearsWithTeam: "1983-1995" },
-      { name: "Bill Walton", yearInducted: "1993", category: "Player", role: "C", yearsWithTeam: "1974-1979" },
-      { name: "Scottie Pippen", yearInducted: "2010", category: "Player", role: "F", yearsWithTeam: "1999-2003" },
-      { name: "Arvydas Sabonis", yearInducted: "2011", category: "Player", role: "C", yearsWithTeam: "1995-2001, 2002-2003" },
-      { name: "Jack Ramsay", yearInducted: "1992", category: "Coach", role: "Head Coach", yearsWithTeam: "1976-1986" },
-      { name: "Rick Adelman", yearInducted: "2021", category: "Coach", role: "Head Coach", yearsWithTeam: "1989-1994" },
-      { name: "Lenny Wilkens", yearInducted: "1998", category: "Coach", role: "Head Coach", yearsWithTeam: "1974-1976" },
-      { name: "Gary Payton", yearInducted: "2013", category: "Player", role: "G", yearsWithTeam: "2002-2003" }
-    ]
-  },
-  'sacramento-kings': {
-    founded: '1923',
-    capacity: '17,608',
-    owner: 'Vivek Ranadivé',
-    championships: '1',
-    championshipYears: ['1951'],
-    conferenceChampionships: '1',
-    mostRecentConferenceChampionship: '2002',
-    divisionTitles: '3',
-    mostRecentDivisionTitle: '2023',
-    playoffAppearances: '29',
-    mostRecentPlayoffAppearance: '2024',
-    retiredNumbers: [
-      { number: '1', name: 'Nate Archibald', position: 'G', years: '1970-1976' },
-      { number: '2', name: 'Mitch Richmond', position: 'G', years: '1991-1998' },
-      { number: '4', name: 'Chris Webber', position: 'F/C', years: '1998-2005' },
-      { number: '6', name: 'Fans', position: 'Sixth Man', years: 'Retired 1987' },
-      { number: '11', name: 'Bob Davies', position: 'G', years: '1948-1955' },
-      { number: '12', name: 'Maurice Stokes', position: 'F', years: '1955-1958' },
-      { number: '14', name: 'Oscar Robertson', position: 'G', years: '1960-1970' },
-      { number: '16', name: 'Peja Stojakovic', position: 'F', years: '1998-2006' },
-      { number: '21', name: 'Vlade Divac', position: 'C', years: '1998-2004' },
-      { number: '27', name: 'Jack Twyman', position: 'F', years: '1955-1966' },
-      { number: '44', name: 'Sam Lacey', position: 'C', years: '1970-1982' }
-    ],
-    hallOfFamers: [
-      { name: "Oscar Robertson", yearInducted: "1980", category: "Player", role: "G", yearsWithTeam: "1960-1970" },
-      { name: "Tiny Archibald", yearInducted: "1991", category: "Player", role: "G", yearsWithTeam: "1976-1981" },
-      { name: "Mitch Richmond", yearInducted: "2014", category: "Player", role: "G", yearsWithTeam: "1991-1998" },
-      { name: "Chris Webber", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "1998-2005" },
-      { name: "Jack Twyman", yearInducted: "1983", category: "Player", role: "F", yearsWithTeam: "1955-1966" },
-      { name: "Maurice Stokes", yearInducted: "2004", category: "Player", role: "F/C", yearsWithTeam: "1955-1958" },
-      { name: "Rick Adelman", yearInducted: "2021", category: "Coach", role: "Head Coach", yearsWithTeam: "1998-2006" },
-      { name: "Vlade Divac", yearInducted: "2019", category: "Player", role: "C", yearsWithTeam: "1998-2004" },
-      { name: "Bob Davies", yearInducted: "1970", category: "Player", role: "G", yearsWithTeam: "1945-1955" },
-      { name: "Bobby Wanzer", yearInducted: "1987", category: "Player", role: "G", yearsWithTeam: "1947-1957" },
-      { name: "Arnie Risen", yearInducted: "1998", category: "Player", role: "C", yearsWithTeam: "1948-1955" }
-    ]
-  },
-  'san-antonio-spurs': {
-    founded: '1967',
-    capacity: '18,418',
-    owner: 'Peter J. Holt',
-    championships: '5',
-    championshipYears: ['1999', '2003', '2005', '2007', '2014'],
-    conferenceChampionships: '6',
-    mostRecentConferenceChampionship: '2017',
-    divisionTitles: '22',
-    mostRecentDivisionTitle: '2017',
-    playoffAppearances: '44',
-    mostRecentPlayoffAppearance: '2022',
-    retiredNumbers: [
-      { number: '00', name: 'Johnny Moore', position: 'G', years: '1980-1990' },
-      { number: '6', name: 'Avery Johnson', position: 'G', years: '1991-2001' },
-      { number: '9', name: 'Tony Parker', position: 'G', years: '2001-2018' },
-      { number: '12', name: 'Bruce Bowen', position: 'F', years: '2001-2009' },
-      { number: '13', name: 'James Silas', position: 'G', years: '1972-1981' },
-      { number: '20', name: 'Manu Ginobili', position: 'G', years: '2002-2018' },
-      { number: '21', name: 'Tim Duncan', position: 'F/C', years: '1997-2016' },
-      { number: '32', name: 'Sean Elliott', position: 'F', years: '1989-2001' },
-      { number: '44', name: 'George Gervin', position: 'G', years: '1976-1985' },
-      { number: '50', name: 'David Robinson', position: 'C', years: '1989-2003' }
-    ],
-    hallOfFamers: [
-      { name: "Tim Duncan", yearInducted: "2020", category: "Player", role: "F/C", yearsWithTeam: "1997-2016" },
-      { name: "David Robinson", yearInducted: "2009", category: "Player", role: "C", yearsWithTeam: "1989-2003" },
-      { name: "George Gervin", yearInducted: "1996", category: "Player", role: "G/F", yearsWithTeam: "1974-1985" },
-      { name: "Manu Ginobili", yearInducted: "2022", category: "Player", role: "G", yearsWithTeam: "2002-2018" },
-      { name: "Tony Parker", yearInducted: "2023", category: "Player", role: "G", yearsWithTeam: "2001-2018" },
-      { name: "Gregg Popovich", yearInducted: "2023", category: "Player", role: "Head Coach", yearsWithTeam: "1996-present" },
-      { name: "Artis Gilmore", yearInducted: "2011", category: "Player", role: "C", yearsWithTeam: "1982-1987" },
-      { name: "Dominique Wilkins", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1996-1997" },
-      { name: "Larry Brown", yearInducted: "2002", category: "Coach", role: "Head Coach", yearsWithTeam: "1988-1992" },
-      { name: "Tracy McGrady", yearInducted: "2017", category: "Player", role: "F/G", yearsWithTeam: "2013" }
-    ]
-  },
-  'toronto-raptors': {
+
+  'jacksonville-jaguars': {
     founded: '1995',
-    capacity: '19,800',
-    owner: 'Maple Leaf Sports & Entertainment',
-    championships: '1',
-    championshipYears: ['2019'],
-    conferenceChampionships: '1',
-    mostRecentConferenceChampionship: '2019',
-    divisionTitles: '7',
-    mostRecentDivisionTitle: '2020',
-    playoffAppearances: '14',
-    mostRecentPlayoffAppearance: '2023',
-    retiredNumbers: [
-      { number: '15', name: 'Vince Carter', position: 'G/F', years: '1998-2004' }
+    stadium: 'EverBank Stadium',
+    capacity: '67,814',
+    location: 'Jacksonville, FL',
+    owner: 'Shahid Khan',
+    conference: 'AFC',
+    division: 'AFC South',
+    superbowlWins: 0,
+    superbowlAppearances: [],
+    conferenceChampionships: 0,
+    divisionTitles: 2,
+    playoffAppearances: 8,
+    retiredNumbers: [],
+    stadiumHistory: [
+      { name: 'Jacksonville Municipal Stadium/EverBank Stadium', years: '1995–present', description: 'Home since inaugural season • Hosted Super Bowl XXXIX', isCurrent: true }
     ],
-    hallOfFamers: [
-      { name: "Vince Carter", yearInducted: "2024", category: "Player", role: "G/F", yearsWithTeam: "1998-2004" },
-      { name: "Tracy McGrady", yearInducted: "2017", category: "Player", role: "F/G", yearsWithTeam: "1997-2000" },
-      { name: "Hakeem Olajuwon", yearInducted: "2008", category: "Player", role: "C", yearsWithTeam: "2001-2002" },
-      { name: "Alonzo Mourning", yearInducted: "2014", category: "Player", role: "C", yearsWithTeam: "1995, 2004-2005" }
+    achievements: [
+      { title: 'AFC Championship Games', description: '1996, 1999, 2017', count: 3 },
+      { title: 'Division Titles', description: '1998, 1999', count: 2 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2022', count: 8 },
+      { title: 'Playoff Wins', description: 'Including 2017 divisional round', count: 8 }
     ]
   },
-  'utah-jazz': {
-    founded: '1974',
-    capacity: '18,306',
-    owner: 'Ryan Smith',
-    championships: '0',
-    conferenceChampionships: '2',
-    mostRecentConferenceChampionship: '1998',
-    divisionTitles: '11',
-    mostRecentDivisionTitle: '2022',
-    playoffAppearances: '31',
-    mostRecentPlayoffAppearance: '2024',
+
+  'las-vegas-raiders': {
+    founded: '1960',
+    stadium: 'Allegiant Stadium',
+    capacity: '65,000',
+    location: 'Las Vegas, NV',
+    owner: 'Mark Davis',
+    conference: 'AFC',
+    division: 'AFC West',
+    superbowlWins: 3,
+    superbowlAppearances: ['1976 (XI)', '1980 (XV)', '1983 (XVIII)', '2002 (XXXVII)'],
+    conferenceChampionships: 4,
+    divisionTitles: 15,
+    playoffAppearances: 23,
     retiredNumbers: [
-      { number: '1', name: 'Frank Layden', position: 'Coach', years: '1981-1989' },
-      { number: '4', name: 'Adrian Dantley', position: 'F', years: '1979-1986' },
-      { number: '7', name: 'Pete Maravich', position: 'G', years: '1974-1980' },
-      { number: '9', name: 'Larry H. Miller', position: 'Owner', years: '1985-2009' },
-      { number: '12', name: 'John Stockton', position: 'G', years: '1984-2003' },
-      { number: '14', name: 'Jeff Hornacek', position: 'G', years: '1994-2000' },
-      { number: '32', name: 'Karl Malone', position: 'F', years: '1985-2003' },
-      { number: '35', name: 'Darrell Griffith', position: 'G', years: '1980-1991' },
-      { number: '53', name: 'Mark Eaton', position: 'C', years: '1982-1993' }
+      { number: '12', name: 'Ken Stabler', position: 'Quarterback', years: '1970-1979' },
+      { number: '16', name: 'Jim Plunkett', position: 'Quarterback', years: '1978-1986' },
+      { number: '24', name: 'Marcus Allen', position: 'Running Back', years: '1982-1992' },
+      { number: '32', name: 'Tim Brown', position: 'Wide Receiver', years: '1988-2003' },
+      { number: '42', name: 'Art Shell', position: 'Tackle', years: '1968-1982' },
+      { number: '75', name: 'Howie Long', position: 'Defensive End', years: '1981-1993' }
     ],
-    hallOfFamers: [
-      { name: "John Stockton", yearInducted: "2009", category: "Player", role: "G", yearsWithTeam: "1984-2003" },
-      { name: "Karl Malone", yearInducted: "2010", category: "Player", role: "F", yearsWithTeam: "1985-2003" },
-      { name: "Adrian Dantley", yearInducted: "2008", category: "Player", role: "F", yearsWithTeam: "1979-1986" },
-      { name: "Jerry Sloan", yearInducted: "2009", category: "Coach", role: "Head Coach", yearsWithTeam: "1988-2011" },
-      { name: "Pete Maravich", yearInducted: "1987", category: "Player", role: "G", yearsWithTeam: "1974-1980" },
-      { name: "Gail Goodrich", yearInducted: "1996", category: "Player", role: "G", yearsWithTeam: "1976-1977" },
-      { name: "Dominique Wilkins", yearInducted: "2006", category: "Player", role: "F", yearsWithTeam: "1995" }
+    stadiumHistory: [
+      { name: 'Candlestick Park', years: '1960', description: 'First season in San Francisco' },
+      { name: 'Oakland-Alameda County Coliseum', years: '1966–1981, 1995–2019', description: 'Primary home for most of franchise history' },
+      { name: 'Los Angeles Memorial Coliseum', years: '1982–1994', description: 'Los Angeles Raiders era' },
+      { name: 'Allegiant Stadium', years: '2020–present', description: 'State-of-the-art domed stadium in Las Vegas', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XI (1976), XV (1980), XVIII (1983)', count: 3 },
+      { title: 'AFC Championships', description: 'Most recent: 2002', count: 4 },
+      { title: 'Division Titles', description: 'Most recent: 2002', count: 15 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2021', count: 23 }
     ]
   },
-  'washington-wizards': {
-    founded: '1961',
-    capacity: '20,356',
-    owner: 'Ted Leonsis',
-    championships: '1',
-    championshipYears: ['1978'],
-    conferenceChampionships: '4',
-    mostRecentConferenceChampionship: '1979',
-    divisionTitles: '7',
-    mostRecentDivisionTitle: '2017',
-    playoffAppearances: '28',
-    mostRecentPlayoffAppearance: '2021',
+
+  'los-angeles-chargers': {
+    founded: '1960',
+    stadium: 'SoFi Stadium',
+    capacity: '70,240',
+    location: 'Inglewood, CA',
+    owner: 'Dean Spanos',
+    conference: 'AFC',
+    division: 'AFC West',
+    superbowlWins: 0,
+    superbowlAppearances: ['1994 (XXIX)'],
+    conferenceChampionships: 1,
+    divisionTitles: 15,
+    playoffAppearances: 21,
     retiredNumbers: [
-      { number: '10', name: 'Earl Monroe', position: 'G', years: '1967-1971' },
-      { number: '11', name: 'Elvin Hayes', position: 'F/C', years: '1972-1981' },
-      { number: '25', name: 'Gus Johnson', position: 'F', years: '1963-1972' },
-      { number: '41', name: 'Wes Unseld', position: 'C', years: '1968-1981' }
+      { number: '14', name: 'Dan Fouts', position: 'Quarterback', years: '1973-1987' },
+      { number: '19', name: 'Johnny Unitas', position: 'Quarterback', years: '1973' },
+      { number: '21', name: 'LaDainian Tomlinson', position: 'Running Back', years: '2001-2009' },
+      { number: '55', name: 'Junior Seau', position: 'Linebacker', years: '1990-2002' }
     ],
-    hallOfFamers: [
-      { name: "Wes Unseld", yearInducted: "1988", category: "Player", role: "C/F", yearsWithTeam: "1968-1981" },
-      { name: "Elvin Hayes", yearInducted: "1990", category: "Player", role: "F/C", yearsWithTeam: "1972-1981" },
-      { name: "Earl Monroe", yearInducted: "1990", category: "Player", role: "G", yearsWithTeam: "1967-1971" },
-      { name: "Gus Johnson", yearInducted: "2010", category: "Player", role: "F", yearsWithTeam: "1963-1972" },
-      { name: "Chris Webber", yearInducted: "2021", category: "Player", role: "F", yearsWithTeam: "1994-1998, 2007-2008" },
-      { name: "Bernard King", yearInducted: "2013", category: "Player", role: "F", yearsWithTeam: "1987-1991" },
-      { name: "Mitch Richmond", yearInducted: "2014", category: "Player", role: "G", yearsWithTeam: "1999-2001" },
-      { name: "Bob Lanier", yearInducted: "1992", category: "Player", role: "C", yearsWithTeam: "1980" },
-      { name: "Walt Bellamy", yearInducted: "1993", category: "Player", role: "C", yearsWithTeam: "1961-1965" }
+    stadiumHistory: [
+      { name: 'Los Angeles Memorial Coliseum', years: '1960', description: 'Original home as Los Angeles Chargers' },
+      { name: 'Balboa Stadium', years: '1961–1966', description: 'First San Diego venue' },
+      { name: 'San Diego Stadium/Qualcomm Stadium', years: '1967–2016', description: '50 seasons in San Diego' },
+      { name: 'StubHub Center', years: '2017–2019', description: 'Temporary home after return to LA' },
+      { name: 'SoFi Stadium', years: '2020–present', description: 'Shared with Los Angeles Rams', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'AFL Championship', description: '1963', count: 1 },
+      { title: 'Super Bowl Appearances', description: 'XXIX (1994)', count: 1 },
+      { title: 'AFC Championships', description: '1994', count: 1 },
+      { title: 'Division Titles', description: 'Most recent: 2009', count: 15 }
+    ]
+  },
+
+  'los-angeles-rams': {
+    founded: '1936',
+    stadium: 'SoFi Stadium',
+    capacity: '70,240',
+    location: 'Inglewood, CA',
+    owner: 'Stan Kroenke',
+    conference: 'NFC',
+    division: 'NFC West',
+    superbowlWins: 2,
+    superbowlAppearances: ['1979 (XIV)', '1999 (XXXIV)', '2001 (XXXVI)', '2018 (LIII)', '2021 (LVI)'],
+    conferenceChampionships: 5,
+    divisionTitles: 19,
+    playoffAppearances: 30,
+    retiredNumbers: [
+      { number: '7', name: 'Bob Waterfield', position: 'Quarterback', years: '1945-1952' },
+      { number: '28', name: 'Marshall Faulk', position: 'Running Back', years: '1999-2005' },
+      { number: '29', name: 'Eric Dickerson', position: 'Running Back', years: '1983-1987' },
+      { number: '74', name: 'Merlin Olsen', position: 'Defensive Tackle', years: '1962-1976' },
+      { number: '78', name: 'Jackie Slater', position: 'Tackle', years: '1976-1995' },
+      { number: '85', name: 'Jack Youngblood', position: 'Defensive End', years: '1971-1984' }
+    ],
+    stadiumHistory: [
+      { name: 'League Park/Cleveland Stadium', years: '1937–1945', description: 'Cleveland Rams era' },
+      { name: 'Los Angeles Memorial Coliseum', years: '1946–1979', description: 'First Los Angeles era' },
+      { name: 'Anaheim Stadium', years: '1980–1994', description: 'Moved to Orange County' },
+      { name: 'Trans World Dome/Edward Jones Dome', years: '1995–2015', description: 'St. Louis Rams era' },
+      { name: 'Los Angeles Memorial Coliseum', years: '2016–2019', description: 'Return to LA while SoFi was built' },
+      { name: 'SoFi Stadium', years: '2020–present', description: 'State-of-the-art stadium • Hosted Super Bowl LVI', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XXXIV (1999), LVI (2021)', count: 2 },
+      { title: 'NFL Championships', description: '1945, 1951 (pre-Super Bowl)', count: 2 },
+      { title: 'NFC Championships', description: 'Most recent: 2021', count: 5 },
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 19 }
+    ]
+  },
+
+  'miami-dolphins': {
+    founded: '1966',
+    stadium: 'Hard Rock Stadium',
+    capacity: '64,767',
+    location: 'Miami Gardens, FL',
+    owner: 'Stephen M. Ross',
+    conference: 'AFC',
+    division: 'AFC East',
+    superbowlWins: 2,
+    superbowlAppearances: ['1971 (VI)', '1972 (VII)', '1973 (VIII)', '1982 (XVII)', '1984 (XIX)'],
+    conferenceChampionships: 5,
+    divisionTitles: 13,
+    playoffAppearances: 23,
+    retiredNumbers: [
+      { number: '12', name: 'Bob Griese', position: 'Quarterback', years: '1967-1980' },
+      { number: '13', name: 'Dan Marino', position: 'Quarterback', years: '1983-1999' },
+      { number: '39', name: 'Larry Csonka', position: 'Fullback', years: '1968-1974, 1979' }
+    ],
+    stadiumHistory: [
+      { name: 'Orange Bowl', years: '1966–1986', description: 'Original home in Miami' },
+      { name: 'Joe Robbie Stadium/Hard Rock Stadium', years: '1987–present', description: 'Multiple naming rights changes over the years', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Perfect Season', description: '17-0 in 1972 (only undefeated season in NFL history)', count: 1 },
+      { title: 'Super Bowl Championships', description: 'VII (1972), VIII (1973)', count: 2 },
+      { title: 'AFC Championships', description: 'Most recent: 1984', count: 5 },
+      { title: 'Division Titles', description: 'Most recent: 2008', count: 13 }
+    ]
+  },
+
+  'minnesota-vikings': {
+    founded: '1960',
+    stadium: 'U.S. Bank Stadium',
+    capacity: '66,860',
+    location: 'Minneapolis, MN',
+    owner: 'Zygi Wilf',
+    conference: 'NFC',
+    division: 'NFC North',
+    superbowlWins: 0,
+    superbowlAppearances: ['1969 (IV)', '1973 (VIII)', '1974 (IX)', '1976 (XI)'],
+    conferenceChampionships: 4,
+    divisionTitles: 20,
+    playoffAppearances: 30,
+    retiredNumbers: [
+      { number: '10', name: 'Fran Tarkenton', position: 'Quarterback', years: '1961-1966, 1972-1978' },
+      { number: '53', name: 'Mick Tingelhoff', position: 'Center', years: '1962-1978' },
+      { number: '70', name: 'Jim Marshall', position: 'Defensive End', years: '1961-1979' },
+      { number: '77', name: 'Korey Stringer', position: 'Tackle', years: '1995-2000' },
+      { number: '80', name: 'Cris Carter', position: 'Wide Receiver', years: '1990-2001' },
+      { number: '88', name: 'Alan Page', position: 'Defensive Tackle', years: '1967-1978' }
+    ],
+    stadiumHistory: [
+      { name: 'Metropolitan Stadium', years: '1961–1981', description: 'Original home in Bloomington' },
+      { name: 'Hubert H. Humphrey Metrodome', years: '1982–2013', description: '32 seasons in downtown Minneapolis dome' },
+      { name: 'TCF Bank Stadium', years: '2014–2015', description: 'Temporary home during U.S. Bank Stadium construction' },
+      { name: 'U.S. Bank Stadium', years: '2016–present', description: 'State-of-the-art facility • Features the Gjallarhorn', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'NFL Championship', description: '1969 (pre-Super Bowl merger)', count: 1 },
+      { title: 'Super Bowl Appearances', description: 'IV, VIII, IX, XI (0-4 record)', count: 4 },
+      { title: 'NFC Championships', description: 'Most recent: 1976', count: 4 },
+      { title: 'Division Titles', description: 'Most recent: 2017', count: 20 }
+    ]
+  },
+
+  'new-orleans-saints': {
+    founded: '1967',
+    stadium: 'Caesars Superdome',
+    capacity: '73,208',
+    location: 'New Orleans, LA',
+    owner: 'Gayle Benson',
+    conference: 'NFC',
+    division: 'NFC South',
+    superbowlWins: 1,
+    superbowlAppearances: ['2009 (XLIV)'],
+    conferenceChampionships: 1,
+    divisionTitles: 8,
+    playoffAppearances: 13,
+    retiredNumbers: [
+      { number: '8', name: 'Archie Manning', position: 'Quarterback', years: '1971-1982' },
+      { number: '9', name: 'Drew Brees', position: 'Quarterback', years: '2006-2020' }
+    ],
+    stadiumHistory: [
+      { name: 'Tulane Stadium', years: '1967–1974', description: 'Original home for first 8 seasons' },
+      { name: 'Louisiana Superdome/Caesars Superdome', years: '1975–present', description: 'The Superdome • Largest fixed domed structure in the world', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XLIV (2009) - Drew Brees MVP', count: 1 },
+      { title: 'NFC Championships', description: '2009', count: 1 },
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 8 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2020', count: 13 }
+    ]
+  },
+
+  'new-york-giants': {
+    founded: '1925',
+    stadium: 'MetLife Stadium',
+    capacity: '82,500',
+    location: 'East Rutherford, NJ',
+    owner: 'John Mara & Steve Tisch',
+    conference: 'NFC',
+    division: 'NFC East',
+    superbowlWins: 4,
+    superbowlAppearances: ['1986 (XXI)', '1990 (XXV)', '2000 (XXXV)', '2007 (XLII)', '2011 (XLVI)'],
+    conferenceChampionships: 8,
+    divisionTitles: 16,
+    playoffAppearances: 32,
+    retiredNumbers: [
+      { number: '4', name: 'Tuffy Leemans', position: 'Running Back', years: '1936-1943' },
+      { number: '7', name: 'Mel Hein', position: 'Center', years: '1931-1945' },
+      { number: '10', name: 'Eli Manning', position: 'Quarterback', years: '2004-2019' },
+      { number: '14', name: 'Y.A. Tittle & Ward Cuff', position: 'Quarterback & Running Back', years: '1961-1964 & 1937-1945' },
+      { number: '16', name: 'Frank Gifford', position: 'Running Back', years: '1952-1960, 1962-1964' },
+      { number: '32', name: 'Al Blozis', position: 'Tackle', years: '1942-1944' },
+      { number: '40', name: 'Joe Morrison', position: 'Running Back', years: '1959-1972' },
+      { number: '56', name: 'Lawrence Taylor', position: 'Linebacker', years: '1981-1993' }
+    ],
+    stadiumHistory: [
+      { name: 'Polo Grounds', years: '1925–1955', description: 'Original home shared with baseball Giants' },
+      { name: 'Yankee Stadium', years: '1956–1973', description: 'Shared with New York Yankees' },
+      { name: 'Yale Bowl', years: '1973–1974', description: 'Temporary home during Giants Stadium construction' },
+      { name: 'Shea Stadium', years: '1975', description: 'One season shared with Jets and Mets' },
+      { name: 'Giants Stadium', years: '1976–2009', description: '34 seasons in original Meadowlands facility' },
+      { name: 'MetLife Stadium', years: '2010–present', description: 'Largest NFL stadium • Shared with New York Jets', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'NFL Championships', description: '8 total: 1927, 1934, 1938, 1956, XXI, XXV, XLII, XLVI', count: 8 },
+      { title: 'Super Bowl Championships', description: 'XXI (1986), XXV (1990), XLII (2007), XLVI (2011)', count: 4 },
+      { title: 'NFC Championships', description: 'Most recent: 2011', count: 8 },
+      { title: 'Division Titles', description: 'Most recent: 2011', count: 16 }
+    ]
+  },
+
+  'new-york-jets': {
+    founded: '1960',
+    stadium: 'MetLife Stadium',
+    capacity: '82,500',
+    location: 'East Rutherford, NJ',
+    owner: 'Woody Johnson',
+    conference: 'AFC',
+    division: 'AFC East',
+    superbowlWins: 1,
+    superbowlAppearances: ['1968 (III)'],
+    conferenceChampionships: 1,
+    divisionTitles: 4,
+    playoffAppearances: 14,
+    retiredNumbers: [
+      { number: '12', name: 'Joe Namath', position: 'Quarterback', years: '1965-1976' },
+      { number: '13', name: 'Don Maynard', position: 'Wide Receiver', years: '1960-1972' },
+      { number: '28', name: 'Curtis Martin', position: 'Running Back', years: '1998-2005' },
+      { number: '73', name: 'Joe Klecko', position: 'Defensive Line', years: '1977-1987' },
+      { number: '90', name: 'Dennis Byrd', position: 'Defensive End', years: '1989-1992' }
+    ],
+    stadiumHistory: [
+      { name: 'Polo Grounds', years: '1960–1963', description: 'Original home as New York Titans' },
+      { name: 'Shea Stadium', years: '1964–1983', description: 'First home as Jets, shared with Mets' },
+      { name: 'Giants Stadium', years: '1984–2009', description: '26 seasons shared with Giants' },
+      { name: 'MetLife Stadium', years: '2010–present', description: 'First jointly-built NFL stadium • Shared with Giants', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'III (1968) - Joe Namath guarantee', count: 1 },
+      { title: 'AFL Championship', description: '1968', count: 1 },
+      { title: 'AFC Championships', description: '1998, 2009, 2010', count: 3 },
+      { title: 'Division Titles', description: 'Most recent: 2002', count: 4 }
+    ]
+  },
+
+  'philadelphia-eagles': {
+    founded: '1933',
+    stadium: 'Lincoln Financial Field',
+    capacity: '67,594',
+    location: 'Philadelphia, PA',
+    owner: 'Jeffrey Lurie',
+    conference: 'NFC',
+    division: 'NFC East',
+    superbowlWins: 2,
+    superbowlAppearances: ['1980 (XV)', '2004 (XXXIX)', '2017 (LII)', '2022 (LVII)', '2024 (LIX)'],
+    conferenceChampionships: 5,
+    divisionTitles: 16,
+    playoffAppearances: 31,
+    retiredNumbers: [
+      { number: '5', name: 'Donovan McNabb', position: 'Quarterback', years: '1999-2009' },
+      { number: '15', name: 'Steve Van Buren', position: 'Running Back', years: '1944-1951' },
+      { number: '20', name: 'Brian Dawkins', position: 'Safety', years: '1996-2008' },
+      { number: '40', name: 'Tom Brookshier', position: 'Cornerback', years: '1953-1961' },
+      { number: '60', name: 'Chuck Bednarik', position: 'Center/Linebacker', years: '1949-1962' },
+      { number: '70', name: 'Al Wistert', position: 'Tackle', years: '1943-1951' },
+      { number: '92', name: 'Reggie White', position: 'Defensive End', years: '1985-1992' },
+      { number: '99', name: 'Jerome Brown', position: 'Defensive Tackle', years: '1987-1991' }
+    ],
+    stadiumHistory: [
+      { name: 'Baker Bowl', years: '1933–1935', description: 'Original home shared with Phillies' },
+      { name: 'Municipal Stadium', years: '1936–1939', description: 'Temporary home' },
+      { name: 'Shibe Park/Connie Mack Stadium', years: '1940–1957', description: 'Shared with Athletics' },
+      { name: 'Franklin Field', years: '1958–1970', description: 'University of Pennsylvania campus' },
+      { name: 'Veterans Stadium', years: '1971–2002', description: '32 seasons in The Vet' },
+      { name: 'Lincoln Financial Field', years: '2003–present', description: 'State-of-the-art facility in South Philadelphia', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'LII (2017), LIX (2024)', count: 2 },
+      { title: 'NFL Championships', description: '1948, 1949, 1960 (pre-Super Bowl)', count: 3 },
+      { title: 'NFC Championships', description: 'Most recent: 2024', count: 5 },
+      { title: 'Division Titles', description: 'Most recent: 2024', count: 16 }
+    ]
+  },
+
+  'pittsburgh-steelers': {
+    founded: '1933',
+    stadium: 'Acrisure Stadium',
+    capacity: '68,400',
+    location: 'Pittsburgh, PA',
+    owner: 'Art Rooney II',
+    conference: 'AFC',
+    division: 'AFC North',
+    superbowlWins: 6,
+    superbowlAppearances: ['1974 (IX)', '1975 (X)', '1978 (XIII)', '1979 (XIV)', '1995 (XXX)', '2005 (XL)', '2008 (XLIII)', '2010 (XLV)'],
+    conferenceChampionships: 8,
+    divisionTitles: 25,
+    playoffAppearances: 33,
+    retiredNumbers: [
+      { number: '70', name: 'Ernie Stautner', position: 'Defensive Tackle', years: '1950-1963' }
+    ],
+    stadiumHistory: [
+      { name: 'Forbes Field', years: '1933–1957', description: 'Original home shared with Pirates' },
+      { name: 'Forbes Field & Pitt Stadium', years: '1958–1963', description: 'Split home games between venues' },
+      { name: 'Pitt Stadium', years: '1964–1969', description: 'University of Pittsburgh campus' },
+      { name: 'Three Rivers Stadium', years: '1970–2000', description: '31 seasons shared with Pirates' },
+      { name: 'Heinz Field/Acrisure Stadium', years: '2001–present', description: 'North Shore stadium • Most Super Bowl wins since opening', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'IX, X, XIII, XIV, XL, XLIII (most in NFL)', count: 6 },
+      { title: 'AFC Championships', description: 'Most recent: 2010', count: 8 },
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 25 },
+      { title: 'Playoff Wins', description: 'Most in NFL history', count: 36 }
+    ]
+  },
+
+  'san-francisco-49ers': {
+    founded: '1946',
+    stadium: 'Levi\'s Stadium',
+    capacity: '68,500',
+    location: 'Santa Clara, CA',
+    owner: 'Denise DeBartolo York',
+    conference: 'NFC',
+    division: 'NFC West',
+    superbowlWins: 5,
+    superbowlAppearances: ['1981 (XVI)', '1984 (XIX)', '1988 (XXIII)', '1989 (XXIV)', '1994 (XXIX)', '2012 (XLVII)', '2019 (LIV)'],
+    conferenceChampionships: 8,
+    divisionTitles: 22,
+    playoffAppearances: 30,
+    retiredNumbers: [
+      { number: '8', name: 'Steve Young', position: 'Quarterback', years: '1987-1999' },
+      { number: '12', name: 'John Brodie', position: 'Quarterback', years: '1957-1973' },
+      { number: '16', name: 'Joe Montana', position: 'Quarterback', years: '1979-1992' },
+      { number: '34', name: 'Joe Perry', position: 'Running Back', years: '1948-1960, 1963' },
+      { number: '37', name: 'Jimmy Johnson', position: 'Running Back', years: '1961-1976' },
+      { number: '39', name: 'Hugh McElhenny', position: 'Running Back', years: '1952-1960' },
+      { number: '42', name: 'Ronnie Lott', position: 'Safety', years: '1981-1990' },
+      { number: '70', name: 'Charlie Krueger', position: 'Defensive Tackle', years: '1958-1973' },
+      { number: '73', name: 'Leo Nomellini', position: 'Defensive Tackle', years: '1950-1963' },
+      { number: '79', name: 'Bob St. Clair', position: 'Tackle', years: '1953-1963' },
+      { number: '80', name: 'Jerry Rice', position: 'Wide Receiver', years: '1985-2000' },
+      { number: '87', name: 'Dwight Clark', position: 'Wide Receiver', years: '1979-1987' }
+    ],
+    stadiumHistory: [
+      { name: 'Kezar Stadium', years: '1946–1970', description: 'Original home in San Francisco' },
+      { name: 'Candlestick Park', years: '1971–2013', description: '43 seasons by the Bay • Five Super Bowl championships' },
+      { name: 'Levi\'s Stadium', years: '2014–present', description: 'State-of-the-art facility in Santa Clara • Hosted Super Bowl 50', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XVI, XIX, XXIII, XXIV, XXIX (5 total)', count: 5 },
+      { title: 'NFC Championships', description: 'Most recent: 2019', count: 8 },
+      { title: 'Division Titles', description: 'Most recent: 2023', count: 22 },
+      { title: 'Hall of Fame Players', description: 'Montana, Rice, Young, Lott, and more', count: 30 }
+    ]
+  },
+
+  'seattle-seahawks': {
+    founded: '1976',
+    stadium: 'Lumen Field',
+    capacity: '68,740',
+    location: 'Seattle, WA',
+    owner: 'Jody Allen',
+    conference: 'NFC',
+    division: 'NFC West',
+    superbowlWins: 1,
+    superbowlAppearances: ['2005 (XL)', '2013 (XLVIII)', '2014 (XLIX)'],
+    conferenceChampionships: 3,
+    divisionTitles: 11,
+    playoffAppearances: 20,
+    retiredNumbers: [
+      { number: '12', name: '12th Man', position: 'Fans', years: '1976-present' },
+      { number: '45', name: 'Kenny Easley', position: 'Safety', years: '1981-1987' },
+      { number: '71', name: 'Walter Jones', position: 'Tackle', years: '1997-2009' },
+      { number: '80', name: 'Steve Largent', position: 'Wide Receiver', years: '1976-1989' },
+      { number: '96', name: 'Cortez Kennedy', position: 'Defensive Tackle', years: '1990-2000' }
+    ],
+    stadiumHistory: [
+      { name: 'Kingdome', years: '1976–1999', description: 'Original home for 24 seasons' },
+      { name: 'Husky Stadium', years: '2000–2001', description: 'Temporary home during new stadium construction' },
+      { name: 'Seahawks Stadium/Lumen Field', years: '2002–present', description: 'Home of the 12th Man • Loudest stadium in NFL', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XLVIII (2013) - Legion of Boom era', count: 1 },
+      { title: 'NFC Championships', description: 'Most recent: 2014', count: 3 },
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 11 },
+      { title: '12th Man', description: 'Loudest crowd noise records', count: 1 }
+    ]
+  },
+
+  'tampa-bay-buccaneers': {
+    founded: '1976',
+    stadium: 'Raymond James Stadium',
+    capacity: '65,618',
+    location: 'Tampa, FL',
+    owner: 'Glazer Family',
+    conference: 'NFC',
+    division: 'NFC South',
+    superbowlWins: 2,
+    superbowlAppearances: ['2002 (XXXVII)', '2020 (LV)'],
+    conferenceChampionships: 2,
+    divisionTitles: 6,
+    playoffAppearances: 14,
+    retiredNumbers: [
+      { number: '12', name: 'Tom Brady', position: 'Quarterback', years: '2020-2022' },
+      { number: '40', name: 'Mike Alstott', position: 'Fullback', years: '1996-2006' },
+      { number: '47', name: 'John Lynch', position: 'Safety', years: '1993-2003' },
+      { number: '55', name: 'Derrick Brooks', position: 'Linebacker', years: '1995-2008' },
+      { number: '63', name: 'Lee Roy Selmon', position: 'Defensive End', years: '1976-1984' },
+      { number: '99', name: 'Warren Sapp', position: 'Defensive Tackle', years: '1995-2003' }
+    ],
+    stadiumHistory: [
+      { name: 'Tampa Stadium', years: '1976–1997', description: 'Original home for 22 seasons' },
+      { name: 'Raymond James Stadium', years: '1998–present', description: 'Pirate ship • Two Super Bowl championships', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XXXVII (2002), LV (2020)', count: 2 },
+      { title: 'NFC Championships', description: 'Most recent: 2020', count: 2 },
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 6 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2022', count: 14 }
+    ]
+  },
+
+  'tennessee-titans': {
+    founded: '1960',
+    stadium: 'Nissan Stadium',
+    capacity: '69,143',
+    location: 'Nashville, TN',
+    owner: 'Amy Adams Strunk',
+    conference: 'AFC',
+    division: 'AFC South',
+    superbowlWins: 0,
+    superbowlAppearances: ['1999 (XXXIV)'],
+    conferenceChampionships: 1,
+    divisionTitles: 8,
+    playoffAppearances: 22,
+    retiredNumbers: [
+      { number: '1', name: 'Warren Moon', position: 'Quarterback', years: '1984-1993' },
+      { number: '9', name: 'Steve McNair', position: 'Quarterback', years: '1995-2005' },
+      { number: '27', name: 'Eddie George', position: 'Running Back', years: '1996-2003' },
+      { number: '34', name: 'Earl Campbell', position: 'Running Back', years: '1978-1984' },
+      { number: '43', name: 'Jim Norton', position: 'Safety', years: '1960-1972' },
+      { number: '63', name: 'Mike Munchak', position: 'Guard', years: '1982-1993' },
+      { number: '65', name: 'Elvin Bethea', position: 'Defensive End', years: '1968-1983' },
+      { number: '74', name: 'Bruce Matthews', position: 'Guard/Center', years: '1983-2001' }
+    ],
+    stadiumHistory: [
+      { name: 'Jeppesen Stadium', years: '1960–1964', description: 'Original home as Houston Oilers' },
+      { name: 'Rice Stadium', years: '1965–1967', description: 'University of Houston campus' },
+      { name: 'Astrodome', years: '1968–1996', description: 'The Eighth Wonder of the World' },
+      { name: 'Liberty Bowl Memorial Stadium', years: '1997', description: 'One season in Memphis as Tennessee Oilers' },
+      { name: 'Vanderbilt Stadium', years: '1998', description: 'Temporary Nashville home' },
+      { name: 'Adelphia Coliseum/Nissan Stadium', years: '1999–present', description: 'Permanent Nashville home • Music City Miracle', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'AFL Championships', description: '1960, 1961 (Houston Oilers)', count: 2 },
+      { title: 'Super Bowl Appearances', description: 'XXXIV (1999) - One yard short', count: 1 },
+      { title: 'AFC Championships', description: '1999', count: 1 },
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 8 }
+    ]
+  },
+
+  'washington-commanders': {
+    founded: '1932',
+    stadium: 'Commanders Field',
+    capacity: '62,000',
+    location: 'Landover, MD',
+    owner: 'Josh Harris',
+    conference: 'NFC',
+    division: 'NFC East',
+    superbowlWins: 3,
+    superbowlAppearances: ['1972 (VII)', '1982 (XVII)', '1983 (XVIII)', '1987 (XXII)', '1991 (XXVI)'],
+    conferenceChampionships: 5,
+    divisionTitles: 14,
+    playoffAppearances: 25,
+    retiredNumbers: [
+      { number: '7', name: 'Joe Theismann', position: 'Quarterback', years: '1974-1985' },
+      { number: '9', name: 'Sonny Jurgensen', position: 'Quarterback', years: '1964-1974' },
+      { number: '21', name: 'Sean Taylor', position: 'Safety', years: '2004-2007' },
+      { number: '28', name: 'Darrell Green', position: 'Cornerback', years: '1983-2002' },
+      { number: '33', name: 'Sammy Baugh', position: 'Quarterback', years: '1937-1952' },
+      { number: '44', name: 'John Riggins', position: 'Running Back', years: '1976-1979, 1981-1985' },
+      { number: '70', name: 'Sam Huff', position: 'Linebacker', years: '1964-1967, 1969' }
+    ],
+    stadiumHistory: [
+      { name: 'Fenway Park', years: '1932', description: 'Original home as Boston Braves' },
+      { name: 'Braves Field', years: '1932', description: 'Brief stint in Boston' },
+      { name: 'Polo Grounds', years: '1936', description: 'One season in New York' },
+      { name: 'Griffith Stadium', years: '1937–1960', description: '24 seasons in Washington D.C.' },
+      { name: 'D.C. Stadium/RFK Stadium', years: '1961–1996', description: '36 seasons • Three Super Bowl championships' },
+      { name: 'FedExField/Commanders Field', years: '1997–present', description: 'Landover home • Recent ownership change', isCurrent: true }
+    ],
+    achievements: [
+      { title: 'Super Bowl Championships', description: 'XVII (1982), XXII (1987), XXVI (1991)', count: 3 },
+      { title: 'NFL Championships', description: '1937, 1942 (pre-Super Bowl)', count: 2 },
+      { title: 'NFC Championships', description: 'Most recent: 1991', count: 5 },
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 14 }
     ]
   }
+
+  // Add more teams as needed...
 };
 
-export function getTeamInfo(teamId: string): TeamInfo | undefined {
-  return teamInfo[teamId];
-}
+// Fallback data for teams not yet defined
+export const getTeamInfo = (teamId: string): TeamInfoData => {
+  return teamInfoData[teamId] || {
+    founded: '1960',
+    stadium: 'Unknown Stadium',
+    capacity: 'N/A',
+    location: 'Unknown',
+    owner: 'Unknown',
+    conference: 'NFL',
+    division: 'Unknown',
+    superbowlWins: 0,
+    superbowlAppearances: [],
+    conferenceChampionships: 0,
+    divisionTitles: 0,
+    playoffAppearances: 0,
+    retiredNumbers: [],
+    stadiumHistory: [],
+    achievements: []
+  };
+};

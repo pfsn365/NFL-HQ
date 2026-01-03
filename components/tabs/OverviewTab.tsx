@@ -1,255 +1,343 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
+import OptimizedImage from '../OptimizedImage';
 import { TeamData, getAllTeams } from '@/data/teams';
-import { useState, useEffect } from 'react';
+import { trackNewsClick, trackStandingsView, trackScheduleView } from '@/utils/ga-events';
+
+// Helper function to clean player names for display and URLs
+const getCleanPlayerName = (playerName: string) => {
+  // Handle specific player name mappings
+  if (playerName === 'James Cook III') {
+    return 'James Cook';
+  }
+
+  return playerName;
+};
+
+// Helper function to generate Pro Football Network URL
+const getPFNUrl = (playerName: string) => {
+  const cleanName = getCleanPlayerName(playerName);
+  return `https://www.profootballnetwork.com/players/${cleanName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
+};
+
+// Helper function to get teams in the same division
+const getDivisionTeams = (currentTeam: TeamData): TeamData[] => {
+  const allTeams = getAllTeams();
+  return allTeams
+    .filter(team => team.division === currentTeam.division)
+    .sort((a, b) => {
+      // Sort by record (this would need real win-loss data in production)
+      // For now, just sort alphabetically by city name
+      return a.city.localeCompare(b.city);
+    });
+};
+
+// Helper function to get team data by abbreviation
+const getTeamByAbbreviation = (abbr: string): TeamData | null => {
+  const allTeams = getAllTeams();
+  return allTeams.find(team =>
+    team.abbreviation.toLowerCase() === abbr.toLowerCase() ||
+    team.espnAbbr.toLowerCase() === abbr.toLowerCase()
+  ) || null;
+};
+
+// Helper function to get team nickname from full name
+const getTeamNickname = (opponent: string, opponentAbbr?: string): string => {
+  let targetTeam: TeamData | null = null;
+
+  if (opponentAbbr) {
+    targetTeam = getTeamByAbbreviation(opponentAbbr);
+  }
+
+  if (!targetTeam) {
+    // Try to find by opponent name
+    const allTeams = getAllTeams();
+    targetTeam = allTeams.find(team =>
+      team.fullName.toLowerCase() === opponent.toLowerCase() ||
+      team.name.toLowerCase() === opponent.toLowerCase()
+    ) || null;
+  }
+
+  // Return the nickname if we found the team, otherwise extract from full name
+  if (targetTeam) {
+    return targetTeam.name; // This is the nickname (e.g., "Chargers")
+  }
+
+  // Fallback: extract nickname from full name
+  // "Los Angeles Chargers" -> "Chargers"
+  const parts = opponent.split(' ');
+  return parts[parts.length - 1];
+};
+
+// Helper function to get team URL by name or abbreviation
+const getTeamUrl = (opponent: string, opponentAbbr?: string): string => {
+  let targetTeam: TeamData | null = null;
+
+  if (opponentAbbr) {
+    targetTeam = getTeamByAbbreviation(opponentAbbr);
+  }
+
+  if (!targetTeam) {
+    // Try to find by opponent name
+    const allTeams = getAllTeams();
+    targetTeam = allTeams.find(team =>
+      team.fullName.toLowerCase() === opponent.toLowerCase() ||
+      team.name.toLowerCase() === opponent.toLowerCase()
+    ) || null;
+  }
+
+  if (targetTeam) {
+    return `/nfl/teams/${targetTeam.id}`;
+  }
+
+  return '#';
+};
 
 interface OverviewTabProps {
   team: TeamData;
   onTabChange?: (tab: string) => void;
 }
 
-// Map API team slugs to our team IDs
-const teamSlugMapping: Record<string, string> = {
-  'atlanta-hawks': 'atlanta-hawks',
-  'boston-celtics': 'boston-celtics',
-  'brooklyn-nets': 'brooklyn-nets',
-  'charlotte-hornets': 'charlotte-hornets',
-  'chicago-bulls': 'chicago-bulls',
-  'cleveland-cavaliers': 'cleveland-cavaliers',
-  'dallas-mavericks': 'dallas-mavericks',
-  'denver-nuggets': 'denver-nuggets',
-  'detroit-pistons': 'detroit-pistons',
-  'golden-state-warriors': 'golden-state-warriors',
-  'houston-rockets': 'houston-rockets',
-  'indiana-pacers': 'indiana-pacers',
-  'la-clippers': 'los-angeles-clippers',
-  'los-angeles-clippers': 'los-angeles-clippers',
-  'lakers': 'los-angeles-lakers',
-  'los-angeles-lakers': 'los-angeles-lakers',
-  'memphis-grizzlies': 'memphis-grizzlies',
-  'miami-heat': 'miami-heat',
-  'milwaukee-bucks': 'milwaukee-bucks',
-  'minnesota-timberwolves': 'minnesota-timberwolves',
-  'new-orleans-pelicans': 'new-orleans-pelicans',
-  'new-york-knicks': 'new-york-knicks',
-  'oklahoma-city-thunder': 'oklahoma-city-thunder',
-  'orlando-magic': 'orlando-magic',
-  'philadelphia-76ers': 'philadelphia-76ers',
-  'phoenix-suns': 'phoenix-suns',
-  'portland-trail-blazers': 'portland-trail-blazers',
-  'portland-trailblazers': 'portland-trail-blazers',
-  'sacramento-kings': 'sacramento-kings',
-  'san-antonio-spurs': 'san-antonio-spurs',
-  'toronto-raptors': 'toronto-raptors',
-  'utah-jazz': 'utah-jazz',
-  'washington-wizards': 'washington-wizards',
-};
-
-interface StatLeader {
-  name: string;
-  stat: string;
+interface Article {
+  title: string;
+  description: string;
+  link: string;
+  pubDate: string;
+  author: string;
+  category: string;
+  readTime: string;
+  featuredImage?: string;
 }
 
-interface StatLeaders {
-  points: StatLeader;
-  rebounds: StatLeader;
-  assists: StatLeader;
-  steals: StatLeader;
-  blocks: StatLeader;
-  fieldGoalPct: StatLeader;
+interface ScheduleGame {
+  week: number | string;
+  date: string;
+  opponent: string;
+  opponentLogo: string;
+  opponentAbbr?: string;
+  isHome: boolean | null;
+  time: string;
+  tv: string;
+  venue: string;
+  result?: 'W' | 'L' | 'T' | null;
+  score?: { home: number; away: number };
+  eventType: string;
 }
+
 
 export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
-  const [divisionStandings, setDivisionStandings] = useState<any[]>([]);
-  const [standingsLoading, setStandingsLoading] = useState(true);
-
-  // Team schedule state
-  const [teamSchedule, setTeamSchedule] = useState<any[]>([]);
-  const [scheduleLoading, setScheduleLoading] = useState(true);
-
-  // Stat leaders state
-  const [statLeaders, setStatLeaders] = useState<StatLeaders>({
-    points: { name: '-', stat: '-' },
-    rebounds: { name: '-', stat: '-' },
-    assists: { name: '-', stat: '-' },
-    steals: { name: '-', stat: '-' },
-    blocks: { name: '-', stat: '-' },
-    fieldGoalPct: { name: '-', stat: '-' },
-  });
-  const [statLeadersLoading, setStatLeadersLoading] = useState(true);
-
-  // NBA articles state
-  const [articles, setArticles] = useState<any[]>([]);
-  const [articlesLoading, setArticlesLoading] = useState(true);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [visibleArticles, setVisibleArticles] = useState(3);
 
-  // Fetch team schedule
-  useEffect(() => {
-    async function fetchTeamSchedule() {
-      try {
-        const response = await fetch(`/nfl-hq/api/nfl/schedule/${team.id}?season=2025`);
+  // Schedule state
+  const [schedule, setSchedule] = useState<ScheduleGame[]>([]);
+  const [scheduleLoading, setScheduleLoading] = useState(true);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
 
-        if (!response.ok) return;
+  // Stats state
+  const [stats, setStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
-        const data = await response.json();
+  // Division standings state
+  const [divisionStandings, setDivisionStandings] = useState<any[]>([]);
+  const [standingsLoading, setStandingsLoading] = useState(true);
+  const [standingsError, setStandingsError] = useState<string | null>(null);
 
-        if (data.schedule) {
-          // Get next 5 games (upcoming + recent)
-          const now = new Date();
-          const relevantGames = data.schedule
-            .filter((game: any) => {
-              const gameDate = new Date(game.start_date);
-              const daysDiff = (gameDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-              return daysDiff >= -3; // Include games from last 3 days and all future
-            })
-            .slice(0, 5);
 
-          setTeamSchedule(relevantGames);
-        }
-      } catch (err) {
-        console.error('Error fetching team schedule:', err);
-      } finally {
-        setScheduleLoading(false);
+  const fetchOverviewArticles = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Use the team-specific API endpoint that works for all teams
+      const response = await fetch(`/nfl/teams/api/overview-articles/${team.id}`);
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
-    }
 
-    fetchTeamSchedule();
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch articles');
+      }
+
+      // Set all articles for pagination
+      setArticles(data.articles);
+    } catch (err) {
+      setError(`Failed to load ${team.name} articles`);
+      console.error('Error fetching overview articles:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [team.id, team.name]);
+
+  const fetchTeamSchedule = useCallback(async () => {
+    try {
+      setScheduleLoading(true);
+      setScheduleError(null);
+
+      const response = await fetch(`/nfl/teams/api/schedule/${team.id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Schedule data not available for this team yet');
+        }
+        throw new Error(`Failed to fetch schedule: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.schedule || !Array.isArray(data.schedule)) {
+        throw new Error('Invalid schedule data received');
+      }
+
+      // Filter to regular season games only
+      const regularSeasonGames = data.schedule.filter(
+        (game: ScheduleGame) => game.eventType === 'Regular Season'
+      );
+
+      // Find the current week or most recent week with results
+      const now = new Date();
+      const currentWeekIndex = regularSeasonGames.findIndex((game: ScheduleGame) => {
+        if (game.opponentAbbr === 'BYE') return false;
+        const gameDate = new Date(game.date);
+        return gameDate >= now && !game.result;
+      });
+
+      let relevantGames: ScheduleGame[];
+
+      if (currentWeekIndex === -1) {
+        // No upcoming games - show last 5 games of the season
+        relevantGames = regularSeasonGames.slice(-5);
+      } else {
+        // Show 2 games before current week and 2 games after (total 5 games)
+        const startIndex = Math.max(0, currentWeekIndex - 2);
+        const endIndex = Math.min(regularSeasonGames.length, startIndex + 5);
+
+        // If we're near the end and can't get 5 games, shift the window back
+        const actualStartIndex = endIndex - startIndex < 5
+          ? Math.max(0, regularSeasonGames.length - 5)
+          : startIndex;
+
+        relevantGames = regularSeasonGames.slice(actualStartIndex, actualStartIndex + 5);
+      }
+
+      setSchedule(relevantGames);
+    } catch (err) {
+      console.error('Error fetching schedule:', err);
+      setScheduleError(err instanceof Error ? err.message : 'Failed to load schedule');
+    } finally {
+      setScheduleLoading(false);
+    }
   }, [team.id]);
 
-  // Fetch live standings for division
-  useEffect(() => {
-    async function fetchDivisionStandings() {
-      try {
-        const response = await fetch('/nfl-hq/api/nfl/standings?season=2025&level=conference');
+  const fetchTeamStats = useCallback(async () => {
+    try {
+      setStatsLoading(true);
+      setStatsError(null);
 
-        if (!response.ok) return;
+      const response = await fetch(`/nfl/teams/api/stats/${team.id}`);
 
-        const data = await response.json();
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Stats data not available for this team yet');
+        }
+        throw new Error(`Failed to fetch stats: ${response.status}`);
+      }
 
-        // Find teams in this team's division
-        // API returns { data: { standings: { conferences: [...] } } }
-        const ourDivisionTeams: any[] = [];
-        const allTeams = getAllTeams();
-        const conferences = data.data?.standings?.conferences;
+      const data = await response.json();
 
-        if (conferences) {
-          for (const conf of conferences) {
-            for (const apiTeam of conf.teams) {
-              // API uses sk_slug for team identifiers
-              const teamId = teamSlugMapping[apiTeam.sk_slug] || apiTeam.sk_slug;
-              const ourTeam = allTeams.find(t => t.id === teamId);
+      if (!data.stats) {
+        throw new Error('Invalid stats data received');
+      }
 
-              if (ourTeam && ourTeam.division === team.division) {
-                ourDivisionTeams.push({
-                  id: teamId,
-                  abbreviation: ourTeam.abbreviation,
-                  logoUrl: ourTeam.logoUrl,
-                  wins: apiTeam.wins || 0,
-                  losses: apiTeam.losses || 0,
-                  winPct: parseFloat(apiTeam.percentage || '0'),
-                });
-              }
-            }
+      setStats(data.stats);
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+      setStatsError(err instanceof Error ? err.message : 'Failed to load stats');
+    } finally {
+      setStatsLoading(false);
+    }
+  }, [team.id]);
+
+  const fetchDivisionStandings = useCallback(async () => {
+    try {
+      setStandingsLoading(true);
+      setStandingsError(null);
+
+      // Fetch schedule data for all teams in the division
+      const divisionTeams = getDivisionTeams(team);
+      const standingsPromises = divisionTeams.map(async (divisionTeam) => {
+        try {
+          const response = await fetch(`/nfl/teams/api/schedule/${divisionTeam.id}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch schedule for ${divisionTeam.name}`);
           }
-        }
+          const data = await response.json();
 
-        // Sort by win percentage
-        ourDivisionTeams.sort((a, b) => b.winPct - a.winPct);
-        setDivisionStandings(ourDivisionTeams);
-      } catch (err) {
-        console.error('Error fetching division standings:', err);
-      } finally {
-        setStandingsLoading(false);
-      }
-    }
+          // Calculate record from regular season games only
+          const regularSeasonGames = data.schedule.filter((game: ScheduleGame) =>
+            game.eventType === 'Regular Season' && game.result !== null
+          );
 
-    fetchDivisionStandings();
-  }, [team.division]);
+          const wins = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'W').length;
+          const losses = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'L').length;
+          const ties = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'T').length;
 
-  // Fetch stat leaders
-  useEffect(() => {
-    async function fetchStatLeaders() {
-      try {
-        const response = await fetch(`/nfl-hq/api/nfl/team-stats/${team.id}?season=2025&event=regular`);
-
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const playerStats = data?.data?.player_stats;
-
-        if (playerStats && Array.isArray(playerStats) && playerStats.length > 0) {
-          // Find leaders for each category
-          const getLeader = (stats: any[], key: string): StatLeader => {
-            const sorted = [...stats].sort((a, b) =>
-              parseFloat(b[key] || '0') - parseFloat(a[key] || '0')
-            );
-            const leader = sorted[0];
-            return leader ? { name: leader.name, stat: leader[key] } : { name: '-', stat: '-' };
+          return {
+            ...divisionTeam,
+            wins,
+            losses,
+            ties,
+            winPercentage: wins + losses + ties > 0 ? wins / (wins + losses + ties) : 0
           };
-
-          setStatLeaders({
-            points: getLeader(playerStats, 'points_per_game'),
-            rebounds: getLeader(playerStats, 'rebounds_per_game'),
-            assists: getLeader(playerStats, 'assists_per_game'),
-            steals: getLeader(playerStats, 'steals_per_game'),
-            blocks: getLeader(playerStats, 'blocks_per_game'),
-            fieldGoalPct: getLeader(playerStats, 'fields_goal_percentage'),
-          });
+        } catch (err) {
+          console.error(`Error fetching data for ${divisionTeam.name}:`, err);
+          return {
+            ...divisionTeam,
+            wins: 0,
+            losses: 0,
+            ties: 0,
+            winPercentage: 0
+          };
         }
-      } catch (err) {
-        console.error('Error fetching stat leaders:', err);
-      } finally {
-        setStatLeadersLoading(false);
-      }
+      });
+
+      const standings = await Promise.all(standingsPromises);
+
+      // Sort by win percentage (highest first), then by wins as tiebreaker
+      standings.sort((a, b) => {
+        if (b.winPercentage !== a.winPercentage) {
+          return b.winPercentage - a.winPercentage;
+        }
+        return b.wins - a.wins;
+      });
+
+      setDivisionStandings(standings);
+    } catch (err) {
+      console.error('Error fetching division standings:', err);
+      setStandingsError(err instanceof Error ? err.message : 'Failed to load standings');
+    } finally {
+      setStandingsLoading(false);
     }
+  }, [team]);
 
-    fetchStatLeaders();
-  }, [team.id]);
-
-  // Fetch NBA articles
   useEffect(() => {
-    async function fetchArticles() {
-      try {
-        const response = await fetch('/nfl-hq/api/nfl/overview-articles');
+    // Track overview tab view
+    trackScheduleView(team.id, '2025');
+    trackStandingsView(team.division);
 
-        if (!response.ok) return;
+    fetchOverviewArticles();
+    fetchTeamSchedule();
+    fetchTeamStats();
+    fetchDivisionStandings();
+  }, [fetchOverviewArticles, fetchTeamSchedule, fetchTeamStats, fetchDivisionStandings, team.id, team.division]);
 
-        const data = await response.json();
-        setArticles(data.articles || []);
-      } catch (err) {
-        console.error('Error fetching articles:', err);
-      } finally {
-        setArticlesLoading(false);
-      }
-    }
-
-    fetchArticles();
-  }, []);
-
-  // Format schedule for display
-  const displaySchedule = teamSchedule.map(game => {
-    const isHome = game.home_team.team_slug === team.id || teamSlugMapping[game.home_team.team_slug] === team.id;
-    const opponent = isHome ? game.away_team : game.home_team;
-    const allTeams = getAllTeams();
-    const opponentTeam = allTeams.find(t => t.id === teamSlugMapping[opponent.team_slug] || t.id === opponent.team_slug);
-
-    const gameDate = new Date(game.start_date);
-    const formattedDate = gameDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const gameTime = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-    return {
-      date: formattedDate,
-      opponent: opponent.abbr,
-      opponentLogo: opponentTeam?.logoUrl || '',
-      isHome,
-      result: game.has_score ? (game.home_team.is_winner ? (isHome ? 'W' : 'L') : (isHome ? 'L' : 'W')) : null,
-      score: game.has_score ? `${game.home_team.score}-${game.away_team.score}` : null,
-      time: !game.has_score ? gameTime : null,
-      status: game.status
-    };
-  });
-
-  // Format date helper
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -259,7 +347,6 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
     });
   };
 
-  // Get relative time (e.g., "2h ago", "3d ago")
   const getRelativeTime = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
@@ -279,63 +366,75 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
     }
   };
 
-  // Use live division standings or fallback to static
-  const displayTeams = divisionStandings.length > 0
-    ? divisionStandings
-    : getAllTeams()
-        .filter(t => t.division === team.division)
-        .map(t => ({
-          id: t.id,
-          abbreviation: t.abbreviation,
-          logoUrl: t.logoUrl,
-          wins: parseInt(t.record.split('-')[0]),
-          losses: parseInt(t.record.split('-')[1]),
-          winPct: 0.500
-        }));
-
   return (
     <div className="space-y-6">
       {/* Row 1 - Three columns with key widgets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Column 1 - Schedule Widget */}
-        <div className="flex">
-          <div className="bg-white rounded-lg shadow p-6 min-h-[400px] flex flex-col w-full">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">2025-26 Schedule</h2>
+        <div>
+          <div className="bg-white rounded-lg shadow p-6 min-h-[400px] flex flex-col">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">2025 Schedule</h2>
 
             <div className="space-y-3 flex-grow">
-              {!scheduleLoading && displaySchedule.length > 0 ? (
-                displaySchedule.map((game, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-xs text-gray-600 w-12">{game.date}</div>
-                      <div className="flex items-center space-x-2">
-                        {!game.isHome && <span className="text-xs text-gray-500">@</span>}
-                        <img
-                          src={game.opponentLogo}
-                          alt={game.opponent}
-                          className="w-5 h-5"
-                        />
-                        <span className="text-sm font-medium">{game.opponent}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                    {game.result ? (
-                      <>
-                        <span className={`font-bold text-xs ${game.result === 'W' ? 'text-green-600' : 'text-red-600'}`}>
-                          {game.result}
-                        </span>
-                        <div className="text-xs text-gray-500">{game.score}</div>
-                      </>
-                    ) : (
-                      <div className="text-xs text-gray-600">{game.time}</div>
-                    )}
-                  </div>
-                </div>
-                ))
-              ) : scheduleLoading ? (
+              {scheduleLoading ? (
                 <div className="text-center py-8">
                   <div className="text-gray-500 text-sm">Loading schedule...</div>
                 </div>
+              ) : scheduleError ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-red-600">{scheduleError}</p>
+                </div>
+              ) : schedule.length > 0 ? (
+                schedule.map((game, index) => (
+                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                    {game.opponentAbbr === 'BYE' ? (
+                      <>
+                        <div className="flex items-center space-x-3">
+                          <div className="text-xs text-gray-600 w-12">Week {game.week}</div>
+                          <span className="text-sm font-medium text-gray-600">BYE WEEK</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center space-x-3">
+                          <div className="text-xs text-gray-600 w-12">
+                            {new Date(game.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {!game.isHome && <span className="text-xs text-gray-500">@</span>}
+                            <OptimizedImage
+                              src={game.opponentLogo}
+                              alt={game.opponentAbbr || ''}
+                              width={20}
+                              height={20}
+                              className="w-5 h-5"
+                              sizes="20px"
+                            />
+                            <a
+                              href={getTeamUrl(game.opponent, game.opponentAbbr)}
+                              className="text-sm font-medium hover:underline transition-colors"
+                              style={{ color: team.primaryColor }}
+                            >
+                              {getTeamNickname(game.opponent, game.opponentAbbr)}
+                            </a>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {game.result && game.score ? (
+                            <>
+                              <span className={`font-bold text-xs ${game.result === 'W' ? 'text-green-600' : 'text-red-600'}`}>
+                                {game.result}
+                              </span>
+                              <div className="text-xs text-gray-500">{game.score.home}-{game.score.away}</div>
+                            </>
+                          ) : (
+                            <div className="text-xs text-gray-600">{game.time || 'TBD'}</div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
               ) : (
                 <div className="text-center py-8">
                   <div className="text-gray-500 text-sm">No upcoming games</div>
@@ -356,10 +455,10 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
         </div>
 
         {/* Column 2 - Division Standings */}
-        <div className="flex">
-          <div className="bg-white rounded-lg shadow p-6 min-h-[400px] flex flex-col w-full">
+        <div>
+          <div className="bg-white rounded-lg shadow p-6 min-h-[400px] flex flex-col">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-900">{team.division} Division Standings</h2>
+              <h2 className="text-lg font-bold text-gray-900">{team.division} Standings</h2>
             </div>
             <div className="overflow-x-auto flex-grow">
               <table className="w-full text-sm">
@@ -372,115 +471,156 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayTeams.map((t, index) => (
-                    <tr
-                      key={t.id}
-                      className={`${t.id === team.id ? 'font-bold' : ''} ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                      style={t.id === team.id ? { backgroundColor: team.primaryColor + '10' } : {}}
-                    >
-                      <td className="py-2 pr-4">
-                        <div className="flex items-center space-x-2">
-                          <img
-                            src={t.logoUrl}
-                            alt={t.abbreviation}
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">{t.abbreviation}</span>
-                        </div>
+                  {standingsLoading ? (
+                    <>
+                      {[...Array(4)].map((_, i) => (
+                        <tr key={i} className="border-b">
+                          <td className="py-2">
+                            <div className="flex items-center space-x-2">
+                              <div className="h-4 w-4 bg-gray-200 rounded-full animate-pulse"></div>
+                              <div className="h-4 bg-gray-200 rounded animate-pulse w-12"></div>
+                            </div>
+                          </td>
+                          <td className="py-2 text-center">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-6 mx-auto"></div>
+                          </td>
+                          <td className="py-2 text-center">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-6 mx-auto"></div>
+                          </td>
+                          <td className="py-2 text-center">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-12 mx-auto"></div>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  ) : standingsError ? (
+                    <tr>
+                      <td colSpan={4} className="text-center p-4 text-red-600 text-xs">
+                        {standingsError}
                       </td>
-                      <td className="py-2 text-center">{t.wins}</td>
-                      <td className="py-2 text-center">{t.losses}</td>
-                      <td className="py-2 text-center">{t.winPct.toFixed(3)}</td>
                     </tr>
-                  ))}
+                  ) : (
+                    divisionStandings.map((divisionTeam, index) => (
+                      <tr
+                        key={divisionTeam.id}
+                        className={`${divisionTeam.id === team.id ? 'font-bold' : ''} ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                        style={divisionTeam.id === team.id ? { backgroundColor: team.primaryColor + '10' } : {}}
+                      >
+                        <td className="py-2 pr-4">
+                          <div className="flex items-center space-x-2">
+                            <OptimizedImage
+                              src={divisionTeam.logoUrl}
+                              alt={divisionTeam.abbreviation}
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                              sizes="16px"
+                            />
+                            <span className="text-sm">{divisionTeam.abbreviation}</span>
+                          </div>
+                        </td>
+                        <td className="py-2 text-center">{divisionTeam.wins}</td>
+                        <td className="py-2 text-center">{divisionTeam.losses}</td>
+                        <td className="py-2 text-center">{divisionTeam.winPercentage.toFixed(3)}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
             <a
-              href="/standings"
+              href="https://www.profootballnetwork.com/nfl-playoff-predictor"
+              target="_blank"
+              rel="noopener noreferrer"
               className="block w-full mt-4 px-4 py-3 text-sm sm:text-base font-medium text-white rounded-lg hover:opacity-90 transition-opacity text-center min-h-[48px] flex items-center justify-center"
               style={{ backgroundColor: team.primaryColor }}
             >
-              View All NBA Standings
+              View NFL Playoff Predictor
             </a>
           </div>
         </div>
 
         {/* Column 3 - Team Stat Leaders */}
-        <div className="flex">
-          <div className="bg-white rounded-lg shadow p-6 min-h-[400px] flex flex-col w-full">
+        <div>
+          <div className="bg-white rounded-lg shadow p-6 min-h-[400px] flex flex-col">
             <div className="mb-4">
               <h2 className="text-lg font-bold text-gray-900">{team.name} Leaders</h2>
             </div>
-            {statLeadersLoading ? (
+            {statsLoading ? (
               <div className="flex items-center justify-center py-8 flex-grow">
                 <div className="text-gray-500 text-sm">Loading stats...</div>
               </div>
+            ) : statsError ? (
+              <div className="flex items-center justify-center py-8 flex-grow">
+                <div className="text-red-600 text-sm">{statsError}</div>
+              </div>
             ) : (
               <div className="space-y-3 flex-grow">
-                {/* Points & Rebounds */}
+                {/* Passing & Rushing */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-center">
                     <div className="text-center py-2 text-xs font-medium rounded mb-2 bg-gray-100 text-gray-700">
-                      POINTS
+                      PASSING YDS
                     </div>
-                    <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
-                      {statLeaders.points.name}
-                    </div>
-                    <div className="text-sm font-bold">{statLeaders.points.stat}</div>
+                    {stats?.passingYards ? (
+                      <>
+                        <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
+                          {getCleanPlayerName(stats.passingYards.name)}
+                        </div>
+                        <div className="text-sm font-bold">{stats.passingYards.stat.toLocaleString()}</div>
+                      </>
+                    ) : (
+                      <div className="text-xs text-gray-500">No data</div>
+                    )}
                   </div>
                   <div className="text-center">
                     <div className="text-center py-2 text-xs font-medium rounded mb-2 bg-gray-100 text-gray-700">
-                      REBOUNDS
+                      RUSHING YDS
                     </div>
-                    <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
-                      {statLeaders.rebounds.name}
-                    </div>
-                    <div className="text-sm font-bold">{statLeaders.rebounds.stat}</div>
+                    {stats?.rushingYards ? (
+                      <>
+                        <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
+                          {getCleanPlayerName(stats.rushingYards.name)}
+                        </div>
+                        <div className="text-sm font-bold">{stats.rushingYards.stat.toLocaleString()}</div>
+                      </>
+                    ) : (
+                      <div className="text-xs text-gray-500">No data</div>
+                    )}
                   </div>
                 </div>
 
-                {/* Assists & Steals */}
+                {/* Receiving & Tackles */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-center">
                     <div className="text-center py-2 text-xs font-medium rounded mb-2 bg-gray-100 text-gray-700">
-                      ASSISTS
+                      RECEIVING YDS
                     </div>
-                    <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
-                      {statLeaders.assists.name}
-                    </div>
-                    <div className="text-sm font-bold">{statLeaders.assists.stat}</div>
+                    {stats?.receivingYards ? (
+                      <>
+                        <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
+                          {getCleanPlayerName(stats.receivingYards.name)}
+                        </div>
+                        <div className="text-sm font-bold">{stats.receivingYards.stat.toLocaleString()}</div>
+                      </>
+                    ) : (
+                      <div className="text-xs text-gray-500">No data</div>
+                    )}
                   </div>
                   <div className="text-center">
                     <div className="text-center py-2 text-xs font-medium rounded mb-2 bg-gray-100 text-gray-700">
-                      STEALS
+                      TACKLES
                     </div>
-                    <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
-                      {statLeaders.steals.name}
-                    </div>
-                    <div className="text-sm font-bold">{statLeaders.steals.stat}</div>
-                  </div>
-                </div>
-
-                {/* Blocks & FG% */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="text-center">
-                    <div className="text-center py-2 text-xs font-medium rounded mb-2 bg-gray-100 text-gray-700">
-                      BLOCKS
-                    </div>
-                    <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
-                      {statLeaders.blocks.name}
-                    </div>
-                    <div className="text-sm font-bold">{statLeaders.blocks.stat}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-center py-2 text-xs font-medium rounded mb-2 bg-gray-100 text-gray-700">
-                      FG%
-                    </div>
-                    <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
-                      {statLeaders.fieldGoalPct.name}
-                    </div>
-                    <div className="text-sm font-bold">{statLeaders.fieldGoalPct.stat}</div>
+                    {stats?.tackles ? (
+                      <>
+                        <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
+                          {getCleanPlayerName(stats.tackles.name)}
+                        </div>
+                        <div className="text-sm font-bold">{stats.tackles.stat.toLocaleString()}</div>
+                      </>
+                    ) : (
+                      <div className="text-xs text-gray-500">No data</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -502,9 +642,9 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
       <div className="w-full">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Latest NBA Articles</h2>
+            <h2 className="text-xl font-bold text-gray-900">Latest {team.name} Articles</h2>
           </div>
-          {articlesLoading ? (
+          {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse">
@@ -521,15 +661,20 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
                 </div>
               ))}
             </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <div className="text-red-600 text-sm">{error}</div>
+            </div>
           ) : articles.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {articles.slice(0, visibleArticles).map((article, index) => (
                   <a
                     key={index}
-                    href={article.link || article.url}
+                    href={article.link}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackNewsClick(article.title, team.id)}
                     className="block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   >
                     {/* Featured Image */}
@@ -550,11 +695,11 @@ export default function OverviewTab({ team, onTabChange }: OverviewTabProps) {
                         {article.title}
                       </h3>
                       <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                        {article.description || article.excerpt || ''}
+                        {article.description}
                       </p>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-500">
-                          {article.pubDate ? getRelativeTime(article.pubDate) : ''}
+                          {getRelativeTime(article.pubDate)}
                         </span>
                         <span className="font-medium" style={{ color: team.primaryColor }}>
                           Read More →

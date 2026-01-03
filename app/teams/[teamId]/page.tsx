@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTeam, getAllTeamIds } from '@/data/teams';
-import TeamPageSimple from '@/components/TeamPageSimple';
+import TeamPage from '@/components/TeamPage';
 
 interface PageProps {
   params: Promise<{ teamId: string }>;
@@ -20,7 +20,7 @@ export default async function TeamPageRoute({ params }: PageProps) {
     notFound();
   }
 
-  return <TeamPageSimple team={team} initialTab="overview" />;
+  return <TeamPage team={team} initialTab="overview" />;
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -33,27 +33,28 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  const canonicalUrl = `https://www.profootballnetwork.com/nfl-hq/teams/${teamId}/`;
+  const canonicalUrl = `https://www.profootballnetwork.com/nfl/teams/${teamId}/`;
 
   return {
-    title: `${team.fullName} - NBA Team Page`,
-    description: `${team.fullName} roster, schedule, stats, and more. ${team.generalManager} (GM), ${team.headCoach} (HC). ${team.record} record in the ${team.division}.`,
+    title: `${team.fullName} - NFL Team Page`,
+    description: `${team.fullName} roster, schedule, stats, depth chart, and more. ${team.generalManager} (GM), ${team.headCoach} (HC). ${team.record} record in ${team.division}.`,
     keywords: [
       team.fullName,
       team.name,
       team.city,
-      'NBA',
+      'NFL',
       team.conference,
       team.division,
       'roster',
       'schedule',
-      'stats'
+      'stats',
+      'depth chart'
     ].join(', '),
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${team.fullName} - NBA Team Page`,
+      title: `${team.fullName} - NFL Team Page`,
       description: `${team.fullName} roster, schedule, stats, and more.`,
       images: [team.logoUrl],
       url: canonicalUrl,

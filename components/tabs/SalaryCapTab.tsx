@@ -1,305 +1,395 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import LayoutStabilizer from '@/components/LayoutStabilizer';
 import { TeamData } from '@/data/teams';
+
+// Helper function to generate Pro Football Network URL
+const getPFNUrl = (playerName: string) => {
+  return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
+};
+
+interface CapPlayer {
+  name: string;
+  slug: string;
+  capHit: number;
+  baseSalary: number;
+  signingBonus: number;
+  guaranteed: number;
+  restructureCapSaving: number;
+  extensionCapSaving: number;
+  cutDeadMoney: number;
+  cutSaving: number;
+  tradeDeadMoney: number;
+  tradeSaving: number;
+}
+
+interface TeamSummary {
+  capSpace: number;
+  salaryCap: number;
+  activeCapSpend: number;
+  deadMoney: number;
+}
+
+interface SalaryCapResponse {
+  teamId: string;
+  salaryCapData: {
+    teamSummary: TeamSummary;
+    players: CapPlayer[];
+  };
+  totalPlayers: number;
+  lastUpdated: string;
+  season: number;
+}
+
+type SortField = 'name' | 'capHit' | 'baseSalary' | 'guaranteed' | 'restructureCapSaving' | 'extensionCapSaving' | 'cutDeadMoney' | 'cutSaving';
+type SortDirection = 'asc' | 'desc';
 
 interface SalaryCapTabProps {
   team: TeamData;
 }
 
-interface PlayerSalary {
-  name: string;
-  age: number;
-  salaries: {
-    '2025-26': number;
-    '2026-27': number;
-    '2027-28': number;
-    '2028-29': number;
-    '2029-30': number;
-    '2030-31': number;
-    guaranteed: number;
-  };
-}
-
-interface TeamSalaryData {
-  lastUpdated: string;
-  source: string;
-  team: string;
-  slug: string;
-  totalPayroll: number;
-  salaryCap: number;
-  capSpace: number;
-  players: PlayerSalary[];
-}
-
 export default function SalaryCapTab({ team }: SalaryCapTabProps) {
-  const [salaryData, setSalaryData] = useState<TeamSalaryData | null>(null);
+  const [sortField, setSortField] = useState<SortField>('capHit');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [salaryCapData, setSalaryCapData] = useState<{teamSummary: TeamSummary, players: CapPlayer[]} | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>('2025-26');
+  const [showPotentialSavings, setShowPotentialSavings] = useState(false);
+
+  const fetchSalaryCap = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/nfl/teams/api/salary-cap/${team.id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Salary cap data not available for this team yet');
+        }
+        throw new Error(`Failed to fetch salary cap: ${response.status}`);
+      }
+
+      const data: SalaryCapResponse = await response.json();
+
+      if (!data.salaryCapData) {
+        throw new Error('Invalid salary cap data received');
+      }
+
+      setSalaryCapData(data.salaryCapData);
+    } catch (err) {
+      console.error('Error fetching salary cap:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load salary cap');
+    } finally {
+      setLoading(false);
+    }
+  }, [team.id]);
 
   useEffect(() => {
-    async function fetchSalaryData() {
-      try {
-        setLoading(true);
-        // Map team ID to file name (team IDs use full names, files use abbreviations)
-        const teamAbbrev = team.abbreviation.toLowerCase();
-        const response = await fetch(`/data/salary-cap/${teamAbbrev}.json`);
+    fetchSalaryCap();
+  }, [fetchSalaryCap]);
 
-        if (!response.ok) {
-          throw new Error('Salary data not available');
-        }
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection(field === 'name' ? 'asc' : 'desc');
+    }
+  };
 
-        const data: TeamSalaryData = await response.json();
-        setSalaryData(data);
-      } catch (err) {
-        console.error('Error loading salary data:', err);
-        setError('Salary cap data is currently unavailable for this team.');
-      } finally {
-        setLoading(false);
-      }
+  const sortedData = salaryCapData ? [...salaryCapData.players].sort((a, b) => {
+    let aValue = a[sortField];
+    let bValue = b[sortField];
+
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase();
+      bValue = (bValue as string).toLowerCase();
     }
 
-    fetchSalaryData();
-  }, [team]);
+    if (sortDirection === 'asc') {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
+  }) : [];
 
-  const formatCurrency = (amount: number): string => {
-    if (amount === 0) return '-';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return (
+        <svg className="w-3 h-3 inline ml-1" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 10l4-4 4 4H8zm0 4l4 4 4-4H8z" opacity="0.5"/>
+        </svg>
+      );
+    }
+    if (sortDirection === 'asc') {
+      return (
+        <svg className="w-3 h-3 inline ml-1" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 14l4-4 4 4H8z"/>
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-3 h-3 inline ml-1" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 10l4 4 4-4H8z"/>
+      </svg>
+    );
   };
-
-  const luxuryTaxThreshold = 187895000; // 2025-26 luxury tax threshold
-  const firstApron = 195945000; // First apron
-  const secondApron = 207824000; // Second apron
-
-  const isOverLuxuryTax = salaryData && salaryData.totalPayroll > luxuryTaxThreshold;
-  const isOverFirstApron = salaryData && salaryData.totalPayroll > firstApron;
-  const isOverSecondApron = salaryData && salaryData.totalPayroll > secondApron;
-
-  // Calculate year totals
-  const getYearTotal = (year: string): number => {
-    if (!salaryData) return 0;
-    return salaryData.players.reduce((sum, player) => {
-      return sum + (player.salaries[year as keyof typeof player.salaries] as number || 0);
-    }, 0);
-  };
-
-  // Sort players by selected year salary
-  const sortedPlayers = salaryData?.players ?
-    [...salaryData.players].sort((a, b) => {
-      const aSalary = a.salaries[selectedYear as keyof typeof a.salaries] as number || 0;
-      const bSalary = b.salaries[selectedYear as keyof typeof b.salaries] as number || 0;
-      return bSalary - aSalary;
-    }).filter(player => {
-      // Only show players with salary in selected year
-      return (player.salaries[selectedYear as keyof typeof player.salaries] as number || 0) > 0;
-    }) : [];
-
-  const years = ['2025-26', '2026-27', '2027-28', '2028-29', '2029-30', '2030-31'];
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6 min-h-[500px] flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-gray-900 mb-4"></div>
-          <p className="text-gray-600">Loading salary cap data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !salaryData) {
-    return (
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6 min-h-[500px]">
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Salary Cap</h2>
-            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '320px' }}></div>
+            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '270px' }}></div>
           </div>
         </div>
         <div className="text-center py-12">
-          <p className="text-gray-600 mb-2">{error || 'Salary cap data is not available for this team yet.'}</p>
-          <p className="text-sm text-gray-500">Data will be available soon via automated updates from Basketball Reference.</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading salary cap data...</p>
         </div>
-      </div>
+      </LayoutStabilizer>
     );
   }
 
-  const currentYearTotal = getYearTotal(selectedYear);
+  if (error) {
+    return (
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Salary Cap</h2>
+            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '270px' }}></div>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <div className="text-red-600 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Salary Cap</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={fetchSalaryCap}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
+            style={{ backgroundColor: team.primaryColor }}
+          >
+            Try Again
+          </button>
+        </div>
+      </LayoutStabilizer>
+    );
+  }
+
+  if (!salaryCapData) {
+    return (
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Salary Cap</h2>
+            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '270px' }}></div>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Salary Cap Data Available</h3>
+          <p className="text-gray-600">No salary cap data found for this team.</p>
+        </div>
+      </LayoutStabilizer>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+    <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Salary Cap</h2>
-          <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '320px' }}></div>
+          <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '270px' }}></div>
         </div>
       </div>
 
-      {/* Cap Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
-          <div>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(currentYearTotal)}</p>
-            <p className="text-sm text-gray-600">Total Payroll</p>
-            <p className="text-xs text-gray-500 mt-1">{sortedPlayers.length} players</p>
-          </div>
-        </div>
+      <div className="space-y-8">
+        {/* Cap Summary Cards */}
+        <div className="mb-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
+              <div className="text-center">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Salary Cap</h4>
+                <div className="text-2xl font-bold text-gray-900 mb-1">${salaryCapData.teamSummary.salaryCap.toFixed(1)}M</div>
+                <div className="text-sm text-gray-500">2025 Season</div>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-gray-300">
-          <div>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(salaryData.salaryCap)}</p>
-            <p className="text-sm text-gray-600">Salary Cap</p>
-            <p className="text-xs text-gray-500 mt-1">2025-26 Season</p>
-          </div>
-        </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
+              <div className="text-center">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Available Cap Space</h4>
+                <div className={`text-2xl font-bold mb-1 ${salaryCapData.teamSummary.capSpace > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  ${salaryCapData.teamSummary.capSpace.toFixed(1)}M
+                </div>
+                <div className="text-sm text-gray-500">
+                  {salaryCapData.teamSummary.capSpace > 0 ? 'Over Cap' : 'Under Cap'}
+                </div>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: salaryData.capSpace >= 0 ? '#10b981' : '#ef4444' }}>
-          <div>
-            <p className={`text-2xl font-bold ${salaryData.capSpace >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(Math.abs(salaryData.capSpace))}
-            </p>
-            <p className="text-sm text-gray-600">{salaryData.capSpace >= 0 ? 'Cap Space' : 'Over Cap'}</p>
-            <p className="text-xs text-gray-500 mt-1">
-              {((Math.abs(salaryData.capSpace) / salaryData.salaryCap) * 100).toFixed(1)}% of cap
-            </p>
-          </div>
-        </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
+              <div className="text-center">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Active Cap Spend</h4>
+                <div className="text-2xl font-bold text-gray-900 mb-1">${salaryCapData.teamSummary.activeCapSpend.toFixed(1)}M</div>
+                <div className="text-sm text-gray-500">
+                  {((salaryCapData.teamSummary.activeCapSpend / salaryCapData.teamSummary.salaryCap) * 100).toFixed(1)}% of cap
+                </div>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: isOverLuxuryTax ? '#ef4444' : '#10b981' }}>
-          <div>
-            <p className={`text-2xl font-bold ${isOverLuxuryTax ? 'text-red-600' : 'text-green-600'}`}>
-              {isOverLuxuryTax ? formatCurrency(salaryData.totalPayroll - luxuryTaxThreshold) : 'Under'}
-            </p>
-            <p className="text-sm text-gray-600">Luxury Tax</p>
-            <p className="text-xs text-gray-500 mt-1">
-              {isOverLuxuryTax ? 'Over threshold' : `${formatCurrency(luxuryTaxThreshold - salaryData.totalPayroll)} below`}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Luxury Tax & Apron Status */}
-      {isOverLuxuryTax && (
-        <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-          <h3 className="font-semibold text-red-900 mb-2">Luxury Tax Status</h3>
-          <div className="text-sm text-red-800 space-y-1">
-            <p>• Over luxury tax threshold ({formatCurrency(luxuryTaxThreshold)})</p>
-            {isOverFirstApron && <p>• Over first apron ({formatCurrency(firstApron)}) - Limited trade flexibility</p>}
-            {isOverSecondApron && <p>• Over second apron ({formatCurrency(secondApron)}) - Significant restrictions</p>}
-          </div>
-        </div>
-      )}
-
-      {/* Player Contracts Table */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
-          <h3 className="text-lg font-semibold text-gray-800">Player Salaries</h3>
-          <div className="relative">
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="appearance-none bg-white border-2 rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-900 cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors"
-              style={{
-                borderColor: team.primaryColor
-              }}
-            >
-              {years.map(year => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
+              <div className="text-center">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Dead Money</h4>
+                <div className="text-2xl font-bold text-gray-900 mb-1">${salaryCapData.teamSummary.deadMoney.toFixed(1)}M</div>
+                <div className="text-sm text-gray-500">
+                  {((salaryCapData.teamSummary.deadMoney / salaryCapData.teamSummary.salaryCap) * 100).toFixed(1)}% of cap
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
-                <th className="text-left p-3 font-medium">Player</th>
-                <th className="text-center p-3 font-medium">Age</th>
-                <th className="text-right p-3 font-medium">{selectedYear}</th>
-                <th className="text-right p-3 font-medium hidden sm:table-cell">Guaranteed</th>
-                <th className="text-center p-3 font-medium hidden md:table-cell">% of Cap</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedPlayers.map((player, index) => {
-                const salary = player.salaries[selectedYear as keyof typeof player.salaries] as number;
-                const capPercentage = (salary / salaryData.salaryCap) * 100;
 
-                return (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 font-medium text-gray-900">{player.name}</td>
-                    <td className="p-3 text-center text-gray-600">{player.age}</td>
-                    <td className="p-3 text-right font-semibold text-gray-900">{formatCurrency(salary)}</td>
-                    <td className="p-3 text-right text-gray-600 hidden sm:table-cell">
-                      {formatCurrency(player.salaries.guaranteed)}
+        {/* 2025 Active Roster Cap */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+            <h3 className="text-lg font-semibold text-gray-800">2025 Active Roster Cap</h3>
+            <button
+              onClick={() => setShowPotentialSavings(!showPotentialSavings)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors border ${
+                showPotentialSavings
+                  ? 'text-white border-transparent'
+                  : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50'
+              }`}
+              style={showPotentialSavings ? { backgroundColor: team.primaryColor } : {}}
+            >
+              {showPotentialSavings ? '✓ ' : ''}Potential Savings
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
+                  <th
+                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap min-w-[160px]"
+                    onClick={() => handleSort('name')}
+                  >
+                    PLAYER {getSortIcon('name')}
+                  </th>
+                  <th
+                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                    onClick={() => handleSort('capHit')}
+                  >
+                    CAP HIT {getSortIcon('capHit')}
+                  </th>
+                  <th
+                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                    onClick={() => handleSort('baseSalary')}
+                  >
+                    BASE SALARY {getSortIcon('baseSalary')}
+                  </th>
+                  <th
+                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                    onClick={() => handleSort('guaranteed')}
+                  >
+                    GUARANTEED {getSortIcon('guaranteed')}
+                  </th>
+
+                  {showPotentialSavings ? (
+                    <>
+                      <th
+                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        onClick={() => handleSort('restructureCapSaving')}
+                      >
+                        RESTRUCTURE {getSortIcon('restructureCapSaving')}
+                      </th>
+                      <th
+                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        onClick={() => handleSort('extensionCapSaving')}
+                      >
+                        EXTENSION {getSortIcon('extensionCapSaving')}
+                      </th>
+                      <th
+                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        onClick={() => handleSort('cutSaving')}
+                      >
+                        CUT SAVINGS {getSortIcon('cutSaving')}
+                      </th>
+                      <th
+                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        onClick={() => handleSort('cutDeadMoney')}
+                      >
+                        DEAD MONEY {getSortIcon('cutDeadMoney')}
+                      </th>
+                    </>
+                  ) : null}
+                </tr>
+              </thead>
+              <tbody>
+                {sortedData.map((player, index) => (
+                  <tr key={player.name} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="p-3 whitespace-nowrap">
+                      <a
+                        href={getPFNUrl(player.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium hover:underline"
+                        style={{ color: team.primaryColor }}
+                      >
+                        {player.name}
+                      </a>
                     </td>
-                    <td className="p-3 text-center text-gray-600 hidden md:table-cell">
-                      {capPercentage.toFixed(1)}%
+                    <td className="p-3 text-gray-900 font-medium whitespace-nowrap">
+                      {player.capHit >= 1 ? `$${player.capHit.toFixed(1)}M` : `$${(player.capHit * 1000000).toLocaleString()}`}
                     </td>
+                    <td className="p-3 text-gray-700 whitespace-nowrap">
+                      {player.baseSalary >= 1 ? `$${player.baseSalary.toFixed(1)}M` : `$${(player.baseSalary * 1000000).toLocaleString()}`}
+                    </td>
+                    <td className="p-3 text-gray-700 whitespace-nowrap">
+                      {player.guaranteed >= 1 ? `$${player.guaranteed.toFixed(1)}M` : `$${(player.guaranteed * 1000000).toLocaleString()}`}
+                    </td>
+
+                    {showPotentialSavings ? (
+                      <>
+                        <td className={`p-3 whitespace-nowrap font-medium ${
+                          player.restructureCapSaving > 0 ? 'text-green-600' :
+                          player.restructureCapSaving < 0 ? 'text-red-600' : 'text-gray-700'
+                        }`}>
+                          {player.restructureCapSaving >= 1 ? `$${player.restructureCapSaving.toFixed(1)}M` :
+                           player.restructureCapSaving <= -1 ? `-$${Math.abs(player.restructureCapSaving).toFixed(1)}M` :
+                           `$${(player.restructureCapSaving * 1000000).toLocaleString()}`}
+                        </td>
+                        <td className={`p-3 whitespace-nowrap font-medium ${
+                          player.extensionCapSaving > 0 ? 'text-green-600' :
+                          player.extensionCapSaving < 0 ? 'text-red-600' : 'text-gray-700'
+                        }`}>
+                          {player.extensionCapSaving >= 1 ? `$${player.extensionCapSaving.toFixed(1)}M` :
+                           player.extensionCapSaving <= -1 ? `-$${Math.abs(player.extensionCapSaving).toFixed(1)}M` :
+                           `$${(player.extensionCapSaving * 1000000).toLocaleString()}`}
+                        </td>
+                        <td className={`p-3 whitespace-nowrap font-medium ${
+                          player.cutSaving > 0 ? 'text-green-600' :
+                          player.cutSaving < 0 ? 'text-red-600' : 'text-gray-700'
+                        }`}>
+                          {player.cutSaving >= 1 ? `$${player.cutSaving.toFixed(1)}M` :
+                           player.cutSaving <= -1 ? `-$${Math.abs(player.cutSaving).toFixed(1)}M` :
+                           `$${(player.cutSaving * 1000000).toLocaleString()}`}
+                        </td>
+                        <td className="p-3 text-red-600 whitespace-nowrap font-medium">
+                          {player.cutDeadMoney >= 1 ? `$${player.cutDeadMoney.toFixed(1)}M` : `$${(player.cutDeadMoney * 1000000).toLocaleString()}`}
+                        </td>
+                      </>
+                    ) : null}
                   </tr>
-                );
-              })}
-              <tr className="font-bold border-t-2 border-gray-300">
-                <td className="p-3 text-gray-900" colSpan={2}>Total</td>
-                <td className="p-3 text-right text-gray-900">{formatCurrency(currentYearTotal)}</td>
-                <td className="p-3 text-right text-gray-600 hidden sm:table-cell">-</td>
-                <td className="p-3 text-center text-gray-600 hidden md:table-cell">
-                  {((currentYearTotal / salaryData.salaryCap) * 100).toFixed(1)}%
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-
-      {/* Multi-Year Overview */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Multi-Year Payroll Projection</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="text-left p-3 font-medium text-gray-700">Season</th>
-                <th className="text-right p-3 font-medium text-gray-700">Total Payroll</th>
-                <th className="text-right p-3 font-medium text-gray-700 hidden sm:table-cell">Active Players</th>
-              </tr>
-            </thead>
-            <tbody>
-              {years.map((year, index) => {
-                const yearTotal = getYearTotal(year);
-                const playerCount = salaryData.players.filter(p =>
-                  (p.salaries[year as keyof typeof p.salaries] as number || 0) > 0
-                ).length;
-
-                return (
-                  <tr key={year} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 font-medium text-gray-900">{year}</td>
-                    <td className="p-3 text-right font-semibold text-gray-900">{formatCurrency(yearTotal)}</td>
-                    <td className="p-3 text-right text-gray-600 hidden sm:table-cell">{playerCount}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="text-xs text-gray-500 border-t pt-4">
-        <p>Note: Salaries include base salary and do not reflect bonuses, incentives, or other compensation. Player/team options may affect actual payroll.</p>
-      </div>
-    </div>
+    </LayoutStabilizer>
   );
 }

@@ -34,21 +34,19 @@ const NBATeamsSidebar: React.FC<NBATeamsSidebarProps> = ({ currentTeam, currentT
     { title: 'NFL Schedule', url: '/nfl-hq/schedule', external: false },
     { title: 'NFL Stat Leaders', url: '/nfl-hq/stats', external: false },
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
-    { title: 'NFL Draft Order', url: '/nfl-hq/draft-order', external: false },
-    { title: 'NFL Lottery Simulator', url: '/nfl-hq/lottery-simulator', external: false },
     { title: 'NFL Power Rankings Builder', url: '/nfl-hq/power-rankings-builder', external: false },
     { title: 'NFL Player Rankings Builder', url: '/nfl-hq/player-rankings-builder', external: false },
     { title: 'NFL Salary Cap Tracker', url: '/nfl-hq/salary-cap-tracker', external: false },
-    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nba/cta-playoff-predictor-nba/', external: true },
-    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/nba-mock-draft-simulator', external: true },
+    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor', external: true },
+    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', external: true },
   ];
 
 
   const otherTools = [
-    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor-cta-splash/' },
+    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor' },
     { title: 'CFB Playoff Predictor', url: 'https://www.profootballnetwork.com/cfb/playoff-predictor-cfb-cta/' },
     { title: 'MLB Playoff Predictor', url: 'https://www.profootballnetwork.com/mlb-playoff-predictor/' },
-    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mock-draft-simulator/' },
+    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft' },
     { title: 'NFL Draft Hub', url: 'https://www.profootballnetwork.com/nfl-draft-hq/' },
     { title: 'NFL Ultimate GM Simulator', url: 'https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/' },
     { title: 'Fantasy Football Hub', url: 'https://www.profootballnetwork.com/fantasy/football/' },

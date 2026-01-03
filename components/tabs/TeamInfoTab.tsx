@@ -2,34 +2,18 @@
 
 import { TeamData } from '@/data/teams';
 import { getTeamInfo } from '@/data/teamInfo';
+import { getHallOfFamers } from '@/data/hallOfFame';
 
 interface TeamInfoTabProps {
   team: TeamData;
 }
 
 export default function TeamInfoTab({ team }: TeamInfoTabProps) {
-  const teamInfoData = getTeamInfo(team.id);
-
-  if (!teamInfoData) {
-    return <div>Team information not found</div>;
-  }
-
-  const teamInfo = {
-    founded: teamInfoData.founded,
-    arena: team.homeVenue,
-    capacity: teamInfoData.capacity,
-    location: team.location,
-    owner: teamInfoData.owner,
-    championships: teamInfoData.championships,
-    conferenceChampionships: teamInfoData.conferenceChampionships,
-    divisionTitles: teamInfoData.divisionTitles,
-    playoffAppearances: teamInfoData.playoffAppearances
-  };
-
-  const retiredNumbers = teamInfoData.retiredNumbers;
+  const teamInfo = getTeamInfo(team.id);
+  const hallOfFamers = getHallOfFamers(team.id);
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 sm:p-6 min-h-[600px]">
+    <div className="bg-white rounded-lg shadow p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Team Information</h2>
@@ -45,15 +29,17 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
               <p className="text-2xl font-bold text-gray-900">{teamInfo.founded}</p>
               <p className="text-sm text-gray-600">Founded</p>
             </div>
+            <div className="text-3xl">🏈</div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xl font-bold text-gray-900">{teamInfo.arena}</p>
-              <p className="text-sm text-gray-600">Home Arena</p>
+              <p className="text-xl font-bold text-gray-900">{teamInfo.stadium}</p>
+              <p className="text-sm text-gray-600">Home Stadium</p>
             </div>
+            <div className="text-3xl">🏟️</div>
           </div>
         </div>
 
@@ -61,17 +47,19 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-gray-900">{teamInfo.capacity}</p>
-              <p className="text-sm text-gray-600">Arena Capacity</p>
+              <p className="text-sm text-gray-600">Stadium Capacity</p>
             </div>
+            <div className="text-3xl">👥</div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderLeftColor: team.primaryColor }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg font-bold text-gray-900">{team.division}</p>
+              <p className="text-lg font-bold text-gray-900">{teamInfo.division}</p>
               <p className="text-sm text-gray-600">Division</p>
             </div>
+            <div className="text-3xl">🏆</div>
           </div>
         </div>
 
@@ -81,6 +69,7 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
               <p className="text-lg font-bold text-gray-900">{teamInfo.location}</p>
               <p className="text-sm text-gray-600">Location</p>
             </div>
+            <div className="text-3xl">📍</div>
           </div>
         </div>
 
@@ -90,6 +79,7 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
               <p className="text-lg font-bold text-gray-900">{teamInfo.owner}</p>
               <p className="text-sm text-gray-600">Owner</p>
             </div>
+            <div className="text-3xl">👤</div>
           </div>
         </div>
       </div>
@@ -97,117 +87,135 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
       {/* Achievements Section */}
       <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Team Achievements</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* NBA Championships */}
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-lg" style={{ backgroundColor: team.primaryColor }}>
-              {teamInfo.championships}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            {/* Super Bowl Championships */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: team.primaryColor }}>
+                {teamInfo.superbowlWins}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Super Bowl Championships</p>
+                <p className="text-sm text-gray-600">{teamInfo.superbowlAppearances.join(', ')}</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <div className="font-bold text-lg text-gray-900">NBA Championships</div>
-              <div className="text-sm text-gray-600">
-                {teamInfoData.championshipYears && teamInfoData.championshipYears.length > 0
-                  ? teamInfoData.championshipYears.join(', ')
-                  : 'No championships yet'}
+
+            {/* Conference Championships */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: team.primaryColor }}>
+                {teamInfo.conferenceChampionships}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Conference Championships</p>
+                <p className="text-sm text-gray-600">Most Recent: {teamInfo.superbowlAppearances.length > 0 ? teamInfo.superbowlAppearances[teamInfo.superbowlAppearances.length - 1].split(' ')[0] : 'N/A'}</p>
               </div>
             </div>
           </div>
 
-          {/* Division Titles */}
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-lg" style={{ backgroundColor: team.primaryColor }}>
-              {teamInfo.divisionTitles}
-            </div>
-            <div className="flex-1">
-              <div className="font-bold text-lg text-gray-900">Division Titles</div>
-              <div className="text-sm text-gray-600">
-                {teamInfoData.mostRecentDivisionTitle
-                  ? `Most Recent: ${teamInfoData.mostRecentDivisionTitle}`
-                  : 'No division titles yet'}
+          <div className="space-y-4">
+            {/* Division Titles */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: team.primaryColor }}>
+                {teamInfo.divisionTitles}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Division Titles</p>
+                <p className="text-sm text-gray-600">Most Recent: {
+                  teamInfo.achievements.find(a => a.title.includes('Division'))?.description?.match(/Most recent: (\d{4})/)?.[1] ||
+                  teamInfo.achievements.find(a => a.title.includes('Division'))?.description?.match(/(\d{4})/)?.[1] ||
+                  'N/A'
+                }</p>
               </div>
             </div>
-          </div>
 
-          {/* Conference Championships */}
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-lg" style={{ backgroundColor: team.primaryColor }}>
-              {teamInfo.conferenceChampionships}
-            </div>
-            <div className="flex-1">
-              <div className="font-bold text-lg text-gray-900">Conference Championships</div>
-              <div className="text-sm text-gray-600">
-                {teamInfoData.mostRecentConferenceChampionship
-                  ? `Most Recent: ${teamInfoData.mostRecentConferenceChampionship}`
-                  : 'No conference championships yet'}
+            {/* Playoff Appearances */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: team.primaryColor }}>
+                {teamInfo.playoffAppearances}
               </div>
-            </div>
-          </div>
-
-          {/* Playoff Appearances */}
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-lg" style={{ backgroundColor: team.primaryColor }}>
-              {teamInfo.playoffAppearances}
-            </div>
-            <div className="flex-1">
-              <div className="font-bold text-lg text-gray-900">Playoff Appearances</div>
-              <div className="text-sm text-gray-600">
-                {teamInfoData.mostRecentPlayoffAppearance
-                  ? `Most Recent: ${teamInfoData.mostRecentPlayoffAppearance}`
-                  : 'No playoff appearances yet'}
+              <div>
+                <p className="font-semibold text-gray-900">Playoff Appearances</p>
+                <p className="text-sm text-gray-600">Most Recent: {
+                  teamInfo.achievements.find(a => a.title.includes('Playoff'))?.description?.match(/Most recent: (\d{4})/)?.[1] ||
+                  teamInfo.achievements.find(a => a.title.includes('Playoff'))?.description?.match(/(\d{4})/)?.[1] ||
+                  'N/A'
+                }</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Retired Numbers */}
+      {/* Stadium History */}
       <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">Retired Numbers</h3>
-        {retiredNumbers.length > 0 ? (
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Stadium History</h3>
+        <div className="space-y-4">
+          {teamInfo.stadiumHistory.map((stadium, index) => (
+            <div
+              key={index}
+              className={`rounded-lg p-4 ${stadium.isCurrent ? 'border-2' : 'bg-gray-50'}`}
+              style={stadium.isCurrent ? {
+                borderColor: team.primaryColor,
+                backgroundColor: team.primaryColor + '10'
+              } : {}}
+            >
+              <h4 className={`font-bold ${stadium.isCurrent ? '' : 'text-gray-900'}`}
+                  style={stadium.isCurrent ? { color: team.primaryColor } : {}}>
+                {stadium.name}
+              </h4>
+              <p className={`text-sm font-semibold ${stadium.isCurrent ? '' : 'text-gray-600'}`}
+                 style={stadium.isCurrent ? { color: team.primaryColor } : {}}>
+                {stadium.years}
+              </p>
+              {stadium.description && (
+                <p className="text-xs text-gray-600 mt-1">{stadium.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Retired Numbers */}
+      {teamInfo.retiredNumbers.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">Retired Numbers</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {retiredNumbers.map((player, index) => (
+            {teamInfo.retiredNumbers.map((player, index) => (
               <div key={index} className="flex items-center gap-3">
                 <div className="w-16 h-16 text-white rounded-lg flex items-center justify-center font-bold text-xl" style={{ backgroundColor: team.primaryColor }}>
                   {player.number}
                 </div>
                 <div>
                   <div className="font-bold text-lg text-gray-900">{player.name}</div>
-                  <div className="text-base text-gray-600">{player.position} {player.years && `(${player.years})`}</div>
+                  <div className="text-base text-gray-600">{player.position} ({player.years})</div>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No retired numbers yet for {team.fullName}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Hall of Fame Players */}
       <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">Hall of Famers ({teamInfoData.hallOfFamers.length})</h3>
-        {teamInfoData.hallOfFamers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {teamInfoData.hallOfFamers.map((hofMember, index) => (
-              <div
-                key={index}
-                className="px-3 py-2 rounded-lg border-4 border-yellow-400 text-white"
-                style={{ backgroundColor: team.primaryColor }}
-              >
-                <div className="font-semibold text-white text-sm leading-tight">{hofMember.name}</div>
-                <div className="text-xs text-gray-200 leading-snug">
-                  {hofMember.role}{hofMember.yearsWithTeam && ` (${hofMember.yearsWithTeam})`}
-                </div>
-                <div className="text-xs text-yellow-200 leading-snug">
-                  Inducted: {hofMember.yearInducted}
-                </div>
-              </div>
-            ))}
+        <h3 className="text-xl font-bold text-gray-900 mb-6">
+          Hall of Famers {hallOfFamers.length > 0 && `(${hallOfFamers.length})`}
+        </h3>
+
+        {hallOfFamers.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No Hall of Fame data available for {team.fullName}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            No Hall of Famers yet for {team.fullName}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {hallOfFamers.map((player, index) => (
+              <div key={index} className="px-3 py-2 rounded-lg border-4 border-yellow-400 text-white" style={{ backgroundColor: team.primaryColor }}>
+                <div className="font-semibold text-white text-sm leading-tight">{player.name}</div>
+                <div className="text-xs text-gray-200 leading-snug">{player.position} {player.years && `(${player.years})`}</div>
+                {player.inducted && player.inducted !== 'N/A' && (
+                  <div className="text-xs text-yellow-200 leading-snug">Inducted: {player.inducted}</div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>

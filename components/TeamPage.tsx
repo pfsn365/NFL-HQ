@@ -1,76 +1,166 @@
 'use client';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TeamData, getAllTeams } from '@/data/teams';
-import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import { useSEO } from '@/hooks/useSEO';
+import { useOptimizedTabChange, useINPMonitoring } from '@/hooks/useINPOptimization';
+import PerformanceMonitor from '@/components/PerformanceMonitor';
+import CriticalCSS from '@/components/CriticalCSS';
+import {
+  trackPageEngagement,
+  trackTeamView,
+  trackTabChange,
+  pageview
+} from '@/utils/ga-events';
+import LayoutStabilizer from '@/components/LayoutStabilizer';
+import OptimizedImage from '@/components/OptimizedImage';
+import NavigationTabs from '@/components/NavigationTabs';
 import OverviewTab from '@/components/tabs/OverviewTab';
-import NewsTab from '@/components/tabs/NewsTab';
-import ScheduleTab from '@/components/tabs/ScheduleTab';
-import RosterTab from '@/components/tabs/RosterTab';
-import StatsTab from '@/components/tabs/StatsTab';
-import TransactionsTab from '@/components/tabs/TransactionsTab';
-import DraftPicksTab from '@/components/tabs/DraftPicksTab';
-import SalaryCapTab from '@/components/tabs/SalaryCapTab';
 import TeamInfoTab from '@/components/tabs/TeamInfoTab';
-import InjuriesTab from '@/components/tabs/InjuriesTab';
-import TeamStructuredData from '@/components/TeamStructuredData';
+import DraftPicksTab from '@/components/tabs/DraftPicksTab';
+import TransactionsTab from '@/components/tabs/TransactionsTab';
+import SalaryCapTab from '@/components/tabs/SalaryCapTab';
+import RosterTab from '@/components/tabs/RosterTab';
+import DepthChartTab from '@/components/tabs/DepthChartTab';
+import ScheduleTab from '@/components/tabs/ScheduleTab';
+import StatsTab from '@/components/tabs/StatsTab';
+import NewsTab from '@/components/tabs/NewsTab';
+import InjuryReportTab from '@/components/tabs/InjuryReportTab';
+import GamesPageSidebar from '@/components/GamesPageSidebar';
 
 interface TeamPageProps {
   team: TeamData;
   initialTab?: string;
 }
 
-// Map API team slugs to our team IDs
-const teamSlugMapping: Record<string, string> = {
-  'la-clippers': 'los-angeles-clippers',
-  'portland-trailblazers': 'portland-trail-blazers',
-};
-
-interface LiveStandings {
-  record: string;
-  conferenceRank: string;
-  divisionRank: string;
+interface TeamStats {
+  offi: {
+    value: number;
+    grade: string;
+    rank: string;
+  } | null; // Can be null if offensive data is unavailable
+  defi: {
+    value: number | string;
+    grade: string;
+    rank: string;
+  } | null; // Can be null if defensive data is unavailable
 }
 
-function TeamHeroSection({ team, liveStandings }: { team: TeamData; liveStandings?: LiveStandings }) {
-  const record = liveStandings?.record || team.record;
-  const conferenceRank = liveStandings?.conferenceRank || '0th';
-  const divisionRank = liveStandings?.divisionRank || '0th';
+interface TeamHeroSectionProps {
+  team: TeamData;
+  liveRecord?: string;
+  liveDivisionRank?: string;
+  teamStats?: TeamStats | null;
+}
 
+function TeamHeroSection({ team, liveRecord, liveDivisionRank, teamStats }: TeamHeroSectionProps) {
   return (
-    <div style={{ backgroundColor: team.primaryColor }} className="text-white pt-[57px] lg:pt-0">
-      <div className="container mx-auto px-4 py-4 sm:py-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6">
-          <div className="flex items-center space-x-3 sm:space-x-6">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-white rounded-full flex items-center justify-center shadow-lg p-3 sm:p-4">
-              <img
+    <div style={{ backgroundColor: team.primaryColor }} className="text-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          <div className="flex items-center space-x-6 mb-6 lg:mb-0">
+            <div className="w-24 h-24 lg:w-32 lg:h-32 bg-white rounded-full flex items-center justify-center shadow-lg p-2">
+              <OptimizedImage
                 src={team.logoUrl}
                 alt={`${team.fullName} Logo`}
-                className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain"
+                width={80}
+                height={80}
+                className="w-16 h-16 lg:w-20 lg:h-20"
+                priority={true}
+                sizes="(max-width: 1024px) 64px, 80px"
+                quality={90}
               />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold">{team.fullName}</h1>
-              <p className="text-sm sm:text-base lg:text-lg xl:text-xl opacity-90 mt-1">
-                {conferenceRank} in {team.conference} Conference
+              <h1 className="text-3xl lg:text-4xl font-bold">{team.fullName}</h1>
+              <p className="text-lg lg:text-xl opacity-90 min-w-[300px]">
+                {liveDivisionRank && liveRecord ? (
+                  `${liveDivisionRank} in ${team.division} • ${liveRecord}`
+                ) : (
+                  <span className="inline-block min-w-[300px]">Loading standings data...</span>
+                )}
               </p>
-              <p className="text-xs sm:text-sm lg:text-base opacity-80 mt-1">
+              <p className="text-sm lg:text-base opacity-80 mt-1">
                 GM: {team.generalManager} • HC: {team.headCoach}
               </p>
             </div>
           </div>
 
           <div className="bg-white text-gray-800 rounded-lg p-6 w-full lg:w-auto shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-center text-gray-700">2025-26 Season</h3>
+            <h3 className="text-lg font-semibold mb-4 text-center text-gray-700">2025-26 REGULAR SEASON</h3>
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{record}</div>
-                <div className="text-sm text-gray-600 mt-1">Record</div>
+                {teamStats && teamStats.offi ? (
+                  <>
+                    <div className="text-2xl font-bold text-gray-900 min-w-[100px] inline-block">
+                      {teamStats.offi.value}
+                      <span className="text-sm text-gray-500 ml-1">({teamStats.offi.rank})</span>
+                    </div>
+                    <a
+                      href="https://www.profootballnetwork.com/nfl-offense-rankings-impact/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 hover:underline transition-colors"
+                      style={{ color: 'inherit' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = team.primaryColor}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+                    >
+                      OFFi
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold text-gray-900 min-w-[100px] inline-block">N/A</div>
+                    <a
+                      href="https://www.profootballnetwork.com/nfl-offense-rankings-impact/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 hover:underline transition-colors"
+                      style={{ color: 'inherit' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = team.primaryColor}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+                    >
+                      OFFi
+                    </a>
+                  </>
+                )}
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{divisionRank}</div>
-                <div className="text-sm text-gray-600 mt-1">Division</div>
+                {teamStats && teamStats.defi ? (
+                  <>
+                    <div className="text-2xl font-bold text-gray-900 min-w-[100px] inline-block">
+                      {teamStats.defi.value}
+                      <span className="text-sm text-gray-500 ml-1">({teamStats.defi.rank})</span>
+                    </div>
+                    <a
+                      href="https://www.profootballnetwork.com/nfl-defense-rankings-impact/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 hover:underline transition-colors"
+                      style={{ color: 'inherit' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = team.primaryColor}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+                    >
+                      DEFi
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold text-gray-900 min-w-[100px] inline-block">N/A</div>
+                    <a
+                      href="https://www.profootballnetwork.com/nfl-defense-rankings-impact/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 hover:underline transition-colors"
+                      style={{ color: 'inherit' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = team.primaryColor}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+                    >
+                      DEFi
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -80,115 +170,175 @@ function TeamHeroSection({ team, liveStandings }: { team: TeamData; liveStanding
   );
 }
 
-function NavigationTabs({ activeTab, onTabChange, team, isLoading }: { activeTab: string; onTabChange: (tab: string) => void; team: TeamData; isLoading?: boolean }) {
-  const navRef = useRef<HTMLElement>(null);
-  const activeButtonRef = useRef<HTMLButtonElement>(null);
-
-  const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'news', label: 'News' },
-    { id: 'schedule', label: 'Schedule' },
-    { id: 'roster', label: 'Roster' },
-    { id: 'injury-report', label: 'Injury Report' },
-    { id: 'stats', label: 'Stats' },
-    { id: 'transactions', label: 'Transactions' },
-    { id: 'draft-picks', label: 'Draft Picks' },
-    { id: 'salary-cap', label: 'Salary Cap' },
-    { id: 'team-info', label: 'Team Info' },
-  ];
-
-  // Scroll active tab into view when activeTab changes
-  useEffect(() => {
-    if (activeButtonRef.current && navRef.current) {
-      const button = activeButtonRef.current;
-      const nav = navRef.current;
-
-      // Calculate button position relative to nav container
-      const buttonRect = button.getBoundingClientRect();
-      const navRect = nav.getBoundingClientRect();
-
-      // Check if button is out of view
-      const buttonLeft = buttonRect.left - navRect.left + nav.scrollLeft;
-      const buttonRight = buttonLeft + buttonRect.width;
-      const navWidth = nav.clientWidth;
-
-      if (buttonLeft < nav.scrollLeft) {
-        // Button is to the left of visible area
-        nav.scrollTo({
-          left: buttonLeft - 20, // Add some padding
-          behavior: 'smooth'
-        });
-      } else if (buttonRight > nav.scrollLeft + navWidth) {
-        // Button is to the right of visible area
-        nav.scrollTo({
-          left: buttonRight - navWidth + 20, // Add some padding
-          behavior: 'smooth'
-        });
-      }
-    }
-  }, [activeTab]);
-
-  return (
-    <div className="bg-white border-b border-gray-200 sticky top-[57px] lg:top-0 z-10 shadow-sm">
-      <div className="container mx-auto px-4">
-        <nav ref={navRef} className="flex space-x-4 sm:space-x-6 lg:space-x-8 overflow-x-auto scrollbar-hide">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              ref={activeTab === tab.id ? activeButtonRef : null}
-              onClick={() => onTabChange(tab.id)}
-              disabled={isLoading}
-              className={`py-3 sm:py-4 px-2 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${
-                activeTab === tab.id
-                  ? 'text-gray-900'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              style={{
-                ...(activeTab === tab.id && team ? {
-                  borderBottomColor: team.primaryColor,
-                  color: team.primaryColor
-                } : {})
-              }}
-              aria-current={activeTab === tab.id ? 'page' : undefined}
-              role="tab"
-            >
-              {tab.label}
-              {isLoading && activeTab === tab.id && (
-                <svg
-                  className="animate-spin h-3 w-3"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              )}
-            </button>
-          ))}
-        </nav>
-      </div>
-    </div>
-  );
+interface TeamStanding {
+  recordString: string;
+  divisionRank: string;
 }
+
+interface TeamRecord {
+  wins: number;
+  losses: number;
+  ties: number;
+  winPercentage: number;
+}
+
+interface ScheduleGame {
+  week: number | string;
+  date: string;
+  opponent: string;
+  opponentLogo: string;
+  opponentAbbr?: string;
+  isHome: boolean | null;
+  time: string;
+  tv: string;
+  venue: string;
+  result?: 'W' | 'L' | 'T' | null;
+  score?: { home: number; away: number };
+  eventType: string;
+}
+
+// Helper function to calculate team record from schedule
+const calculateTeamRecord = (schedule: ScheduleGame[]): TeamRecord => {
+  const regularSeasonGames = schedule.filter(
+    (game: ScheduleGame) => game.eventType === 'Regular Season' && game.result
+  );
+
+  const wins = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'W').length;
+  const losses = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'L').length;
+  const ties = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'T').length;
+
+  return {
+    wins,
+    losses,
+    ties,
+    winPercentage: wins + losses + ties > 0 ? wins / (wins + losses + ties) : 0
+  };
+};
+
+// Helper function to format record as string
+const formatRecord = (record: TeamRecord): string => {
+  return `${record.wins}-${record.losses}${record.ties > 0 ? `-${record.ties}` : ''}`;
+};
+
+// Helper function to get teams in the same division
+const getDivisionTeams = (currentTeam: TeamData): TeamData[] => {
+  const allTeams = getAllTeams();
+  return allTeams.filter(team => team.division === currentTeam.division);
+};
 
 function TeamPageContent({ team, initialTab }: TeamPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(initialTab || 'overview');
-  const [isLoadingTab, setIsLoadingTab] = useState(false);
-  const [liveStandings, setLiveStandings] = useState<LiveStandings | undefined>(undefined);
+  const [standings, setStandings] = useState<TeamStanding | null>(null);
+  const [, setLiveRecord] = useState<TeamRecord | null>(null);
+  const [, setDivisionStandings] = useState<any[]>([]);
+  const [teamStats, setTeamStats] = useState<TeamStats | null>(null);
+
+  // Update SEO metadata based on active tab
+  useSEO(team, activeTab);
+
+  // Performance monitoring and INP optimization
+  useINPMonitoring();
+  const optimizedTabChange = useOptimizedTabChange(setActiveTab);
+
+  // Analytics tracking
+  useEffect(() => {
+    // Track initial team page view
+    trackTeamView(team.id, team.fullName);
+
+    // Track page engagement
+    const startTime = Date.now();
+
+    // Cleanup function to track engagement time on unmount
+    return () => {
+      const engagementTime = Date.now() - startTime;
+      trackPageEngagement(engagementTime);
+    };
+  }, [team.id, team.fullName]);
+
+  // Track page view changes (for tab navigation without full page reload)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      pageview(currentPath);
+    }
+  }, [activeTab]);
+
+  // Fetch team's schedule and calculate live standings
+  useEffect(() => {
+    const fetchScheduleAndCalculateStandings = async () => {
+      try {
+        // Get current team's schedule
+        const response = await fetch(`/nfl/teams/api/schedule/${team.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          const schedule: ScheduleGame[] = data.schedule || [];
+
+          // Calculate current team's record
+          const teamRecord = calculateTeamRecord(schedule);
+          setLiveRecord(teamRecord);
+
+          // Get division teams and calculate their records
+          const divisionTeams = getDivisionTeams(team);
+          const standingsPromises = divisionTeams.map(async (divisionTeam) => {
+            try {
+              const divisionResponse = await fetch(`/nfl/teams/api/schedule/${divisionTeam.id}`);
+              if (divisionResponse.ok) {
+                const divisionData = await divisionResponse.json();
+                const divisionSchedule: ScheduleGame[] = divisionData.schedule || [];
+                const record = calculateTeamRecord(divisionSchedule);
+                return {
+                  ...divisionTeam,
+                  record,
+                  winPercentage: record.winPercentage
+                };
+              }
+              return {
+                ...divisionTeam,
+                record: { wins: 0, losses: 0, ties: 0, winPercentage: 0 },
+                winPercentage: 0
+              };
+            } catch {
+              return {
+                ...divisionTeam,
+                record: { wins: 0, losses: 0, ties: 0, winPercentage: 0 },
+                winPercentage: 0
+              };
+            }
+          });
+
+          const divisionStandingsData = await Promise.all(standingsPromises);
+
+          // Sort by win percentage (highest first), then by wins as tiebreaker
+          divisionStandingsData.sort((a, b) => {
+            if (b.winPercentage !== a.winPercentage) {
+              return b.winPercentage - a.winPercentage;
+            }
+            return b.record.wins - a.record.wins;
+          });
+
+          setDivisionStandings(divisionStandingsData);
+
+          // Find current team's rank
+          const teamIndex = divisionStandingsData.findIndex(t => t.id === team.id);
+          if (teamIndex !== -1) {
+            const rank = teamIndex + 1;
+            const rankSuffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th';
+
+            setStandings({
+              recordString: formatRecord(teamRecord),
+              divisionRank: `${rank}${rankSuffix}`
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch schedule and calculate standings:', error);
+      }
+    };
+
+    fetchScheduleAndCalculateStandings();
+  }, [team.id, team]);
 
   useEffect(() => {
     if (initialTab) {
@@ -201,77 +351,63 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
     }
   }, [searchParams, initialTab]);
 
-  // Fetch live standings for hero section
+  // Fetch team stats from new API with localStorage caching
   useEffect(() => {
-    async function fetchStandings() {
+    const fetchTeamStats = async () => {
+      const cacheKey = `team-stats-${team.id}`;
+
       try {
-        const response = await fetch('/nfl-hq/api/nfl/standings?season=2025&level=conference');
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const conferences = data.data?.standings?.conferences;
-
-        if (!conferences) return;
-
-        // Find this team in the standings
-        for (const conf of conferences) {
-          for (let i = 0; i < conf.teams.length; i++) {
-            const apiTeam = conf.teams[i];
-            const apiTeamId = teamSlugMapping[apiTeam.sk_slug] || apiTeam.sk_slug;
-
-            if (apiTeamId === team.id) {
-              // Conference rank is position in conference (1-indexed)
-              const confRank = i + 1;
-              const suffix = confRank === 1 ? 'st' : confRank === 2 ? 'nd' : confRank === 3 ? 'rd' : 'th';
-
-              // Calculate division rank
-              const allTeams = getAllTeams();
-              const divisionTeams = conf.teams.filter((t: any) => {
-                const tId = teamSlugMapping[t.sk_slug] || t.sk_slug;
-                const ourTeamData = allTeams.find((tt: any) => tt.id === tId);
-                return ourTeamData?.division === team.division;
-              });
-
-              // Sort division teams by wins
-              divisionTeams.sort((a: any, b: any) => (b.wins || 0) - (a.wins || 0));
-              const divRank = divisionTeams.findIndex((t: any) => {
-                const tId = teamSlugMapping[t.sk_slug] || t.sk_slug;
-                return tId === team.id;
-              }) + 1;
-              const divSuffix = divRank === 1 ? 'st' : divRank === 2 ? 'nd' : divRank === 3 ? 'rd' : 'th';
-
-              setLiveStandings({
-                record: `${apiTeam.wins || 0}-${apiTeam.losses || 0}`,
-                conferenceRank: `${confRank}${suffix}`,
-                divisionRank: `${divRank}${divSuffix}`,
-              });
-              return;
-            }
+        // Try to load cached stats first to show immediately
+        const cachedStats = localStorage.getItem(cacheKey);
+        if (cachedStats) {
+          try {
+            const parsed = JSON.parse(cachedStats);
+            setTeamStats(parsed);
+          } catch {
+            // Invalid cache, ignore
           }
         }
-      } catch (err) {
-        console.error('Error fetching standings for hero:', err);
-      }
-    }
 
-    fetchStandings();
-  }, [team.id, team.division]);
+        // Fetch fresh stats
+        const response = await fetch(`/nfl/teams/api/team-stats/${team.id}/`);
+        console.log('Team stats response status:', response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Team stats data:', data);
+          console.log('Setting teamStats to:', data.stats);
+          setTeamStats(data.stats);
+
+          // Cache the successful response
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(data.stats));
+          } catch {
+            // localStorage might be full or unavailable
+          }
+        } else {
+          console.error('Failed to fetch team stats:', response.status);
+          // Keep showing cached data if fetch fails
+        }
+      } catch (error) {
+        console.error('Error fetching team stats:', error);
+        // Keep showing cached data if fetch fails
+      }
+    };
+
+    fetchTeamStats();
+  }, [team.id]);
 
   const handleTabChange = (tab: string) => {
-    if (tab === activeTab) return; // Don't reload if same tab
+    // Track tab change for analytics
+    trackTabChange(tab, team.id);
 
-    setIsLoadingTab(true);
-    setActiveTab(tab);
+    // Use optimized tab change to prevent INP degradation
+    optimizedTabChange(tab);
 
-    // Simulate loading time for tab content
-    setTimeout(() => {
-      setIsLoadingTab(false);
-    }, 300);
-
+    // Navigate to path-based URL
     if (tab === 'overview') {
-      router.replace(`/teams/${team.id}`, { scroll: false });
+      router.replace(`/nfl/teams/${team.id}`, { scroll: false });
     } else {
-      router.replace(`/teams/${team.id}/${tab}`, { scroll: false });
+      router.replace(`/nfl/teams/${team.id}/${tab}`, { scroll: false });
     }
   };
 
@@ -279,24 +415,26 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
     switch (activeTab) {
       case 'overview':
         return <OverviewTab team={team} onTabChange={handleTabChange} />;
-      case 'news':
-        return <NewsTab team={team} />;
-      case 'schedule':
-        return <ScheduleTab team={team} />;
-      case 'roster':
-        return <RosterTab team={team} />;
-      case 'injury-report':
-        return <InjuriesTab team={team} />;
-      case 'stats':
-        return <StatsTab team={team} />;
-      case 'transactions':
-        return <TransactionsTab team={team} />;
-      case 'draft-picks':
-        return <DraftPicksTab team={team} />;
-      case 'salary-cap':
-        return <SalaryCapTab team={team} />;
       case 'team-info':
         return <TeamInfoTab team={team} />;
+      case 'draft-picks':
+        return <DraftPicksTab team={team} />;
+      case 'transactions':
+        return <TransactionsTab team={team} />;
+      case 'salary-cap':
+        return <SalaryCapTab team={team} />;
+      case 'roster':
+        return <RosterTab team={team} />;
+      case 'depth-chart':
+        return <DepthChartTab team={team} />;
+      case 'schedule':
+        return <ScheduleTab team={team} />;
+      case 'stats':
+        return <StatsTab team={team} />;
+      case 'news':
+        return <NewsTab team={team} />;
+      case 'injury-report':
+        return <InjuryReportTab team={team} />;
       default:
         return <OverviewTab team={team} onTabChange={handleTabChange} />;
     }
@@ -304,64 +442,44 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
 
   return (
     <>
-      <TeamStructuredData team={team} />
-      <div className="flex min-h-screen bg-gray-50">
-        {/* Desktop sidebar */}
+      <CriticalCSS />
+      <PerformanceMonitor />
+
+      {/* Mobile sidebar */}
+      <div className="lg:hidden">
+        <GamesPageSidebar isMobile={true} currentTeam={team} currentTab={activeTab} />
+      </div>
+
+      <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
+        {/* Desktop sidebar - Fixed position */}
         <div className="hidden lg:block">
           <div className="fixed top-0 left-0 w-64 h-screen z-10">
-            <NFLTeamsSidebar currentTeam={team} currentTab={activeTab} />
+            <GamesPageSidebar isMobile={false} currentTeam={team} currentTab={activeTab} />
           </div>
         </div>
 
-        {/* Mobile sidebar */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
-          <NFLTeamsSidebar currentTeam={team} currentTab={activeTab} isMobile={true} />
-        </div>
-
-        {/* Main content */}
+        {/* Main content - Offset to account for fixed sidebar */}
         <main className="flex-1 lg:ml-64 min-w-0">
-          <TeamHeroSection team={team} liveStandings={liveStandings} />
-          <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} isLoading={isLoadingTab} />
+          <LayoutStabilizer minHeight={200}>
+            <TeamHeroSection
+              team={team}
+              liveRecord={standings?.recordString}
+              liveDivisionRank={standings?.divisionRank}
+              teamStats={teamStats}
+            />
+          </LayoutStabilizer>
+          <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
 
-          {/* Raptive Header Ad */}
-          <div className="container mx-auto px-4 min-h-[150px]">
-            <div className="raptive-pfn-header"></div>
+          {/* Raptive Header Ad - Below Tabs */}
+          <div className="w-full bg-white border-b border-gray-200">
+            <div className="container mx-auto px-4 py-4">
+              <div className="raptive-pfn-header-90"></div>
+            </div>
           </div>
 
-          <div className="container mx-auto px-4 py-6">
-            {isLoadingTab ? (
-              <div className="min-h-[400px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="inline-block">
-                    <svg
-                      className="animate-spin h-12 w-12 mx-auto mb-4"
-                      style={{ color: team.primaryColor }}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-gray-600 font-medium">Loading...</p>
-                </div>
-              </div>
-            ) : (
-              renderActiveTab()
-            )}
-          </div>
+          <LayoutStabilizer minHeight={400} className="w-full max-w-none px-4 py-6 pb-24">
+            {renderActiveTab()}
+          </LayoutStabilizer>
         </main>
       </div>
     </>

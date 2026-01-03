@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTeam, getAllTeamIds } from '@/data/teams';
-import TeamPageSimple from '@/components/TeamPageSimple';
+import TeamPage from '@/components/TeamPage';
 
 interface PageProps {
   params: Promise<{ teamId: string; tab: string }>;
@@ -8,80 +8,88 @@ interface PageProps {
 
 const validTabs = [
   'overview',
-  'news',
-  'schedule',
-  'depth-chart',
-  'roster',
-  'injury-report',
-  'stats',
-  'transactions',
+  'team-info',
   'draft-picks',
+  'transactions',
   'salary-cap',
-  'team-info'
+  'roster',
+  'depth-chart',
+  'schedule',
+  'stats',
+  'injury-report',
+  'news'
 ];
 
 export async function generateStaticParams() {
   const teamIds = getAllTeamIds();
-  const params: { teamId: string; tab: string }[] = [];
+  const paths: { teamId: string; tab: string }[] = [];
 
   teamIds.forEach(teamId => {
     validTabs.forEach(tab => {
-      params.push({ teamId, tab });
+      paths.push({ teamId, tab });
     });
   });
 
-  return params;
+  return paths;
 }
 
 export default async function TeamTabPageRoute({ params }: PageProps) {
   const { teamId, tab } = await params;
   const team = getTeam(teamId);
 
-  if (!team || !validTabs.includes(tab)) {
+  if (!team) {
     notFound();
   }
 
-  return <TeamPageSimple team={team} initialTab={tab} />;
+  if (!validTabs.includes(tab)) {
+    notFound();
+  }
+
+  return <TeamPage team={team} initialTab={tab} />;
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { teamId, tab } = await params;
   const team = getTeam(teamId);
 
-  if (!team) {
+  if (!team || !validTabs.includes(tab)) {
     return {
-      title: 'Team Not Found',
+      title: 'Page Not Found',
     };
   }
 
-  const tabTitles: Record<string, string> = {
-    overview: 'Overview',
-    news: 'News',
-    schedule: 'Schedule',
-    'depth-chart': 'Depth Chart',
-    roster: 'Roster',
-    'injury-report': 'Injury Report',
-    stats: 'Stats',
-    transactions: 'Transactions',
+  const tabTitles: { [key: string]: string } = {
+    'overview': 'Overview',
+    'team-info': 'Team Info',
     'draft-picks': 'Draft Picks',
+    'transactions': 'Transactions',
     'salary-cap': 'Salary Cap',
-    'team-info': 'Team Info'
+    'roster': 'Roster',
+    'depth-chart': 'Depth Chart',
+    'schedule': 'Schedule',
+    'stats': 'Stats',
+    'injury-report': 'Injury Report',
+    'news': 'News'
   };
 
-  const tabTitle = tabTitles[tab] || 'Team Page';
-  const canonicalUrl = `https://www.profootballnetwork.com/nfl-hq/teams/${teamId}/${tab}/`;
+  const tabTitle = tabTitles[tab] || tab;
 
   return {
-    title: `${team.fullName} ${tabTitle}`,
-    description: `View ${team.fullName} ${tabTitle.toLowerCase()} including detailed information, statistics, and updates.`,
-    alternates: {
-      canonical: canonicalUrl,
-    },
+    title: `${team.fullName} ${tabTitle} - NFL Team Page`,
+    description: `${team.fullName} ${tabTitle.toLowerCase()}. ${team.generalManager} (GM), ${team.headCoach} (HC). ${team.record} record in ${team.division}.`,
+    keywords: [
+      team.fullName,
+      team.name,
+      team.city,
+      'NFL',
+      team.conference,
+      team.division,
+      tabTitle.toLowerCase()
+    ].join(', '),
     openGraph: {
-      title: `${team.fullName} ${tabTitle}`,
-      description: `View ${team.fullName} ${tabTitle.toLowerCase()}.`,
+      title: `${team.fullName} ${tabTitle} - NFL Team Page`,
+      description: `${team.fullName} ${tabTitle.toLowerCase()} information.`,
       images: [team.logoUrl],
-      url: canonicalUrl,
     },
   };
 }

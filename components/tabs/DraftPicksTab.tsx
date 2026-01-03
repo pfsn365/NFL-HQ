@@ -1,293 +1,376 @@
 'use client';
 
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import LayoutStabilizer from '@/components/LayoutStabilizer';
 import { TeamData } from '@/data/teams';
-import { useState, useEffect, useMemo } from 'react';
+import futureDraftPicksData from '@/data/futureDraftPicks.json';
+
+// Helper function to generate Pro Football Network URL
+const getPFNUrl = (playerName: string) => {
+  return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
+};
+
+// Helper function to format trade notes
+const formatTradeNotes = (notes: string) => {
+  // Remove hashtags
+  const formatted = notes.replace(/#/g, '');
+
+  // Split into lines
+  const lines = formatted.split('\n');
+  const result: { content: string; isHistory: boolean; addSpacing: boolean }[] = [];
+  let inHistorySection = false;
+
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+
+    // Check if this is a THEN line (start of history)
+    if (trimmedLine === 'THEN') {
+      inHistorySection = true;
+      result.push({ content: 'Trade History:', isHistory: true, addSpacing: true });
+      return;
+    }
+
+    // Skip empty lines unless we're transitioning
+    if (trimmedLine === '') {
+      return;
+    }
+
+    // Check if line ends with ":" (team receiving line)
+    const endsWithColon = trimmedLine.endsWith(':');
+
+    // Add spacing before "receive:" lines (except the first one)
+    const addSpacing = endsWithColon && result.length > 0 && !result[result.length - 1].addSpacing;
+
+    result.push({
+      content: trimmedLine,
+      isHistory: inHistorySection,
+      addSpacing
+    });
+  });
+
+  return result;
+};
+
+interface DraftPick {
+  year: number;
+  name: string;
+  position: string;
+  round: number;
+  roundPick: number;
+  overallPick: number;
+  college: string;
+  // Future pick fields
+  isTraded?: boolean;
+  tradedFrom?: string;
+  tradedAway?: boolean;
+  tradedTo?: string;
+  originalTeamAbbr?: string;
+  currentOwnerAbbr?: string;
+  tradeNotes?: string;
+}
+
+interface DraftPicksResponse {
+  teamId: string;
+  picks: DraftPick[];
+  totalPicks: number;
+  lastUpdated: string;
+  yearsRange: {
+    earliest: number;
+    latest: number;
+  };
+}
 
 interface DraftPicksTabProps {
   team: TeamData;
 }
 
-interface IncomingPick {
-  year: number;
-  round: number;
-  pick: string;
-  from: string;
-  protections: string;
-}
-
-interface OutgoingPick {
-  year: number;
-  round: number;
-  pick: string;
-  to: string;
-  protections: string;
-}
-
-interface HistoricalPick {
-  year: number;
-  round: number;
-  pick: number;
-  player: string;
-  from: string;
-}
-
-interface DraftData {
-  teamId: string;
-  incomingPicks: IncomingPick[];
-  outgoingPicks: OutgoingPick[];
-  historicalPicks: HistoricalPick[];
-}
-
 export default function DraftPicksTab({ team }: DraftPicksTabProps) {
-  const [draftData, setDraftData] = useState<DraftData | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string>('All');
+  const [selectedRound, setSelectedRound] = useState<string>('All');
+  const [selectedPosition, setSelectedPosition] = useState<string>('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [draftData, setDraftData] = useState<DraftPick[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Filter states
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedRound, setSelectedRound] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const fetchDraftPicks = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  useEffect(() => {
-    async function loadDraftData() {
-      try {
-        const response = await fetch(`/data/draft-picks/${team.id}.json`);
-        if (response.ok) {
-          const data = await response.json();
-          setDraftData(data);
+      const response = await fetch(`/nfl/teams/api/draft-picks/${team.id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Draft picks data not available for this team yet');
         }
-      } catch (error) {
-        console.error('Error loading draft data:', error);
-      } finally {
-        setLoading(false);
+        throw new Error(`Failed to fetch draft picks: ${response.status}`);
       }
-    }
 
-    loadDraftData();
+      const data: DraftPicksResponse = await response.json();
+
+      if (!data.picks || !Array.isArray(data.picks)) {
+        throw new Error('Invalid draft picks data received');
+      }
+
+      // Get future picks for this team
+      const futurePicks = (futureDraftPicksData as any)[team.id] || [];
+
+      // Combine historical and future picks
+      const allPicks = [...data.picks, ...futurePicks];
+
+      setDraftData(allPicks);
+    } catch (err) {
+      console.error('Error fetching draft picks:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load draft picks');
+    } finally {
+      setLoading(false);
+    }
   }, [team.id]);
 
-  // Get unique years for filter
-  const availableYears = useMemo(() => {
-    if (!draftData) return [];
-    const years = Array.from(new Set(draftData.historicalPicks.map(p => p.year)));
-    return years.sort((a, b) => b - a);
-  }, [draftData]);
+  useEffect(() => {
+    fetchDraftPicks();
+  }, [fetchDraftPicks]);
 
-  // Filter historical picks
-  const filteredPicks = useMemo(() => {
-    if (!draftData) return [];
+  // Generate filter options from actual data
+  const years = useMemo(() =>
+    Array.from(new Set(draftData.map(pick => pick.year))).sort((a, b) => b - a)
+  , [draftData]);
 
-    return draftData.historicalPicks.filter(pick => {
-      const matchesYear = selectedYear === 'all' || pick.year === parseInt(selectedYear);
-      const matchesRound = selectedRound === 'all' || pick.round === parseInt(selectedRound);
-      const matchesSearch = searchQuery === '' ||
-        pick.player.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pick.from.toLowerCase().includes(searchQuery.toLowerCase());
+  const rounds = [1, 2, 3, 4, 5, 6, 7];
 
-      return matchesYear && matchesRound && matchesSearch;
+  const positions = useMemo(() =>
+    Array.from(new Set(draftData.map(pick => pick.position))).sort()
+  , [draftData]);
+
+  const filteredData = useMemo(() => {
+    return draftData.filter(pick => {
+      const yearMatch = selectedYear === 'All' || pick.year.toString() === selectedYear;
+      const roundMatch = selectedRound === 'All' || pick.round.toString() === selectedRound;
+      const positionMatch = selectedPosition === 'All' || pick.position === selectedPosition;
+      const searchMatch = searchTerm === '' ||
+        pick.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pick.college.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return yearMatch && roundMatch && positionMatch && searchMatch;
     });
-  }, [draftData, selectedYear, selectedRound, searchQuery]);
+  }, [draftData, selectedYear, selectedRound, selectedPosition, searchTerm]);
+
+  // Group picks by year and sort by overall pick number
+  const groupedByYear = useMemo(() => {
+    const groups: { [year: number]: DraftPick[] } = {};
+    filteredData.forEach(pick => {
+      if (!groups[pick.year]) {
+        groups[pick.year] = [];
+      }
+      groups[pick.year].push(pick);
+    });
+    // Sort picks within each year by overall pick number
+    Object.keys(groups).forEach(year => {
+      groups[Number(year)].sort((a, b) => a.overallPick - b.overallPick);
+    });
+    return groups;
+  }, [filteredData]);
+
+  const sortedYears = useMemo(() => {
+    return Object.keys(groupedByYear).map(Number).sort((a, b) => b - a);
+  }, [groupedByYear]);
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-gray-500">Loading draft data...</div>
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
+        <div className="mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
+          <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
-      </div>
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading draft picks...</p>
+        </div>
+      </LayoutStabilizer>
     );
   }
 
-  if (!draftData) {
+  if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
-            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '320px' }}></div>
-          </div>
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
+        <div className="mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
+          <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
-        <p className="text-center text-gray-500 py-12">Draft pick data not available for this team yet.</p>
-      </div>
+        <div className="text-center py-12">
+          <div className="text-red-600 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Draft Picks</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={fetchDraftPicks}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
+            style={{ backgroundColor: team.primaryColor }}
+          >
+            Try Again
+          </button>
+        </div>
+      </LayoutStabilizer>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Incoming Draft Picks */}
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Incoming Draft Picks</h2>
-            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '260px' }}></div>
-          </div>
+    <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
+      <div className="mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
+        <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
+      </div>
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div>
+          <select 
+            value={selectedYear} 
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="All">Year: All</option>
+            {years.map(year => (
+              <option key={year} value={year.toString()}>{year}</option>
+            ))}
+          </select>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
-                <th className="text-left p-3 font-medium">YEAR</th>
-                <th className="text-left p-3 font-medium">ROUND</th>
-                <th className="text-left p-3 font-medium">PICK NO.</th>
-                <th className="text-left p-3 font-medium">FROM</th>
-                <th className="text-left p-3 font-medium">PROTECTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {draftData.incomingPicks.length > 0 ? (
-                draftData.incomingPicks.map((pick, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 font-medium text-gray-900">{pick.year}</td>
-                    <td className="p-3">{pick.round}</td>
-                    <td className="p-3">{pick.pick}</td>
-                    <td className="p-3 text-gray-600">{pick.from}</td>
-                    <td className="p-3 text-gray-600 text-xs">{pick.protections}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-500">
-                    No incoming draft picks on record
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div>
+          <select 
+            value={selectedRound} 
+            onChange={(e) => setSelectedRound(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="All">Round: All</option>
+            {rounds.map(round => (
+              <option key={round} value={round.toString()}>Round {round}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <select 
+            value={selectedPosition} 
+            onChange={(e) => setSelectedPosition(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="All">Position: All</option>
+            {positions.map(position => (
+              <option key={position} value={position}>{position}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <input
+            type="text"
+            placeholder="Search Player..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
       </div>
 
-      {/* Outgoing Draft Picks */}
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Outgoing Draft Picks</h2>
-            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '260px' }}></div>
+      {/* Table with Year Headers */}
+      <div className="overflow-x-auto">
+        {sortedYears.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No draft picks found matching your criteria.
           </div>
-        </div>
+        ) : (
+          <div className="space-y-6">
+            {sortedYears.map(year => (
+              <div key={year}>
+                {/* Year Header */}
+                <div className="mb-3">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 inline-block px-4 py-2 rounded-lg" style={{ backgroundColor: `${team.primaryColor}20`, color: team.primaryColor }}>
+                    {year} Draft Class
+                  </h3>
+                </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
-                <th className="text-left p-3 font-medium">YEAR</th>
-                <th className="text-left p-3 font-medium">ROUND</th>
-                <th className="text-left p-3 font-medium">PICK NO.</th>
-                <th className="text-left p-3 font-medium">TO</th>
-                <th className="text-left p-3 font-medium">PROTECTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {draftData.outgoingPicks.length > 0 ? (
-                draftData.outgoingPicks.map((pick, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 font-medium text-gray-900">{pick.year}</td>
-                    <td className="p-3">{pick.round}</td>
-                    <td className="p-3">{pick.pick}</td>
-                    <td className="p-3 text-gray-600">{pick.to}</td>
-                    <td className="p-3 text-gray-600 text-xs">{pick.protections}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-500">
-                    No outgoing draft picks on record
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                {/* Picks Table for this year */}
+                <table className="w-full text-sm mb-6">
+                  <thead>
+                    <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
+                      <th className="text-left p-3 font-medium">Name</th>
+                      <th className="text-left p-3 font-medium">POS</th>
+                      <th className="text-left p-3 font-medium">Round</th>
+                      <th className="text-left p-3 font-medium">Rnd. Pick</th>
+                      <th className="text-left p-3 font-medium">OVR. Pick</th>
+                      <th className="text-left p-3 font-medium hidden sm:table-cell">College</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groupedByYear[year].map((pick, index) => {
+                      const isFuturePick = pick.name === 'TBD';
+                      const tradeInfo = pick.isTraded && pick.originalTeamAbbr
+                        ? ` (from ${pick.originalTeamAbbr})`
+                        : '';
+
+                      return (
+                        <>
+                          <tr key={`${pick.year}-${pick.round}-${pick.overallPick}-${index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <td className="p-3">
+                              {isFuturePick ? (
+                                <span className="font-medium text-gray-900">TBD</span>
+                              ) : (
+                                <a
+                                  href={getPFNUrl(pick.name)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium hover:underline"
+                                  style={{ color: team.primaryColor }}
+                                >
+                                  {pick.name}
+                                </a>
+                              )}
+                            </td>
+                            <td className="p-3 text-gray-700">{pick.position}</td>
+                            <td className="p-3 text-gray-700">
+                              {pick.round}{tradeInfo && <span className="text-sm text-gray-600 italic">{tradeInfo}</span>}
+                            </td>
+                            <td className="p-3 text-gray-700">{pick.roundPick === 0 ? 'TBD' : pick.roundPick}</td>
+                            <td className="p-3 text-gray-700">{pick.overallPick === 0 ? 'TBD' : pick.overallPick}</td>
+                            <td className="p-3 text-gray-700 hidden sm:table-cell">{pick.college}</td>
+                          </tr>
+                          {pick.tradeNotes && (
+                            <tr key={`${pick.year}-${pick.round}-${pick.overallPick}-${index}-notes`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <td colSpan={6} className="px-3 pb-3 pt-0">
+                                <div className="text-xs border-l-2 pl-3" style={{ borderColor: team.primaryColor }}>
+                                  {formatTradeNotes(pick.tradeNotes).map((item, i) => (
+                                    <div
+                                      key={i}
+                                      className={`${item.addSpacing ? 'mt-2' : ''} ${
+                                        item.isHistory
+                                          ? 'text-gray-500 italic ml-4'
+                                          : item.content.endsWith(':')
+                                          ? 'text-gray-700 font-medium'
+                                          : 'text-gray-600 italic'
+                                      }`}
+                                    >
+                                      {item.content}
+                                    </div>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* Historical Picks with Filters */}
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Draft History</h2>
-            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '180px' }}></div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          {/* Year Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
-            >
-              <option value="all">All Years</option>
-              {availableYears.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Round Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Round</label>
-            <select
-              value={selectedRound}
-              onChange={(e) => setSelectedRound(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
-            >
-              <option value="all">All Rounds</option>
-              <option value="1">Round 1</option>
-              <option value="2">Round 2</option>
-            </select>
-          </div>
-
-          {/* Search */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search Player</label>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
-            />
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
-                <th className="text-left p-3 font-medium">YEAR</th>
-                <th className="text-left p-3 font-medium">RD</th>
-                <th className="text-left p-3 font-medium">PICK</th>
-                <th className="text-left p-3 font-medium">PLAYER</th>
-                <th className="text-left p-3 font-medium">FROM</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPicks.length > 0 ? (
-                filteredPicks.map((pick, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 font-medium text-gray-900">{pick.year}</td>
-                    <td className="p-3">{pick.round}</td>
-                    <td className="p-3 font-semibold" style={{ color: team.primaryColor }}>{pick.pick}</td>
-                    <td className="p-3 font-medium text-gray-900">{pick.player}</td>
-                    <td className="p-3 text-gray-600">{pick.from}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-500">
-                    {draftData.historicalPicks.length === 0
-                      ? 'No historical draft picks on record'
-                      : 'No draft picks found matching your filters'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    </LayoutStabilizer>
   );
 }

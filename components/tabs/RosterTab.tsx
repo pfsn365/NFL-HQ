@@ -1,216 +1,351 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { TeamData } from '@/data/teams';
-import { useState, useEffect } from 'react';
+import LayoutStabilizer from '@/components/LayoutStabilizer';
+
+// Helper function to generate Pro Football Network URL
+const getPFNUrl = (playerName: string) => {
+  return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
+};
+
+interface Player {
+  name: string;
+  slug: string;
+  jerseyNumber: number;
+  position: string;
+  positionFull: string;
+  age: number;
+  height: string;
+  weight: number;
+  college: string;
+  experience: number;
+  impactPlus: number;
+  isActive: boolean;
+  isInjured: boolean;
+  isSuspended: boolean;
+  isPracticeSquad: boolean;
+  isPhysicallyUnable: boolean;
+  isNonFootballInjuryReserve: boolean;
+  isExempt: boolean;
+  status: string;
+  draft?: {
+    year: number;
+    round: number;
+    pick: number;
+  } | null;
+  birthDate: string;
+  birthPlace: string;
+}
+
+interface RosterResponse {
+  teamId: string;
+  roster: {
+    activeRoster: Player[];
+    practiceSquad: Player[];
+    injuredReserve: Player[];
+    physicallyUnableToPerform: Player[];
+    nonFootballInjuryReserve: Player[];
+    suspended: Player[];
+    exempt: Player[];
+  };
+  totalPlayers: number;
+  lastUpdated: string;
+}
+
+// Position groupings for organizing players
+const positionGroups = {
+  'Quarterback': ['QB'],
+  'Running Back': ['RB', 'FB'],
+  'Wide Receiver': ['WR'],
+  'Tight End': ['TE'],
+  'Offensive Line': ['OT', 'OG', 'OL', 'C', 'G', 'T'],
+  'Defensive Line': ['DE', 'DT', 'NT', 'DL'],
+  'Linebacker': ['LB', 'OLB', 'ILB', 'MLB'],
+  'Defensive Back': ['CB', 'S', 'FS', 'SS', 'DB'],
+  'Special Teams': ['K', 'P', 'LS', 'KR', 'PR']
+};
+
+function getPositionGroup(position: string): string {
+  for (const [group, positions] of Object.entries(positionGroups)) {
+    if (positions.includes(position)) {
+      return group;
+    }
+  }
+  return 'Other';
+}
+
+const positionOrder = [
+  'Quarterback',
+  'Running Back',
+  'Wide Receiver',
+  'Tight End',
+  'Offensive Line',
+  'Defensive Line',
+  'Linebacker',
+  'Defensive Back',
+  'Special Teams',
+  'Other'
+];
 
 interface RosterTabProps {
   team: TeamData;
 }
 
-interface Player {
-  name: string;
-  slug: string;
-  jersey_no: string;
-  is_active: boolean;
-  height_in_inch: number;
-  height_in_cm: number;
-  weight_in_lbs: number;
-  weight_in_kg: number;
-  college: string;
-  experience: {
-    year_first: number;
-    experience: number;
-  };
-  age: number;
-  birth_date: string;
-  positions: Array<{
-    name: string;
-    abbreviation: string;
-  }>;
-}
-
 export default function RosterTab({ team }: RosterTabProps) {
-  const [roster, setRoster] = useState<Player[]>([]);
+  const [rosterData, setRosterData] = useState<RosterResponse['roster'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterPosition, setFilterPosition] = useState<string>('all');
+  const [activeSection, setActiveSection] = useState<string>('activeRoster');
 
-  // Fetch roster
-  useEffect(() => {
-    async function fetchRoster() {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchRosterData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const response = await fetch(`/nfl-hq/api/nfl/roster/${team.id}`);
+      const response = await fetch(`/nfl/teams/api/roster/${team.id}`);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch roster');
-        }
-
-        const data = await response.json();
-
-        if (data.squad) {
-          // Filter only active players and sort by jersey number
-          const activePlayers = data.squad
-            .filter((player: Player) => player.is_active)
-            .sort((a: Player, b: Player) => parseInt(a.jersey_no) - parseInt(b.jersey_no));
-
-          setRoster(activePlayers);
-        }
-      } catch (err) {
-        console.error('Error fetching roster:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load roster');
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch roster: ${response.status}`);
       }
-    }
 
-    fetchRoster();
+      const data: RosterResponse = await response.json();
+      setRosterData(data.roster);
+    } catch (err) {
+      console.error('Error fetching roster:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load roster');
+    } finally {
+      setLoading(false);
+    }
   }, [team.id]);
 
-  // Filter roster by position
-  const filteredRoster = filterPosition === 'all'
-    ? roster
-    : roster.filter(player => player.positions.some(pos => pos.abbreviation === filterPosition));
+  useEffect(() => {
+    fetchRosterData();
+  }, [fetchRosterData]);
 
-  // Get unique positions for filter (in preferred order)
-  const positionOrder = ['all', 'PG', 'SG', 'SF', 'PF', 'C'];
-  const availablePositions = new Set(roster.flatMap(player => player.positions.map(pos => pos.abbreviation)));
-  const positions = positionOrder.filter(pos => pos === 'all' || availablePositions.has(pos));
+  if (loading) {
+    return (
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={800}>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Roster</h2>
+            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '230px' }}></div>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading roster...</p>
+        </div>
+      </LayoutStabilizer>
+    );
+  }
 
-  // Format height
-  const formatHeight = (inches: number) => {
-    const feet = Math.floor(inches / 12);
-    const remainingInches = inches % 12;
-    return `${feet}'${remainingInches}"`;
+  if (error) {
+    return (
+      <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={800}>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Roster</h2>
+            <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '230px' }}></div>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <div className="text-red-600 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Roster</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={fetchRosterData}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
+            style={{ backgroundColor: team.primaryColor }}
+          >
+            Try Again
+          </button>
+        </div>
+      </LayoutStabilizer>
+    );
+  }
+
+  // Helper function to get section display name and count
+  const getSectionInfo = (sectionKey: string) => {
+    if (!rosterData) return { name: '', count: 0 };
+
+    const sectionMap: Record<string, string> = {
+      activeRoster: 'Active Roster',
+      practiceSquad: 'Practice Squad',
+      injuredReserve: 'Injured Reserve',
+      physicallyUnableToPerform: 'Physically Unable to Perform',
+      nonFootballInjuryReserve: 'Non-Football Injury Reserve',
+      suspended: 'Suspended',
+      exempt: 'Exempt'
+    };
+
+    return {
+      name: sectionMap[sectionKey] || sectionKey,
+      count: rosterData[sectionKey as keyof typeof rosterData]?.length || 0
+    };
+  };
+
+  // Helper function to group players by position within a section
+  const groupPlayersByPosition = (players: Player[]) => {
+    const grouped: { [key: string]: Player[] } = {};
+
+    players.forEach(player => {
+      const group = getPositionGroup(player.position);
+      if (!grouped[group]) {
+        grouped[group] = [];
+      }
+      grouped[group].push(player);
+    });
+
+    // Sort players within each group by jersey number
+    Object.keys(grouped).forEach(group => {
+      grouped[group].sort((a, b) => a.jerseyNumber - b.jerseyNumber);
+    });
+
+    return grouped;
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+    <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6 pb-24" minHeight={800}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Roster</h2>
-          <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '250px' }}></div>
+          <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '230px' }}></div>
         </div>
-
-        {/* Position Filter */}
-        {!loading && roster.length > 0 && (
-          <div className="flex gap-2 flex-wrap">
-            {positions.map((pos) => (
-              <button
-                key={pos}
-                onClick={() => setFilterPosition(pos)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  filterPosition === pos
-                    ? 'text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-                style={filterPosition === pos ? { backgroundColor: team.primaryColor } : {}}
-              >
-                {pos === 'all' ? 'All' : pos}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="text-sm text-gray-600">
+          2025 Season
+        </div>
       </div>
 
-      {/* Loading State */}
-      {loading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <svg
-              className="animate-spin h-12 w-12 mx-auto mb-4"
-              style={{ color: team.primaryColor }}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-            <p className="text-gray-600 font-medium">Loading roster...</p>
-          </div>
+      {/* Section Tabs */}
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-2">
+          {Object.keys(rosterData || {}).map((sectionKey) => {
+            const section = getSectionInfo(sectionKey);
+            if (section.count === 0) return null;
+
+            return (
+              <button
+                key={sectionKey}
+                onClick={() => setActiveSection(sectionKey)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeSection === sectionKey
+                    ? 'text-white'
+                    : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                }`}
+                style={{
+                  backgroundColor: activeSection === sectionKey ? team.primaryColor : undefined
+                }}
+              >
+                {section.name} ({section.count})
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Active Section Content */}
+      {rosterData && rosterData[activeSection as keyof typeof rosterData] && (
+        <div className="space-y-8">
+          {(() => {
+            const players = rosterData[activeSection as keyof typeof rosterData] as Player[];
+            const groupedPlayers = groupPlayersByPosition(players);
+
+            return positionOrder.map((positionGroup) => {
+              const positionPlayers = groupedPlayers[positionGroup];
+              if (!positionPlayers || positionPlayers.length === 0) return null;
+
+              return (
+                <div key={positionGroup}>
+                  {/* Position Group Header */}
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-gray-200">
+                    {positionGroup}
+                  </h3>
+
+                  {/* Players Table */}
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
+                          <th className="text-center px-4 py-3 font-medium whitespace-nowrap">#</th>
+                          <th className="text-left px-4 py-3 font-medium whitespace-nowrap min-w-[200px]">Name</th>
+                          <th className="text-center px-4 py-3 font-medium whitespace-nowrap">Experience</th>
+                          <th className="text-center px-4 py-3 font-medium whitespace-nowrap">Age</th>
+                          <th className="text-center px-4 py-3 font-medium whitespace-nowrap">Height</th>
+                          <th className="text-center px-4 py-3 font-medium whitespace-nowrap">Weight</th>
+                          <th className="text-left px-4 py-3 font-medium whitespace-nowrap min-w-[150px]">College</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {positionPlayers.map((player, index) => (
+                          <tr key={`${player.jerseyNumber}-${player.name}`}
+                              className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <td className="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap text-center">{player.jerseyNumber}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center space-x-3 min-w-[200px]">
+                                <img
+                                  src={`https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${player.slug}.png?w=80`}
+                                  alt={player.name}
+                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    const fallback = target.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                                <div
+                                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{
+                                    backgroundColor: `${team.primaryColor}20`,
+                                    display: 'none'
+                                  }}
+                                >
+                                  <span
+                                    className="font-semibold text-xs"
+                                    style={{ color: team.primaryColor }}
+                                  >
+                                    {player.name.split(' ').map(n => n[0]).join('')}
+                                  </span>
+                                </div>
+                                <div className="flex flex-col">
+                                  <a
+                                    href={getPFNUrl(player.name)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-medium hover:underline whitespace-nowrap"
+                                    style={{ color: team.primaryColor }}
+                                  >
+                                    {player.name}
+                                  </a>
+                                  {player.isInjured && activeSection !== 'injuredReserve' && (
+                                    <span className="text-xs text-red-600 font-medium">
+                                      Injured
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-gray-700 whitespace-nowrap text-center">{player.experience === 0 ? 'R' : player.experience}</td>
+                            <td className="px-4 py-3 text-gray-700 whitespace-nowrap text-center">{player.age}</td>
+                            <td className="px-4 py-3 text-gray-700 whitespace-nowrap text-center">{player.height}</td>
+                            <td className="px-4 py-3 text-gray-700 whitespace-nowrap text-center">{player.weight}</td>
+                            <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{player.college}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
       )}
-
-      {/* Error State */}
-      {error && !loading && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <div className="flex items-start gap-3">
-            <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h3 className="text-red-800 font-semibold mb-1">Failed to load roster</h3>
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Roster Table */}
-      {!loading && !error && (
-        <>
-          {filteredRoster.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No players found for the selected position.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-white" style={{ backgroundColor: team.primaryColor }}>
-                    <th className="text-left p-3 font-medium">NO</th>
-                    <th className="text-left p-3 font-medium">PLAYER</th>
-                    <th className="text-left p-3 font-medium">POS</th>
-                    <th className="text-left p-3 font-medium">HT</th>
-                    <th className="text-left p-3 font-medium">WT</th>
-                    <th className="text-left p-3 font-medium">AGE</th>
-                    <th className="text-left p-3 font-medium hidden md:table-cell">COLLEGE</th>
-                    <th className="text-left p-3 font-medium hidden lg:table-cell">EXP</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRoster.map((player, index) => (
-                    <tr key={player.slug} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="p-3 font-bold text-gray-900">#{player.jersey_no}</td>
-                      <td className="p-3">
-                        <span className="font-semibold" style={{ color: team.primaryColor }}>
-                          {player.name}
-                        </span>
-                      </td>
-                      <td className="p-3 text-gray-700">
-                        {player.positions.map(pos => pos.abbreviation).join(', ')}
-                      </td>
-                      <td className="p-3 text-gray-700 whitespace-nowrap">{formatHeight(player.height_in_inch)}</td>
-                      <td className="p-3 text-gray-700">{player.weight_in_lbs}</td>
-                      <td className="p-3 text-gray-700">{player.age}</td>
-                      <td className="p-3 text-gray-600 text-xs hidden md:table-cell">
-                        {player.college || 'N/A'}
-                      </td>
-                      <td className="p-3 text-gray-700 hidden lg:table-cell">
-                        {player.experience.experience === 0 ? 'R' : player.experience.experience}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    </LayoutStabilizer>
   );
 }
