@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import RaptiveScript from '@/components/RaptiveScript';
+import VisiblTracking from '@/components/VisiblTracking';
 import { WebVitals } from '@/components/WebVitals';
 import VideoPlayerScript from '@/components/VideoPlayerScript';
 
@@ -77,6 +78,7 @@ export default function RootLayout({
         {/* Analytics and Ad Scripts */}
         <GoogleAnalytics />
         <RaptiveScript />
+        <VisiblTracking />
 
         {/* Resource hints for performance */}
         <link rel="preconnect" href="https://www.profootballnetwork.com" />
