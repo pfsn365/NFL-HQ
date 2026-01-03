@@ -454,16 +454,17 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
             teamStats={teamStats}
           />
         </LayoutStabilizer>
-        <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
 
-        {/* Raptive Header Ad - Below Tabs */}
-        <div className="w-full bg-white border-b border-gray-200">
-          <div className="container mx-auto px-4 py-4">
+        {/* Raptive Header Ad - Between Hero and Tabs */}
+        <div className="w-full bg-white">
+          <div className="container mx-auto px-4 py-4 min-h-[90px]">
             <div className="raptive-pfn-header-90"></div>
           </div>
         </div>
 
-        <LayoutStabilizer minHeight={400} className="w-full max-w-none px-4 py-6 pb-24">
+        <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
+
+        <LayoutStabilizer minHeight={400} className="w-full max-w-none px-4 py-6">
           {renderActiveTab()}
         </LayoutStabilizer>
       </main>
