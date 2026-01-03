@@ -455,14 +455,14 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
           />
         </LayoutStabilizer>
 
-        {/* Raptive Header Ad - Between Hero and Tabs */}
+        <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
+
+        {/* Raptive Header Ad - Below Tabs, Above Content */}
         <div className="w-full bg-white">
           <div className="container mx-auto px-4 py-4 min-h-[90px]">
             <div className="raptive-pfn-header-90"></div>
           </div>
         </div>
-
-        <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
 
         <LayoutStabilizer minHeight={400} className="w-full max-w-none px-4 py-6">
           {renderActiveTab()}

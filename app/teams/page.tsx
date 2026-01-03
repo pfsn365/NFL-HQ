@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { teams } from '@/data/teams';
-import GamesPageSidebar from '@/components/GamesPageSidebar';
+import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 
 interface ScheduleGame {
   week: number | string;
@@ -140,7 +140,7 @@ export default function TeamsPage() {
 
     return (
       <Link
-        href={`/nfl/teams/${team.id}`}
+        href={`/nfl-hq/teams/${team.id}`}
         className="group block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 border border-gray-200"
       >
         <div className="p-4 flex items-center space-x-4">
@@ -182,22 +182,19 @@ export default function TeamsPage() {
   };
 
   return (
-    <>
-      {/* Mobile sidebar */}
-      <div className="lg:hidden">
-        <GamesPageSidebar isMobile={true} />
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:block w-64 fixed left-0 top-0 bottom-0 z-10">
+        <NFLTeamsSidebar />
+      </aside>
+
+      {/* Mobile Sidebar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
+        <NFLTeamsSidebar isMobile={true} />
       </div>
 
-      <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
-        {/* Desktop sidebar - Fixed position */}
-        <div className="hidden lg:block">
-          <div className="fixed top-0 left-0 w-64 h-screen z-10">
-            <GamesPageSidebar isMobile={false} />
-          </div>
-        </div>
-
-        {/* Main content - Offset to account for fixed sidebar */}
-        <main className="flex-1 lg:ml-64 min-w-0">
+      {/* Main Content */}
+      <main className="flex-1 lg:ml-64 min-w-0 lg:pt-0 pt-14">
           {/* Hero Section */}
           <div className="text-white" style={{ background: '#CC3333' }}>
             <div className="container mx-auto px-4 py-6">
@@ -240,7 +237,6 @@ export default function TeamsPage() {
             </div>
           </div>
         </main>
-      </div>
-    </>
+    </div>
   );
 }
