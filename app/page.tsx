@@ -47,14 +47,14 @@ export default function HomePage() {
 
   // Featured teams (popular/successful franchises)
   const featuredTeamIds = [
-    'boston-celtics',
-    'los-angeles-lakers',
-    'golden-state-warriors',
-    'miami-heat',
-    'chicago-bulls',
-    'san-antonio-spurs',
-    'milwaukee-bucks',
-    'denver-nuggets'
+    'kansas-city-chiefs',
+    'philadelphia-eagles',
+    'san-francisco-49ers',
+    'buffalo-bills',
+    'dallas-cowboys',
+    'green-bay-packers',
+    'baltimore-ravens',
+    'detroit-lions'
   ];
 
   const featuredTeams = featuredTeamIds
@@ -63,11 +63,11 @@ export default function HomePage() {
 
   // Top 5 standings - fetch from API
   const [topStandings, setTopStandings] = useState([
-    { teamId: 'oklahoma-city-thunder', teamName: 'Oklahoma City Thunder', wins: 13, losses: 2 },
-    { teamId: 'boston-celtics', teamName: 'Boston Celtics', wins: 12, losses: 3 },
-    { teamId: 'cleveland-cavaliers', teamName: 'Cleveland Cavaliers', wins: 11, losses: 4 },
-    { teamId: 'golden-state-warriors', teamName: 'Golden State Warriors', wins: 11, losses: 4 },
-    { teamId: 'houston-rockets', teamName: 'Houston Rockets', wins: 11, losses: 4 }
+    { teamId: 'kansas-city-chiefs', teamName: 'Kansas City Chiefs', wins: 15, losses: 1 },
+    { teamId: 'detroit-lions', teamName: 'Detroit Lions', wins: 13, losses: 3 },
+    { teamId: 'philadelphia-eagles', teamName: 'Philadelphia Eagles', wins: 12, losses: 4 },
+    { teamId: 'buffalo-bills', teamName: 'Buffalo Bills', wins: 11, losses: 5 },
+    { teamId: 'baltimore-ravens', teamName: 'Baltimore Ravens', wins: 11, losses: 5 }
   ]);
 
   // Fetch live standings
@@ -120,11 +120,11 @@ export default function HomePage() {
 
   // Top 5 draft picks (worst records) - fetch from API
   const [topDraftPicks, setTopDraftPicks] = useState([
-    { pick: 1, teamId: 'washington-wizards', teamName: 'Washington Wizards', record: '3-12' },
-    { pick: 2, teamId: 'toronto-raptors', teamName: 'Toronto Raptors', record: '4-11' },
-    { pick: 3, teamId: 'utah-jazz', teamName: 'Utah Jazz', record: '4-11' },
-    { pick: 4, teamId: 'detroit-pistons', teamName: 'Detroit Pistons', record: '5-10' },
-    { pick: 5, teamId: 'new-orleans-pelicans', teamName: 'New Orleans Pelicans', record: '5-10' }
+    { pick: 1, teamId: 'new-york-giants', teamName: 'New York Giants', record: '2-14' },
+    { pick: 2, teamId: 'cleveland-browns', teamName: 'Cleveland Browns', record: '3-13' },
+    { pick: 3, teamId: 'new-england-patriots', teamName: 'New England Patriots', record: '3-13' },
+    { pick: 4, teamId: 'tennessee-titans', teamName: 'Tennessee Titans', record: '3-13' },
+    { pick: 5, teamId: 'las-vegas-raiders', teamName: 'Las Vegas Raiders', record: '4-12' }
   ]);
 
   // Today's games - fetch from schedule API
@@ -270,12 +270,12 @@ export default function HomePage() {
       {/* Main content */}
       <main className="flex-1 lg:ml-64 min-w-0">
         {/* Hero Section */}
-        <header style={{ backgroundColor: '#0050A0' }} className="text-white shadow-lg pt-[57px] lg:pt-0">
+        <header style={{ backgroundColor: '#013369' }} className="text-white shadow-lg pt-[57px] lg:pt-0">
           <div className="container mx-auto px-4 py-6">
             <div className="text-center">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">NBA Hub</h1>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">NFL HQ</h1>
               <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
-                Your destination for NBA teams, stats, rankings, and interactive tools
+                Your destination for NFL teams, stats, rankings, and interactive tools
               </p>
             </div>
           </div>
@@ -293,7 +293,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-bold text-gray-900">Upcoming Games</h2>
               <Link
                 href="/schedule"
-                className="text-[#0050A0] hover:text-blue-700 font-semibold text-sm transition-colors"
+                className="text-[#013369] hover:text-blue-700 font-semibold text-sm transition-colors"
               >
                 View All Upcoming Games →
               </Link>
@@ -335,7 +335,7 @@ export default function HomePage() {
                   const hasScore = game.has_score || (game.status !== 'Pre-Game' && game.away_team.score !== undefined && game.away_team.score !== null);
 
                   return (
-                    <div key={game.event_id} className={`border rounded-lg p-4 hover:border-[#0050A0] transition-colors relative ${isLive ? 'border-green-400 ring-2 ring-green-100' : 'border-gray-200'}`}>
+                    <div key={game.event_id} className={`border rounded-lg p-4 hover:border-[#013369] transition-colors relative ${isLive ? 'border-green-400 ring-2 ring-green-100' : 'border-gray-200'}`}>
                       {isLive && (
                         <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold uppercase rounded">
                           <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
@@ -424,7 +424,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-bold text-gray-900">Stat Leaders</h2>
               <Link
                 href="/stats"
-                className="text-[#0050A0] hover:text-blue-700 font-semibold text-sm transition-colors"
+                className="text-[#013369] hover:text-blue-700 font-semibold text-sm transition-colors"
               >
                 View All Stats →
               </Link>
@@ -472,7 +472,7 @@ export default function HomePage() {
                             )}
                             <span className="font-medium text-gray-900 truncate text-xs">{player.name}</span>
                           </div>
-                          <span className="font-bold text-[#0050A0] ml-2">{player.value}</span>
+                          <span className="font-bold text-[#013369] ml-2">{player.value}</span>
                         </div>
                       );
                     })}
@@ -498,7 +498,7 @@ export default function HomePage() {
                             )}
                             <span className="font-medium text-gray-900 truncate text-xs">{player.name}</span>
                           </div>
-                          <span className="font-bold text-[#0050A0] ml-2">{player.value}</span>
+                          <span className="font-bold text-[#013369] ml-2">{player.value}</span>
                         </div>
                       );
                     })}
@@ -524,7 +524,7 @@ export default function HomePage() {
                             )}
                             <span className="font-medium text-gray-900 truncate text-xs">{player.name}</span>
                           </div>
-                          <span className="font-bold text-[#0050A0] ml-2">{player.value}</span>
+                          <span className="font-bold text-[#013369] ml-2">{player.value}</span>
                         </div>
                       );
                     })}
@@ -550,7 +550,7 @@ export default function HomePage() {
                             )}
                             <span className="font-medium text-gray-900 truncate text-xs">{player.name}</span>
                           </div>
-                          <span className="font-bold text-[#0050A0] ml-2">{player.value}</span>
+                          <span className="font-bold text-[#013369] ml-2">{player.value}</span>
                         </div>
                       );
                     })}
@@ -576,7 +576,7 @@ export default function HomePage() {
                             )}
                             <span className="font-medium text-gray-900 truncate text-xs">{player.name}</span>
                           </div>
-                          <span className="font-bold text-[#0050A0] ml-2">{player.value}</span>
+                          <span className="font-bold text-[#013369] ml-2">{player.value}</span>
                         </div>
                       );
                     })}
@@ -599,19 +599,19 @@ export default function HomePage() {
                 Interactive Tools & Features
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                Discover comprehensive NBA data, build custom rankings, and explore team information
+                Discover comprehensive NFL data, build custom rankings, and explore team information
               </p>
             </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* NBA Standings Card with Preview */}
+            {/* NFL Standings Card with Preview */}
             <Link
               href="/standings"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                  NBA Standings
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
+                  NFL Standings
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
@@ -644,7 +644,7 @@ export default function HomePage() {
                 })}
               </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 flex items-center text-[#013369] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="text-sm font-medium">View Full Standings</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -655,15 +655,15 @@ export default function HomePage() {
             {/* Draft Order Card with Preview */}
             <Link
               href="/draft-order"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
                   Draft Order
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
-                Latest NBA draft order and lottery results
+                Latest NFL draft order and lottery results
               </p>
 
               {/* Top 5 Draft Picks Preview */}
@@ -674,7 +674,7 @@ export default function HomePage() {
                   return (
                     <div key={pick.teamId} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-white bg-[#0050A0] font-bold w-6 h-6 rounded flex items-center justify-center text-xs flex-shrink-0">
+                        <span className="text-white bg-[#013369] font-bold w-6 h-6 rounded flex items-center justify-center text-xs flex-shrink-0">
                           {pick.pick}
                         </span>
                         {teamInfo && (
@@ -694,7 +694,7 @@ export default function HomePage() {
                 })}
               </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 flex items-center text-[#013369] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="text-sm font-medium">View Full Draft Order</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -705,15 +705,15 @@ export default function HomePage() {
             {/* Power Rankings Builder Card */}
             <Link
               href="/power-rankings-builder"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
                   Power Rankings Builder
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
-                Create and customize your own NBA team power rankings
+                Create and customize your own NFL team power rankings
               </p>
 
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 text-center">
@@ -721,7 +721,7 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600 mt-1">Build your custom list</p>
               </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 flex items-center text-[#013369] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="text-sm font-medium">Start Building</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -732,15 +732,15 @@ export default function HomePage() {
             {/* Player Rankings Builder Card */}
             <Link
               href="/player-rankings-builder"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
                   Player Rankings Builder
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
-                Build custom player rankings from NBA legends and stars
+                Build custom player rankings from NFL legends and stars
               </p>
 
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center">
@@ -748,7 +748,7 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600 mt-1">Your all-time list</p>
               </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 flex items-center text-[#013369] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="text-sm font-medium">Start Ranking</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -759,15 +759,15 @@ export default function HomePage() {
             {/* Salary Cap Tracker Card */}
             <Link
               href="/salary-cap-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
                   Salary Cap Tracker
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
-                Track NBA team salary cap situations and contracts
+                Track NFL team salary cap situations and contracts
               </p>
 
               <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4 text-center">
@@ -775,7 +775,7 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600 mt-1">Team financials</p>
               </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 flex items-center text-[#013369] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="text-sm font-medium">View Salaries</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -783,26 +783,26 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* NBA Teams Card */}
+            {/* NFL Teams Card */}
             <Link
               href="/teams"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                  NBA Teams
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
+                  NFL Teams
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
-                Comprehensive pages for all 30 NBA teams
+                Comprehensive pages for all 30 NFL teams
               </p>
 
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center">
-                <p className="text-sm font-semibold text-gray-700">All 30 Teams</p>
+                <p className="text-sm font-semibold text-gray-700">All 32 Teams</p>
                 <p className="text-xs text-gray-600 mt-1">Rosters, stats & history</p>
               </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-4 flex items-center text-[#013369] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="text-sm font-medium">Browse Teams</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -820,12 +820,12 @@ export default function HomePage() {
                   Featured Teams
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  Quick access to popular NBA franchises
+                  Quick access to popular NFL franchises
                 </p>
               </div>
               <Link
                 href="/teams"
-                className="hidden md:flex items-center gap-2 text-[#0050A0] hover:text-[#ff5722] font-semibold text-sm transition-colors"
+                className="hidden md:flex items-center gap-2 text-[#013369] hover:text-[#ff5722] font-semibold text-sm transition-colors"
               >
               View All Teams →
             </Link>
@@ -836,7 +836,7 @@ export default function HomePage() {
                 <Link
                   key={team.id}
                   href={`/teams/${team.id}`}
-                  className="group relative bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-center aspect-square"
+                  className="group relative bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-center aspect-square"
                 >
                   <div className="relative w-20 h-20 mb-2">
                     <img
@@ -846,7 +846,7 @@ export default function HomePage() {
                     />
                   </div>
                   <div className="text-center">
-                    <div className="text-xs font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                    <div className="text-xs font-bold text-gray-900 group-hover:text-[#013369] transition-colors">
                       {team.abbreviation}
                     </div>
                   </div>
@@ -858,9 +858,9 @@ export default function HomePage() {
             <div className="mt-6 md:hidden text-center">
               <Link
                 href="/teams"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#0050A0] hover:bg-[#003d7a] text-white font-medium rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#013369] hover:bg-[#003d7a] text-white font-medium rounded-lg transition-colors"
               >
-                View All 30 Teams
+                View All 32 Teams
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
