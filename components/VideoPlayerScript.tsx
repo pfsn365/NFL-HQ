@@ -8,11 +8,6 @@ declare global {
     googletag?: {
       apiReady?: boolean;
     };
-    adthrive?: {
-      cmd: Array<() => void>;
-      plugin: string;
-      host: string;
-    };
   }
 }
 
@@ -49,55 +44,8 @@ function removeClass(element: HTMLElement | null, className: string) {
   }
 }
 
-function loadAdThrive(): Promise<void> {
-  return new Promise((resolve) => {
-    window.adthrive = window.adthrive || { cmd: [], plugin: '', host: '' };
-    window.adthrive.cmd = window.adthrive.cmd || [];
-    window.adthrive.plugin = 'adthrive-ads-manual';
-    window.adthrive.host = 'ads.adthrive.com';
-
-    const s = document.createElement('script');
-    s.async = true;
-    s.defer = true;
-    s.referrerPolicy = 'no-referrer-when-downgrade';
-    s.src = 'https://' + window.adthrive.host + '/sites/5e163f2211916d4860b8f332/ads.min.js?referrer=' +
-      encodeURIComponent(window.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
-    s.onload = () => resolve();
-    s.onerror = () => resolve(); // Resolve even on error to prevent hanging
-
-    const n = document.getElementsByTagName('script')[0];
-    if (n && n.parentNode) {
-      n.parentNode.insertBefore(s, n);
-    } else {
-      (document.head || document.body || document.documentElement).appendChild(s);
-    }
-  });
-}
-
-function waitForGPT(): Promise<void> {
-  return new Promise((resolve) => {
-    if (window.googletag && window.googletag.apiReady) {
-      resolve();
-      return;
-    }
-
-    const checkInterval = setInterval(() => {
-      if (window.googletag && window.googletag.apiReady) {
-        clearInterval(checkInterval);
-        resolve();
-      }
-    }, 100);
-
-    // Timeout after 10 seconds
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      resolve();
-    }, 10000);
-  });
-}
-
 function loadSTN(target: HTMLElement) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', function() {
     if (typeof window.gtag === 'function') {
       console.log('gtag triggered for stn');
       window.gtag('event', 'STN_Player_Segment', {
@@ -121,7 +69,7 @@ function loadSTN(target: HTMLElement) {
 }
 
 function loadPrimis(target?: HTMLElement | null) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', function() {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'Primis_Player_Segment', {
         'page_url': window.location.href,
@@ -138,6 +86,28 @@ function loadPrimis(target?: HTMLElement | null) {
   } else {
     (document.body || document.head).appendChild(script);
   }
+}
+
+function waitForGPT(): Promise<void> {
+  return new Promise((resolve) => {
+    if (window.googletag && window.googletag.apiReady) {
+      resolve();
+      return;
+    }
+
+    const checkInterval = setInterval(function() {
+      if (window.googletag && window.googletag.apiReady) {
+        clearInterval(checkInterval);
+        resolve();
+      }
+    }, 100);
+
+    // Timeout after 10 seconds
+    setTimeout(function() {
+      clearInterval(checkInterval);
+      resolve();
+    }, 10000);
+  });
 }
 
 function isDesktop(): boolean {
@@ -165,9 +135,8 @@ export default function VideoPlayerScript() {
       }
     };
 
-    // Execute in sequence: AdThrive → Wait for GPT → Video Player
-    loadAdThrive()
-      .then(() => waitForGPT())
+    // Wait for GPT to be available (loaded by AdThrive), then init video player
+    waitForGPT()
       .then(() => {
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', initVideoPlayer);
