@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
@@ -14,48 +14,67 @@ interface SalaryCapData {
   deadMoney: number;
 }
 
-// Sample NBA salary cap data for 2025-26 season
-// NBA salary cap for 2025-26 is set at $154.647 million
-const sampleSalaryCapData: SalaryCapData[] = [
-  { teamId: 'detroit-pistons', teamName: 'Detroit Pistons', capSpace: 25420000, salaryCap: 154647000, activeCapSpend: 129227000, deadMoney: 0 },
-  { teamId: 'san-antonio-spurs', teamName: 'San Antonio Spurs', capSpace: 22150000, salaryCap: 154647000, activeCapSpend: 132497000, deadMoney: 0 },
-  { teamId: 'utah-jazz', teamName: 'Utah Jazz', capSpace: 20800000, salaryCap: 154647000, activeCapSpend: 133847000, deadMoney: 0 },
-  { teamId: 'portland-trail-blazers', teamName: 'Portland Trail Blazers', capSpace: 18650000, salaryCap: 154647000, activeCapSpend: 135997000, deadMoney: 0 },
-  { teamId: 'oklahoma-city-thunder', teamName: 'Oklahoma City Thunder', capSpace: 15200000, salaryCap: 154647000, activeCapSpend: 139447000, deadMoney: 0 },
-  { teamId: 'indiana-pacers', teamName: 'Indiana Pacers', capSpace: 12400000, salaryCap: 154647000, activeCapSpend: 142247000, deadMoney: 0 },
-  { teamId: 'charlotte-hornets', teamName: 'Charlotte Hornets', capSpace: 11800000, salaryCap: 154647000, activeCapSpend: 142847000, deadMoney: 0 },
-  { teamId: 'orlando-magic', teamName: 'Orlando Magic', capSpace: 9500000, salaryCap: 154647000, activeCapSpend: 145147000, deadMoney: 0 },
-  { teamId: 'brooklyn-nets', teamName: 'Brooklyn Nets', capSpace: 8200000, salaryCap: 154647000, activeCapSpend: 146447000, deadMoney: 0 },
-  { teamId: 'houston-rockets', teamName: 'Houston Rockets', capSpace: 7100000, salaryCap: 154647000, activeCapSpend: 147547000, deadMoney: 0 },
-  { teamId: 'toronto-raptors', teamName: 'Toronto Raptors', capSpace: 5800000, salaryCap: 154647000, activeCapSpend: 148847000, deadMoney: 0 },
-  { teamId: 'washington-wizards', teamName: 'Washington Wizards', capSpace: 4500000, salaryCap: 154647000, activeCapSpend: 150147000, deadMoney: 0 },
-  { teamId: 'atlanta-hawks', teamName: 'Atlanta Hawks', capSpace: 2900000, salaryCap: 154647000, activeCapSpend: 151747000, deadMoney: 0 },
-  { teamId: 'memphis-grizzlies', teamName: 'Memphis Grizzlies', capSpace: 1200000, salaryCap: 154647000, activeCapSpend: 153447000, deadMoney: 0 },
-  { teamId: 'chicago-bulls', teamName: 'Chicago Bulls', capSpace: -2400000, salaryCap: 154647000, activeCapSpend: 157047000, deadMoney: 0 },
-  { teamId: 'cleveland-cavaliers', teamName: 'Cleveland Cavaliers', capSpace: -4100000, salaryCap: 154647000, activeCapSpend: 158747000, deadMoney: 0 },
-  { teamId: 'new-york-knicks', teamName: 'New York Knicks', capSpace: -5800000, salaryCap: 154647000, activeCapSpend: 160447000, deadMoney: 0 },
-  { teamId: 'sacramento-kings', teamName: 'Sacramento Kings', capSpace: -7200000, salaryCap: 154647000, activeCapSpend: 161847000, deadMoney: 0 },
-  { teamId: 'minnesota-timberwolves', teamName: 'Minnesota Timberwolves', capSpace: -9500000, salaryCap: 154647000, activeCapSpend: 164147000, deadMoney: 0 },
-  { teamId: 'new-orleans-pelicans', teamName: 'New Orleans Pelicans', capSpace: -11800000, salaryCap: 154647000, activeCapSpend: 166447000, deadMoney: 0 },
-  { teamId: 'dallas-mavericks', teamName: 'Dallas Mavericks', capSpace: -13200000, salaryCap: 154647000, activeCapSpend: 167847000, deadMoney: 0 },
-  { teamId: 'miami-heat', teamName: 'Miami Heat', capSpace: -15600000, salaryCap: 154647000, activeCapSpend: 170247000, deadMoney: 0 },
-  { teamId: 'denver-nuggets', teamName: 'Denver Nuggets', capSpace: -17900000, salaryCap: 154647000, activeCapSpend: 172547000, deadMoney: 0 },
-  { teamId: 'philadelphia-76ers', teamName: 'Philadelphia 76ers', capSpace: -20100000, salaryCap: 154647000, activeCapSpend: 174747000, deadMoney: 0 },
-  { teamId: 'milwaukee-bucks', teamName: 'Milwaukee Bucks', capSpace: -22400000, salaryCap: 154647000, activeCapSpend: 177047000, deadMoney: 0 },
-  { teamId: 'los-angeles-clippers', teamName: 'Los Angeles Clippers', capSpace: -24700000, salaryCap: 154647000, activeCapSpend: 179347000, deadMoney: 0 },
-  { teamId: 'boston-celtics', teamName: 'Boston Celtics', capSpace: -27800000, salaryCap: 154647000, activeCapSpend: 182447000, deadMoney: 0 },
-  { teamId: 'phoenix-suns', teamName: 'Phoenix Suns', capSpace: -30200000, salaryCap: 154647000, activeCapSpend: 184847000, deadMoney: 0 },
-  { teamId: 'los-angeles-lakers', teamName: 'Los Angeles Lakers', capSpace: -32500000, salaryCap: 154647000, activeCapSpend: 187147000, deadMoney: 0 },
-  { teamId: 'golden-state-warriors', teamName: 'Golden State Warriors', capSpace: -35800000, salaryCap: 154647000, activeCapSpend: 190447000, deadMoney: 0 },
-];
-
 type SortKey = 'teamName' | 'capSpace' | 'salaryCap' | 'activeCapSpend' | 'deadMoney';
 type SortDirection = 'asc' | 'desc';
 
 export default function SalaryCapTrackerClient() {
   const [sortKey, setSortKey] = useState<SortKey>('capSpace');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [salaryCapData, setSalaryCapData] = useState<SalaryCapData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
   const allTeams = getAllTeams();
+
+  // Fetch salary cap data for all teams
+  useEffect(() => {
+    async function fetchAllTeamsSalaryCap() {
+      setLoading(true);
+      const dataPromises = allTeams.map(async (team) => {
+        try {
+          const response = await fetch(`/nfl/teams/api/salary-cap/${team.id}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch data for ${team.id}`);
+          }
+          const data = await response.json();
+
+          return {
+            teamId: team.id,
+            teamName: team.fullName,
+            capSpace: data.salaryCapData.teamSummary.capSpace,
+            salaryCap: data.salaryCapData.teamSummary.salaryCap,
+            activeCapSpend: data.salaryCapData.teamSummary.activeCapSpend,
+            deadMoney: data.salaryCapData.teamSummary.deadMoney
+          };
+        } catch (error) {
+          console.error(`Error fetching salary cap for ${team.id}:`, error);
+          // Return default values if fetch fails
+          return {
+            teamId: team.id,
+            teamName: team.fullName,
+            capSpace: 0,
+            salaryCap: 255400000, // 2025 NFL salary cap
+            activeCapSpend: 0,
+            deadMoney: 0
+          };
+        }
+      });
+
+      const results = await Promise.all(dataPromises);
+      setSalaryCapData(results);
+      setLastUpdated(new Date().toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZoneName: 'short'
+      }));
+      setLoading(false);
+    }
+
+    fetchAllTeamsSalaryCap();
+  }, []);
 
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -64,7 +83,7 @@ export default function SalaryCapTrackerClient() {
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(amount * 1000000); // Convert from millions to dollars
   };
 
   // Handle column sort
@@ -79,7 +98,7 @@ export default function SalaryCapTrackerClient() {
 
   // Sort data
   const sortedData = useMemo(() => {
-    const sorted = [...sampleSalaryCapData].sort((a, b) => {
+    const sorted = [...salaryCapData].sort((a, b) => {
       let aValue = a[sortKey];
       let bValue = b[sortKey];
 
@@ -99,23 +118,12 @@ export default function SalaryCapTrackerClient() {
     });
 
     return sorted;
-  }, [sortKey, sortDirection]);
+  }, [salaryCapData, sortKey, sortDirection]);
 
   // Get team info
   const getTeamInfo = (teamId: string) => {
     return allTeams.find(t => t.id === teamId);
   };
-
-  // Get last updated timestamp
-  const lastUpdated = new Date().toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZoneName: 'short'
-  });
 
   // Sort indicator component
   const SortIndicator = ({ column }: { column: SortKey }) => {
@@ -156,10 +164,10 @@ export default function SalaryCapTrackerClient() {
         <div className="bg-[#0050A0] text-white py-8 px-4 sm:px-6 lg:px-8 w-full">
           <div className="mx-auto max-w-7xl">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
-              NBA Salary Cap Tracker by Team
+              NFL Salary Cap Tracker by Team
             </h1>
             <p className="text-base sm:text-lg lg:text-xl opacity-90">
-              Track cap space, active spending, and dead money for all 30 teams
+              Track cap space, active spending, and dead money for all 32 teams
             </p>
           </div>
         </div>
@@ -174,147 +182,151 @@ export default function SalaryCapTrackerClient() {
           {/* Last Updated */}
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
             <p className="text-sm text-gray-600">
-              <strong>Last Updated:</strong> {lastUpdated}
+              <strong>Last Updated:</strong> {lastUpdated || 'Loading...'}
             </p>
           </div>
 
           {/* Table */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[#0050A0] text-white">
-                  <tr>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
-                      onClick={() => handleSort('teamName')}
-                    >
-                      <div className="flex items-center gap-2">
-                        TEAM
-                        <SortIndicator column="teamName" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
-                      onClick={() => handleSort('capSpace')}
-                    >
-                      <div className="flex items-center gap-2">
-                        CAP SPACE
-                        <SortIndicator column="capSpace" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
-                      onClick={() => handleSort('salaryCap')}
-                    >
-                      <div className="flex items-center gap-2">
-                        2025-26 SALARY CAP
-                        <SortIndicator column="salaryCap" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
-                      onClick={() => handleSort('activeCapSpend')}
-                    >
-                      <div className="flex items-center gap-2">
-                        ACTIVE CAP SPEND
-                        <SortIndicator column="activeCapSpend" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
-                      onClick={() => handleSort('deadMoney')}
-                    >
-                      <div className="flex items-center gap-2">
-                        DEAD MONEY
-                        <SortIndicator column="deadMoney" />
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedData.map((team, index) => {
-                    const teamInfo = getTeamInfo(team.teamId);
-                    return (
-                      <tr
-                        key={team.teamId}
-                        className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="w-12 h-12 border-4 border-gray-200 border-t-[#0050A0] rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-[#0050A0] text-white">
+                    <tr>
+                      <th
+                        className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        onClick={() => handleSort('teamName')}
                       >
-                        <td className="px-4 py-4">
-                          <a
-                            href={`/teams/${team.teamId}/salary-cap`}
-                            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                          >
-                            {teamInfo && (
-                              <img
-                                src={teamInfo.logoUrl}
-                                alt={team.teamName}
-                                
-                                
-                                className="w-8 h-8"
-                              />
-                            )}
-                            <span className="font-medium text-[#0050A0]">
-                              {team.teamName}
-                            </span>
-                          </a>
-                        </td>
-                        <td className={`px-4 py-4 font-semibold ${team.capSpace >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatCurrency(team.capSpace)}
-                        </td>
-                        <td className="px-4 py-4 text-gray-700">
-                          {formatCurrency(team.salaryCap)}
-                        </td>
-                        <td className="px-4 py-4 text-gray-700">
-                          {formatCurrency(team.activeCapSpend)}
-                        </td>
-                        <td className="px-4 py-4 text-gray-700">
-                          {formatCurrency(team.deadMoney)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        <div className="flex items-center gap-2">
+                          TEAM
+                          <SortIndicator column="teamName" />
+                        </div>
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        onClick={() => handleSort('capSpace')}
+                      >
+                        <div className="flex items-center gap-2">
+                          CAP SPACE
+                          <SortIndicator column="capSpace" />
+                        </div>
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        onClick={() => handleSort('salaryCap')}
+                      >
+                        <div className="flex items-center gap-2">
+                          2025 SALARY CAP
+                          <SortIndicator column="salaryCap" />
+                        </div>
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        onClick={() => handleSort('activeCapSpend')}
+                      >
+                        <div className="flex items-center gap-2">
+                          ACTIVE CAP SPEND
+                          <SortIndicator column="activeCapSpend" />
+                        </div>
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        onClick={() => handleSort('deadMoney')}
+                      >
+                        <div className="flex items-center gap-2">
+                          DEAD MONEY
+                          <SortIndicator column="deadMoney" />
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedData.map((team, index) => {
+                      const teamInfo = getTeamInfo(team.teamId);
+                      return (
+                        <tr
+                          key={team.teamId}
+                          className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        >
+                          <td className="px-4 py-4">
+                            <a
+                              href={`/teams/${team.teamId}/salary-cap`}
+                              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                            >
+                              {teamInfo && (
+                                <img
+                                  src={teamInfo.logoUrl}
+                                  alt={team.teamName}
+                                  className="w-8 h-8"
+                                />
+                              )}
+                              <span className="font-medium text-[#0050A0]">
+                                {team.teamName}
+                              </span>
+                            </a>
+                          </td>
+                          <td className={`px-4 py-4 font-semibold ${team.capSpace >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(team.capSpace)}
+                          </td>
+                          <td className="px-4 py-4 text-gray-700">
+                            {formatCurrency(team.salaryCap)}
+                          </td>
+                          <td className="px-4 py-4 text-gray-700">
+                            {formatCurrency(team.activeCapSpend)}
+                          </td>
+                          <td className="px-4 py-4 text-gray-700">
+                            {formatCurrency(team.deadMoney)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           {/* Salary Cap Explanation Section */}
           <div className="mt-12 space-y-8">
-            {/* What Is the NBA Salary Cap? */}
+            {/* What Is the NFL Salary Cap? */}
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                What Is the NBA Salary Cap?
+                What Is the NFL Salary Cap?
               </h2>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  The NBA salary cap is the limit on the total amount of money that NBA teams can spend on their players' salaries for a given season. For the 2025-26 season, the salary cap has been set at $154.647 million, which represents a 10% increase from the previous season. This cap is based on Basketball Related Income (BRI), which includes revenue from ticket sales, broadcasting rights, merchandise, and other basketball-related sources.
+                  The NFL salary cap is a hard cap that limits the total amount teams can spend on player salaries in a given season. For the 2025 season, the salary cap is set at $255.4 million per team. Unlike the NBA's soft cap system, the NFL enforces a strict limit with few exceptions, ensuring competitive balance across all 32 teams.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Unlike the NFL and NHL, the NBA features what is known as a "soft cap," meaning teams can exceed the salary cap threshold using various exceptions. However, teams that significantly exceed the cap face luxury tax penalties. The luxury tax threshold for 2025-26 is set at $187.895 million, and teams that surpass this amount must pay additional taxes on the overage.
+                  The salary cap is calculated based on league revenues, including television contracts, ticket sales, merchandise, and sponsorships. Each year, the cap is adjusted to reflect the league's financial performance, with both the owners and players' union agreeing to split revenues based on the Collective Bargaining Agreement (CBA).
                 </p>
                 <p className="text-gray-700 leading-relaxed">
-                  The NBA also enforces a salary floor, which is the minimum amount teams must spend on player salaries. For 2025-26, the salary floor is $139.182 million. Teams that fail to meet this minimum by the start of the regular season must pay the shortfall to the NBA and forfeit their full share of luxury tax distribution.
+                  Teams must also maintain a salary floor, which requires them to spend a minimum percentage of the cap. This ensures that all teams are competitive and prevents owners from pocketing profits instead of investing in their rosters. The salary floor is calculated over a multi-year period to give teams flexibility in managing their cap space.
                 </p>
               </div>
             </div>
 
-            {/* How Does the NBA Salary Cap Work? */}
+            {/* How Does the NFL Salary Cap Work? */}
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                How Does the NBA Salary Cap Work?
+                How Does the NFL Salary Cap Work?
               </h2>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  The NBA's soft salary cap system allows teams to exceed the cap limit through various exceptions designed to help teams retain their own players and remain competitive. The most significant exception is the Larry Bird Exception (named after Boston Celtics legend Larry Bird), which allows teams to re-sign their own free agents for any amount, even if it puts them over the cap. This encourages team continuity and loyalty by allowing franchises to keep their star players.
+                  The NFL's hard salary cap system means teams cannot exceed the cap limit except in very specific circumstances. However, teams can use various strategies to manage their cap space, including restructuring contracts, converting base salaries into signing bonuses, and releasing or trading players.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Other key exceptions include the Mid-Level Exception (MLE), which allows teams to sign players even when over the cap. For 2025-26, the Non-Taxpayer Mid-Level is $14.104 million, the Taxpayer Mid-Level is $5.685 million, and teams with cap room can use a $8.781 million Mid-Level. Additionally, teams can use the Bi-Annual Exception and various trade exceptions to acquire talent.
+                  Dead money refers to salary cap charges from players who are no longer on the roster. This occurs when a team releases a player who had guaranteed money or unamortized signing bonus remaining on their contract. The remaining guaranteed money counts against the cap, creating "dead cap space" that reduces the team's ability to sign new players.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  The NBA has also implemented the Apron System to create additional spending tiers. The First Apron is set at $195.945 million and the Second Apron at $207.824 million for 2025-26. Teams whose total salary exceeds these thresholds face increasingly severe restrictions. Teams over the First Apron lose access to certain exceptions and trade flexibility. Teams over the Second Apron face even harsher penalties, including the loss of most signing exceptions and the inability to make trades that increase their payroll.
+                  Teams can create cap space through several methods: releasing high-salary players (accepting dead cap hits), restructuring contracts to push cap hits into future years, signing players to front-loaded or back-loaded contracts, and utilizing performance-based incentives that don't count against the cap until earned.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
-                  Teams that exceed the luxury tax threshold must pay dollar-for-dollar penalties on the overage, with the tax rate increasing for repeat offenders. These luxury tax payments are then distributed among teams that stayed under the tax line, creating a financial incentive for fiscal responsibility while still allowing wealthy franchises to spend on championship-caliber rosters.
+                  The NFL also allows teams to carry over unused cap space from previous seasons, giving teams that manage their cap wisely additional flexibility. This rollover provision encourages teams to be fiscally responsible and rewards those who build their rosters efficiently.
                 </p>
               </div>
             </div>
