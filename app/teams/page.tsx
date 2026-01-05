@@ -196,7 +196,7 @@ export default function TeamsPage() {
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 min-w-0 lg:pt-0 pt-14">
           {/* Hero Section */}
-          <div className="text-white" style={{ background: '#CC3333' }}>
+          <div className="text-white" style={{ background: '#0050A0' }}>
             <div className="container mx-auto px-4 py-6">
               <div className="text-center">
                 <h1 className="text-4xl lg:text-5xl font-bold mb-3">NFL Teams</h1>
