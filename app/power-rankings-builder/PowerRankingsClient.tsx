@@ -32,41 +32,7 @@ const getOrdinalSuffix = (num: number): string => {
   return 'th';
 };
 
-// Map API slugs to our team IDs
-const teamSlugMapping: Record<string, string> = {
-  'atlanta-hawks': 'atlanta-hawks',
-  'boston-celtics': 'boston-celtics',
-  'brooklyn-nets': 'brooklyn-nets',
-  'charlotte-hornets': 'charlotte-hornets',
-  'chicago-bulls': 'chicago-bulls',
-  'cleveland-cavaliers': 'cleveland-cavaliers',
-  'dallas-mavericks': 'dallas-mavericks',
-  'denver-nuggets': 'denver-nuggets',
-  'detroit-pistons': 'detroit-pistons',
-  'golden-state-warriors': 'golden-state-warriors',
-  'houston-rockets': 'houston-rockets',
-  'indiana-pacers': 'indiana-pacers',
-  'la-clippers': 'los-angeles-clippers',
-  'los-angeles-clippers': 'los-angeles-clippers',
-  'los-angeles-lakers': 'los-angeles-lakers',
-  'memphis-grizzlies': 'memphis-grizzlies',
-  'miami-heat': 'miami-heat',
-  'milwaukee-bucks': 'milwaukee-bucks',
-  'minnesota-timberwolves': 'minnesota-timberwolves',
-  'new-orleans-pelicans': 'new-orleans-pelicans',
-  'new-york-knicks': 'new-york-knicks',
-  'oklahoma-city-thunder': 'oklahoma-city-thunder',
-  'orlando-magic': 'orlando-magic',
-  'philadelphia-76ers': 'philadelphia-76ers',
-  'phoenix-suns': 'phoenix-suns',
-  'portland-trail-blazers': 'portland-trail-blazers',
-  'portland-trailblazers': 'portland-trail-blazers',
-  'sacramento-kings': 'sacramento-kings',
-  'san-antonio-spurs': 'san-antonio-spurs',
-  'toronto-raptors': 'toronto-raptors',
-  'utah-jazz': 'utah-jazz',
-  'washington-wizards': 'washington-wizards',
-};
+// NFL teams use conference names NFC and AFC
 
 // PFSN Logo (actual white logo from NFL Power Rankings Builder)
 // Source: https://staticd.profootballnetwork.com/skm/assets/pfn/pfsn-logo-white-ver-2.png
@@ -1124,7 +1090,7 @@ export default function PowerRankingsClient() {
                       <td className="hidden md:table-cell px-4 py-4">
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${
-                            rankedTeam.team.conference === 'Eastern'
+                            rankedTeam.team.conference === 'NFC'
                               ? 'bg-blue-100 text-blue-800'
                               : 'bg-red-100 text-red-800'
                           }`}

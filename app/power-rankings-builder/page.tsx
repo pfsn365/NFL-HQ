@@ -14,8 +14,8 @@ const PowerRankingsClient = dynamic(() => import('./PowerRankingsClient'), {
 });
 
 export const metadata: Metadata = {
-  title: 'NFL Power Rankings Builder | NBA Hub',
-  description: 'Create and customize your own NBA power rankings. Rank all 30 teams, download and share your rankings.',
+  title: 'NFL Power Rankings Builder | NFL HQ',
+  description: 'Create and customize your own NFL power rankings. Rank all 32 teams, download and share your rankings.',
 };
 
 export default function PowerRankingsPage() {
