@@ -1486,10 +1486,10 @@ export default function PlayerRankingsClient() {
         <div className="bg-[#0050A0] text-white py-8 px-4 sm:px-6 lg:px-8 w-full">
           <div className="mx-auto max-w-7xl">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
-              NBA Player Rankings Builder
+              NFL Player Rankings Builder
             </h1>
             <p className="text-base sm:text-lg lg:text-xl opacity-90">
-              Create your own custom NBA player rankings
+              Create your own custom NFL player rankings
             </p>
           </div>
         </div>
@@ -1508,7 +1508,7 @@ export default function PlayerRankingsClient() {
                 <div className="w-16 h-16 border-4 border-gray-200 border-t-[#0050A0] rounded-full animate-spin"></div>
               </div>
               <p className="mt-6 text-gray-600 text-lg font-medium">Loading players...</p>
-              <p className="mt-2 text-gray-500 text-sm">Please wait while we load current NBA players</p>
+              <p className="mt-2 text-gray-500 text-sm">Please wait while we load current NFL players</p>
             </div>
           ) : (
             <>

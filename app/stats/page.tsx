@@ -242,7 +242,7 @@ export default function StatsPage() {
         <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-8 lg:pb-10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
-              NBA Stat Leaders
+              NFL Stat Leaders
             </h1>
             <p className="text-base md:text-lg text-white/95 max-w-2xl">
               2025-26 Regular Season Statistical Leaders

@@ -97,8 +97,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
 
         {/* Theme colors - NFL colors */}
-        <meta name="theme-color" content="#013369" />
-        <meta name="msapplication-TileColor" content="#013369" />
+        <meta name="theme-color" content="#0050A0" />
+        <meta name="msapplication-TileColor" content="#0050A0" />
 
         {/* Performance and security */}
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />

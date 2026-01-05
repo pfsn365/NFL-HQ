@@ -780,10 +780,10 @@ export default function PowerRankingsClient() {
         <div className="bg-[#0050A0] text-white py-8 px-4 sm:px-6 lg:px-8 w-full">
           <div className="mx-auto max-w-7xl">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
-              NBA Power Rankings Builder
+              NFL Power Rankings Builder
             </h1>
             <p className="text-base sm:text-lg lg:text-xl opacity-90">
-              Create your own custom NBA power rankings
+              Create your own custom NFL power rankings
             </p>
           </div>
         </div>
@@ -1197,7 +1197,7 @@ export default function PowerRankingsClient() {
               type="text"
               value={saveNameInput}
               onChange={(e) => setSaveNameInput(e.target.value)}
-              placeholder="e.g., My NBA Power Rankings 2025"
+              placeholder="e.g., My NFL Power Rankings 2025"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"
               maxLength={50}
             />

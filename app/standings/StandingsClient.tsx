@@ -422,7 +422,7 @@ export default function StandingsClient() {
         <div className="bg-[#0050A0] text-white py-8 px-4 sm:px-6 lg:px-8 w-full">
           <div className="mx-auto max-w-7xl">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
-              NBA Standings
+              NFL Standings
             </h1>
             <p className="text-base sm:text-lg lg:text-xl opacity-90">
               Live standings and playoff race for all 30 teams

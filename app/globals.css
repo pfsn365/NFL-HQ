@@ -11,6 +11,12 @@ iframe[id^="google_ads_iframe"] {
   overflow: hidden;
 }
 
+.raptive-pfn-header-90 {
+  height: 90px;
+  max-height: 90px;
+  overflow: hidden;
+}
+
 :root {
   --background: #f9fafb;
   --foreground: #111827;

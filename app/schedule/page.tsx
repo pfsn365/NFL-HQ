@@ -310,10 +310,10 @@ export default function SchedulePage() {
         <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-8 lg:pb-10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
-              NBA Schedule
+              NFL Schedule
             </h1>
             <p className="text-base md:text-lg text-white/95 max-w-2xl">
-              View all NBA games, scores, and game details
+              View all NFL games, scores, and game details
             </p>
           </div>
         </div>
@@ -460,7 +460,7 @@ export default function SchedulePage() {
           ) : games.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
               <h3 className="text-xl font-bold text-gray-900 mb-2">No Games Scheduled</h3>
-              <p className="text-gray-600">There are no NBA games scheduled for this date.</p>
+              <p className="text-gray-600">There are no NFL games scheduled for this date.</p>
             </div>
           ) : (
             <div className="space-y-4">
