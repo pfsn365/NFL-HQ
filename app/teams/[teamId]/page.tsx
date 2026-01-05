@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  const canonicalUrl = `https://www.profootballnetwork.com/nfl/teams/${teamId}/`;
+  const canonicalUrl = `https://www.profootballnetwork.com/nfl-hq/teams/${teamId}/`;
 
   return {
     title: `${team.fullName} - NFL Team Page`,
