@@ -156,11 +156,8 @@ export default function TeamsPage() {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-gray-900">
-              <span className="hidden-on-small">
-                <div>{team.city}</div>
-                <div>{team.name}</div>
-              </span>
-              <span className="visible-on-small">{team.abbreviation}</span>
+              <div>{team.city}</div>
+              <div>{team.name}</div>
             </h3>
           </div>
           <div className="text-right flex-shrink-0 hidden lg:block">
