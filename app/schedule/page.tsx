@@ -5,42 +5,143 @@ import Link from 'next/link';
 
 import { getAllTeams } from '@/data/teams';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import { getApiPath } from '@/utils/api';
 
-// Map API team slugs to our team IDs
+// Map API team slugs to our team IDs (Sportskeeda uses various formats)
 const teamSlugMapping: Record<string, string> = {
-  'atlanta-hawks': 'atlanta-hawks',
-  'boston-celtics': 'boston-celtics',
-  'brooklyn-nets': 'brooklyn-nets',
-  'charlotte-hornets': 'charlotte-hornets',
-  'chicago-bulls': 'chicago-bulls',
-  'cleveland-cavaliers': 'cleveland-cavaliers',
-  'dallas-mavericks': 'dallas-mavericks',
-  'denver-nuggets': 'denver-nuggets',
-  'detroit-pistons': 'detroit-pistons',
-  'golden-state-warriors': 'golden-state-warriors',
-  'houston-rockets': 'houston-rockets',
-  'indiana-pacers': 'indiana-pacers',
-  'la-clippers': 'los-angeles-clippers',
-  'los-angeles-clippers': 'los-angeles-clippers',
-  'lakers': 'los-angeles-lakers',
-  'los-angeles-lakers': 'los-angeles-lakers',
-  'memphis-grizzlies': 'memphis-grizzlies',
-  'miami-heat': 'miami-heat',
-  'milwaukee-bucks': 'milwaukee-bucks',
-  'minnesota-timberwolves': 'minnesota-timberwolves',
-  'new-orleans-pelicans': 'new-orleans-pelicans',
-  'new-york-knicks': 'new-york-knicks',
-  'oklahoma-city-thunder': 'oklahoma-city-thunder',
-  'orlando-magic': 'orlando-magic',
-  'philadelphia-76ers': 'philadelphia-76ers',
-  'phoenix-suns': 'phoenix-suns',
-  'portland-trail-blazers': 'portland-trail-blazers',
-  'portland-trailblazers': 'portland-trail-blazers',
-  'sacramento-kings': 'sacramento-kings',
-  'san-antonio-spurs': 'san-antonio-spurs',
-  'toronto-raptors': 'toronto-raptors',
-  'utah-jazz': 'utah-jazz',
-  'washington-wizards': 'washington-wizards',
+  // Arizona Cardinals
+  'arizona-cardinals': 'arizona-cardinals',
+  'ari': 'arizona-cardinals',
+
+  // Atlanta Falcons
+  'atlanta-falcons': 'atlanta-falcons',
+  'atl': 'atlanta-falcons',
+
+  // Baltimore Ravens
+  'baltimore-ravens': 'baltimore-ravens',
+  'bal': 'baltimore-ravens',
+
+  // Buffalo Bills
+  'buffalo-bills': 'buffalo-bills',
+  'buf': 'buffalo-bills',
+
+  // Carolina Panthers
+  'carolina-panthers': 'carolina-panthers',
+  'car': 'carolina-panthers',
+
+  // Chicago Bears
+  'chicago-bears': 'chicago-bears',
+  'chi': 'chicago-bears',
+
+  // Cincinnati Bengals
+  'cincinnati-bengals': 'cincinnati-bengals',
+  'cin': 'cincinnati-bengals',
+
+  // Cleveland Browns
+  'cleveland-browns': 'cleveland-browns',
+  'cle': 'cleveland-browns',
+
+  // Dallas Cowboys
+  'dallas-cowboys': 'dallas-cowboys',
+  'dal': 'dallas-cowboys',
+
+  // Denver Broncos
+  'denver-broncos': 'denver-broncos',
+  'den': 'denver-broncos',
+
+  // Detroit Lions
+  'detroit-lions': 'detroit-lions',
+  'det': 'detroit-lions',
+
+  // Green Bay Packers
+  'green-bay-packers': 'green-bay-packers',
+  'gb': 'green-bay-packers',
+
+  // Houston Texans
+  'houston-texans': 'houston-texans',
+  'hou': 'houston-texans',
+
+  // Indianapolis Colts
+  'indianapolis-colts': 'indianapolis-colts',
+  'ind': 'indianapolis-colts',
+
+  // Jacksonville Jaguars
+  'jacksonville-jaguars': 'jacksonville-jaguars',
+  'jax': 'jacksonville-jaguars',
+
+  // Kansas City Chiefs
+  'kansas-city-chiefs': 'kansas-city-chiefs',
+  'kc': 'kansas-city-chiefs',
+
+  // Las Vegas Raiders
+  'las-vegas-raiders': 'las-vegas-raiders',
+  'lv': 'las-vegas-raiders',
+  'oakland-raiders': 'las-vegas-raiders',
+
+  // Los Angeles Chargers
+  'los-angeles-chargers': 'los-angeles-chargers',
+  'lac': 'los-angeles-chargers',
+  'la-chargers': 'los-angeles-chargers',
+  'san-diego-chargers': 'los-angeles-chargers',
+
+  // Los Angeles Rams
+  'los-angeles-rams': 'los-angeles-rams',
+  'lar': 'los-angeles-rams',
+  'la-rams': 'los-angeles-rams',
+  'st-louis-rams': 'los-angeles-rams',
+
+  // Miami Dolphins
+  'miami-dolphins': 'miami-dolphins',
+  'mia': 'miami-dolphins',
+
+  // Minnesota Vikings
+  'minnesota-vikings': 'minnesota-vikings',
+  'min': 'minnesota-vikings',
+
+  // New England Patriots
+  'new-england-patriots': 'new-england-patriots',
+  'ne': 'new-england-patriots',
+
+  // New Orleans Saints
+  'new-orleans-saints': 'new-orleans-saints',
+  'no': 'new-orleans-saints',
+
+  // New York Giants
+  'new-york-giants': 'new-york-giants',
+  'nyg': 'new-york-giants',
+
+  // New York Jets
+  'new-york-jets': 'new-york-jets',
+  'nyj': 'new-york-jets',
+
+  // Philadelphia Eagles
+  'philadelphia-eagles': 'philadelphia-eagles',
+  'phi': 'philadelphia-eagles',
+
+  // Pittsburgh Steelers
+  'pittsburgh-steelers': 'pittsburgh-steelers',
+  'pit': 'pittsburgh-steelers',
+
+  // San Francisco 49ers
+  'san-francisco-49ers': 'san-francisco-49ers',
+  'sf': 'san-francisco-49ers',
+
+  // Seattle Seahawks
+  'seattle-seahawks': 'seattle-seahawks',
+  'sea': 'seattle-seahawks',
+
+  // Tampa Bay Buccaneers
+  'tampa-bay-buccaneers': 'tampa-bay-buccaneers',
+  'tb': 'tampa-bay-buccaneers',
+
+  // Tennessee Titans
+  'tennessee-titans': 'tennessee-titans',
+  'ten': 'tennessee-titans',
+
+  // Washington Commanders
+  'washington-commanders': 'washington-commanders',
+  'was': 'washington-commanders',
+  'washington-football-team': 'washington-commanders',
 };
 
 interface Game {
@@ -156,7 +257,7 @@ export default function SchedulePage() {
       setExpandedGame(null);
 
       try {
-        const response = await fetch(`/nfl-hq/api/nfl/schedule/by-date?season=2025&date=${selectedDate}`);
+        const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${selectedDate}`));
 
         if (!response.ok) {
           throw new Error('Failed to fetch schedule');
@@ -196,7 +297,7 @@ export default function SchedulePage() {
         // Fetch games for each day of the week
         await Promise.all(
           weekRange.days.map(async (day) => {
-            const response = await fetch(`/nfl-hq/api/nfl/schedule/by-date?season=2025&date=${day}`);
+            const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
             if (response.ok) {
               const data = await response.json();
               const dayGames = (data.schedule || []).filter((game: Game) => {
@@ -237,7 +338,7 @@ export default function SchedulePage() {
         // Fetch games for each day of the month
         await Promise.all(
           monthDays.map(async (day) => {
-            const response = await fetch(`/nfl-hq/api/nfl/schedule/by-date?season=2025&date=${day}`);
+            const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
             if (response.ok) {
               const data = await response.json();
               const dayGames = (data.schedule || []).filter((game: Game) => {
