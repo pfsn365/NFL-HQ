@@ -194,25 +194,42 @@ export async function GET(request: NextRequest) {
 
     // Fetch all NFL games for the season from Sportskeeda
     // Use dynamic cache time based on game schedule
+    // NOTE: General API without team param only returns current/upcoming games
+    // We need to aggregate from multiple teams to get full season history
+    // Query 4 teams from different divisions to get comprehensive coverage
     const revalidateTime = getRevalidationTime();
 
-    const response = await fetch(
-      `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/${season}`,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
-        },
-        next: { revalidate: revalidateTime }
-      }
-    );
+    const teamIds = [366, 331, 359, 339]; // Ravens, Cowboys, 49ers, Chiefs - good coverage
+    const allGames = new Map<number, SportsKeedaGame>(); // Use Map to deduplicate by event_id
 
-    if (!response.ok) {
-      throw new Error(`Sportskeeda API error: ${response.status}`);
+    for (const teamId of teamIds) {
+      try {
+        const response = await fetch(
+          `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/${season}?team=${teamId}`,
+          {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+            },
+            next: { revalidate: revalidateTime }
+          }
+        );
+
+        if (response.ok) {
+          const data: SportsKeedaScheduleResponse = await response.json();
+          if (data.schedule && Array.isArray(data.schedule)) {
+            // Add games to map, deduplicating by event_id
+            data.schedule.forEach(game => {
+              allGames.set(game.event_id, game);
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching schedule for team ${teamId}:`, error);
+        // Continue with other teams
+      }
     }
 
-    const data: SportsKeedaScheduleResponse = await response.json();
-
-    if (!data.schedule || !Array.isArray(data.schedule)) {
+    if (allGames.size === 0) {
       return NextResponse.json(
         { error: 'No schedule data found' },
         { status: 404 }
@@ -220,7 +237,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter games by the requested date
-    const filteredGames = data.schedule.filter((game) => {
+    const filteredGames = Array.from(allGames.values()).filter((game) => {
       const gameDate = new Date(game.start_date.full);
       const gameDateStr = gameDate.toISOString().split('T')[0];
       return gameDateStr === requestedDate;
