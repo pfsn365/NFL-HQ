@@ -239,7 +239,7 @@ type ViewMode = 'daily' | 'weekly' | 'monthly';
 
 export default function SchedulePage() {
   const allTeams = getAllTeams();
-  const [viewMode, setViewMode] = useState<ViewMode>('daily');
+  const [viewMode, setViewMode] = useState<ViewMode>('weekly');
   const [selectedDate, setSelectedDate] = useState<string>(getLocalDateString());
   const [games, setGames] = useState<Game[]>([]);
   const [weeklyGames, setWeeklyGames] = useState<Record<string, Game[]>>({});
@@ -377,6 +377,30 @@ export default function SchedulePage() {
     setSelectedDate(getLocalDateString(date));
   };
 
+  const goToPreviousWeek = () => {
+    const date = new Date(selectedDate + 'T12:00:00');
+    date.setDate(date.getDate() - 7);
+    setSelectedDate(getLocalDateString(date));
+  };
+
+  const goToNextWeek = () => {
+    const date = new Date(selectedDate + 'T12:00:00');
+    date.setDate(date.getDate() + 7);
+    setSelectedDate(getLocalDateString(date));
+  };
+
+  const goToPreviousMonth = () => {
+    const date = new Date(selectedDate + 'T12:00:00');
+    date.setMonth(date.getMonth() - 1);
+    setSelectedDate(getLocalDateString(date));
+  };
+
+  const goToNextMonth = () => {
+    const date = new Date(selectedDate + 'T12:00:00');
+    date.setMonth(date.getMonth() + 1);
+    setSelectedDate(getLocalDateString(date));
+  };
+
   // Format date for display - just show the day of week
   const formatDisplayDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T12:00:00');
@@ -482,7 +506,7 @@ export default function SchedulePage() {
             </div>
           </div>
 
-          {/* Date Navigation - Only show in daily view */}
+          {/* Date Navigation */}
           {viewMode === 'daily' && (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -538,6 +562,81 @@ export default function SchedulePage() {
               </div>
             </div>
           </div>
+          )}
+
+          {/* Weekly Navigation */}
+          {viewMode === 'weekly' && (
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  onClick={goToPreviousWeek}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                  aria-label="Previous week"
+                >
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-700">Previous Week</span>
+                </button>
+
+                <div className="text-center">
+                  <h2 className="text-lg font-bold text-gray-900">
+                    {(() => {
+                      const weekRange = getWeekRange(selectedDate);
+                      const startDate = new Date(weekRange.start + 'T12:00:00');
+                      const endDate = new Date(weekRange.end + 'T12:00:00');
+                      return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                    })()}
+                  </h2>
+                </div>
+
+                <button
+                  onClick={goToNextWeek}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                  aria-label="Next week"
+                >
+                  <span className="text-sm font-medium text-gray-700">Next Week</span>
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Monthly Navigation */}
+          {viewMode === 'monthly' && (
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  onClick={goToPreviousMonth}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                  aria-label="Previous month"
+                >
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-700">Previous Month</span>
+                </button>
+
+                <div className="text-center">
+                  <h2 className="text-lg font-bold text-gray-900">
+                    {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </h2>
+                </div>
+
+                <button
+                  onClick={goToNextMonth}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                  aria-label="Next month"
+                >
+                  <span className="text-sm font-medium text-gray-700">Next Month</span>
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Content based on view mode */}
