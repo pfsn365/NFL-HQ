@@ -40,7 +40,9 @@ export default function SalaryCapTrackerClient() {
           try {
             const response = await fetch(`/nfl/teams/api/salary-cap/${team.id}`);
             if (!response.ok) {
-              throw new Error(`Failed to fetch data for ${team.id}`);
+              const errorText = await response.text();
+              console.error(`API error for ${team.id}: ${response.status} - ${errorText}`);
+              throw new Error(`Failed to fetch data for ${team.id}: ${response.status}`);
             }
             const data = await response.json();
 
