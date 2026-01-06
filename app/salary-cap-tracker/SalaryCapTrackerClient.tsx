@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
+import { getApiPath } from '@/utils/api';
 
 interface SalaryCapData {
   teamId: string;
@@ -38,7 +39,7 @@ export default function SalaryCapTrackerClient() {
 
         const batchPromises = batch.map(async (team) => {
           try {
-            const response = await fetch(`/nfl/teams/api/salary-cap/${team.id}`);
+            const response = await fetch(getApiPath(`nfl/teams/api/salary-cap/${team.id}`));
             if (!response.ok) {
               const errorText = await response.text();
               console.error(`API error for ${team.id}: ${response.status} - ${errorText}`);

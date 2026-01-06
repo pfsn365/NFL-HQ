@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 
 import { getAllTeams, TeamData } from '@/data/teams';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import { getApiPath } from '@/utils/api';
 
 interface TeamWithRecord extends TeamData {
   liveRecord?: string;
@@ -63,7 +64,7 @@ export default function PowerRankingsClient() {
 
     async function fetchStandings() {
       try {
-        const response = await fetch('/nfl/teams/api/standings');
+        const response = await fetch(getApiPath('nfl/teams/api/standings'));
         if (!response.ok) throw new Error('Failed to fetch standings');
 
         const data = await response.json();
