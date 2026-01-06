@@ -25,42 +25,59 @@ export default function SalaryCapTrackerClient() {
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const allTeams = getAllTeams();
 
-  // Fetch salary cap data for all teams
+  // Fetch salary cap data for all teams in batches to avoid rate limiting
   useEffect(() => {
     async function fetchAllTeamsSalaryCap() {
       setLoading(true);
-      const dataPromises = allTeams.map(async (team) => {
-        try {
-          const response = await fetch(`/nfl/teams/api/salary-cap/${team.id}`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch data for ${team.id}`);
+      const batchSize = 4; // Process 4 teams at a time
+      const results: SalaryCapData[] = [];
+
+      // Process teams in batches
+      for (let i = 0; i < allTeams.length; i += batchSize) {
+        const batch = allTeams.slice(i, i + batchSize);
+
+        const batchPromises = batch.map(async (team) => {
+          try {
+            const response = await fetch(`/nfl/teams/api/salary-cap/${team.id}`);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch data for ${team.id}`);
+            }
+            const data = await response.json();
+
+            return {
+              teamId: team.id,
+              teamName: team.fullName,
+              capSpace: data.salaryCapData.teamSummary.capSpace,
+              salaryCap: data.salaryCapData.teamSummary.salaryCap,
+              activeCapSpend: data.salaryCapData.teamSummary.activeCapSpend,
+              deadMoney: data.salaryCapData.teamSummary.deadMoney
+            };
+          } catch (error) {
+            console.error(`Error fetching salary cap for ${team.id}:`, error);
+            // Return default values if fetch fails
+            return {
+              teamId: team.id,
+              teamName: team.fullName,
+              capSpace: 0,
+              salaryCap: 255400000, // 2025 NFL salary cap in dollars
+              activeCapSpend: 0,
+              deadMoney: 0
+            };
           }
-          const data = await response.json();
+        });
 
-          return {
-            teamId: team.id,
-            teamName: team.fullName,
-            capSpace: data.salaryCapData.teamSummary.capSpace,
-            salaryCap: data.salaryCapData.teamSummary.salaryCap,
-            activeCapSpend: data.salaryCapData.teamSummary.activeCapSpend,
-            deadMoney: data.salaryCapData.teamSummary.deadMoney
-          };
-        } catch (error) {
-          console.error(`Error fetching salary cap for ${team.id}:`, error);
-          // Return default values if fetch fails
-          return {
-            teamId: team.id,
-            teamName: team.fullName,
-            capSpace: 0,
-            salaryCap: 255400000, // 2025 NFL salary cap in dollars
-            activeCapSpend: 0,
-            deadMoney: 0
-          };
+        const batchResults = await Promise.all(batchPromises);
+        results.push(...batchResults);
+
+        // Update UI with current results (progressive loading)
+        setSalaryCapData([...results]);
+
+        // Add delay between batches to avoid rate limiting (except for last batch)
+        if (i + batchSize < allTeams.length) {
+          await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay between batches
         }
-      });
+      }
 
-      const results = await Promise.all(dataPromises);
-      setSalaryCapData(results);
       setLastUpdated(new Date().toLocaleString('en-US', {
         month: 'short',
         day: 'numeric',
