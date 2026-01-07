@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, Suspense, useTransition } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TeamData, getAllTeams } from '@/data/teams';
 import { useSEO } from '@/hooks/useSEO';
-import { useINPMonitoring } from '@/hooks/useINPOptimization';
+import { useINPMonitoring, useOptimizedTabChange } from '@/hooks/useINPOptimization';
 import PerformanceMonitor from '@/components/PerformanceMonitor';
 import CriticalCSS from '@/components/CriticalCSS';
 import {
@@ -228,7 +228,6 @@ const getDivisionTeams = (currentTeam: TeamData): TeamData[] => {
 function TeamPageContent({ team, initialTab }: TeamPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState(initialTab || 'overview');
   const [standings, setStandings] = useState<TeamStanding | null>(null);
   const [, setLiveRecord] = useState<TeamRecord | null>(null);
@@ -241,6 +240,9 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
 
   // Performance monitoring
   useINPMonitoring();
+
+  // Optimized tab change handler
+  const optimizedTabChange = useOptimizedTabChange(setActiveTab);
 
   // Analytics tracking
   useEffect(() => {
@@ -412,17 +414,15 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
     // Track tab change for analytics
     trackTabChange(tab, team.id);
 
-    // Wrap state and navigation updates in transition to prevent race conditions
-    startTransition(() => {
-      setActiveTab(tab);
+    // Use optimized tab change with requestAnimationFrame batching
+    optimizedTabChange(tab);
 
-      // Navigate to path-based URL
-      if (tab === 'overview') {
-        router.replace(`/teams/${team.id}`, { scroll: false });
-      } else {
-        router.replace(`/teams/${team.id}/${tab}`, { scroll: false });
-      }
-    });
+    // Navigate to path-based URL
+    if (tab === 'overview') {
+      router.replace(`/teams/${team.id}`, { scroll: false });
+    } else {
+      router.replace(`/teams/${team.id}/${tab}`, { scroll: false });
+    }
   };
 
   const renderActiveTab = () => {
