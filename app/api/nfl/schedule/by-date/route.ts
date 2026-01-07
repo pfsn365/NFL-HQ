@@ -284,10 +284,33 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter games by the requested date
+    // IMPORTANT: The API returns dates in IST (India Standard Time, UTC+5:30)
+    // NFL games happen in US timezones, so we need to convert to Eastern Time for proper date matching
     const filteredGames = Array.from(allGames.values()).filter((game) => {
-      const gameDate = new Date(game.start_date.full);
-      const gameDateStr = gameDate.toISOString().split('T')[0];
-      return gameDateStr === requestedDate;
+      try {
+        // Parse the datetime string - the API returns it in IST format
+        const gameDate = new Date(game.start_date.full);
+
+        // Convert to US Eastern Time to get the correct game date
+        // This ensures Monday Night Football shows on Monday, not Tuesday
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+
+        const parts = formatter.formatToParts(gameDate);
+        const year = parts.find(p => p.type === 'year')?.value;
+        const month = parts.find(p => p.type === 'month')?.value;
+        const day = parts.find(p => p.type === 'day')?.value;
+
+        const easternDateStr = `${year}-${month}-${day}`;
+        return easternDateStr === requestedDate;
+      } catch (error) {
+        console.error('Error parsing game date:', game.start_date.full, error);
+        return false;
+      }
     });
 
     // Transform to expected format
