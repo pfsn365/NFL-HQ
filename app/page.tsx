@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getAllTeams } from '@/data/teams';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { useState, useEffect } from 'react';
+import { getApiPath } from '@/utils/api';
 
 // Map API team slugs to our team IDs (NFL teams)
 const teamSlugMapping: Record<string, string> = {
@@ -134,8 +135,8 @@ export default function HomePage() {
     { pick: 5, teamId: 'las-vegas-raiders', teamName: 'Las Vegas Raiders', record: '4-12' }
   ]);
 
-  // Today's games - fetch from schedule API
-  const [todaysGames, setTodaysGames] = useState<any[]>([]);
+  // Upcoming games - fetch from schedule API
+  const [upcomingGames, setUpcomingGames] = useState<any[]>([]);
   const [gamesLoading, setGamesLoading] = useState(true);
 
   // Stat leaders - NFL stats
@@ -153,35 +154,89 @@ export default function HomePage() {
     passingYards: StatLeader[];
     rushingYards: StatLeader[];
     receivingYards: StatLeader[];
-    sacks: StatLeader[];
-    interceptions: StatLeader[];
+    tackles: StatLeader[];
   }
 
   const [statLeaders, setStatLeaders] = useState<StatLeaders | null>(null);
   const [statLeadersLoading, setStatLeadersLoading] = useState(true);
 
-  // Fetch today's games
+  // Fetch upcoming games
   useEffect(() => {
-    async function fetchTodaysGames() {
+    async function fetchUpcomingGames() {
       try {
-        const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-        const response = await fetch(`/nfl-hq/api/nfl/schedule/by-date?season=2025&date=${today}`);
+        // Fetch schedule from API
+        const response = await fetch(
+          'https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/2025',
+          {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+            },
+          }
+        );
 
-        if (!response.ok) return;
+        if (!response.ok) {
+          setGamesLoading(false);
+          return;
+        }
 
         const data = await response.json();
 
-        if (data.schedule && data.schedule.length > 0) {
-          setTodaysGames(data.schedule);
+        if (data.schedule && Array.isArray(data.schedule)) {
+          // Get current time
+          const now = new Date();
+
+          // Filter for upcoming games (not started yet)
+          const upcoming = data.schedule
+            .filter((game: any) => {
+              const gameDate = new Date(game.start_date.full);
+              return gameDate > now;
+            })
+            .sort((a: any, b: any) => {
+              const dateA = new Date(a.start_date.full);
+              const dateB = new Date(b.start_date.full);
+              return dateA.getTime() - dateB.getTime();
+            })
+            .slice(0, 3); // Get next 3 games
+
+          // Transform to the format we need
+          const transformedGames = upcoming.map((game: any) => {
+            const awayTeam = game.teams.find((t: any) => t.location_type === 'away');
+            const homeTeam = game.teams.find((t: any) => t.location_type === 'home');
+
+            return {
+              event_id: game.event_id,
+              start_date: game.start_date.full,
+              status: game.status,
+              has_score: game.has_score,
+              away_team: {
+                team_slug: awayTeam?.team_slug || '',
+                abbr: awayTeam?.abbr || '',
+                wins: awayTeam?.wins || 0,
+                losses: awayTeam?.losses || 0,
+                score: awayTeam?.score,
+                is_winner: awayTeam?.is_winner,
+              },
+              home_team: {
+                team_slug: homeTeam?.team_slug || '',
+                abbr: homeTeam?.abbr || '',
+                wins: homeTeam?.wins || 0,
+                losses: homeTeam?.losses || 0,
+                score: homeTeam?.score,
+                is_winner: homeTeam?.is_winner,
+              },
+            };
+          });
+
+          setUpcomingGames(transformedGames);
         }
       } catch (err) {
-        console.error('Error fetching today\'s games:', err);
+        console.error('Error fetching upcoming games:', err);
       } finally {
         setGamesLoading(false);
       }
     }
 
-    fetchTodaysGames();
+    fetchUpcomingGames();
   }, []);
 
   // Fetch draft order (worst records)
@@ -238,29 +293,29 @@ export default function HomePage() {
     fetchDraftOrder();
   }, [allTeams]);
 
-  // Fetch stat leaders - using fallback data for now
+  // Fetch stat leaders
   useEffect(() => {
     async function fetchStatLeaders() {
       try {
-        // Try to fetch from API (if endpoint exists)
-        const response = await fetch('/nfl-hq/app/api/nfl/stat-leaders/route');
+        const response = await fetch(getApiPath('api/nfl/stat-leaders?season=2025&limit=5'));
 
         if (response.ok) {
           const data = await response.json();
           if (data.data) {
-            setStatLeaders(data.data);
-            setStatLeadersLoading(false);
-            return;
+            // Extract only the 4 categories we want
+            setStatLeaders({
+              passingYards: data.data.passingYards || [],
+              rushingYards: data.data.rushingYards || [],
+              receivingYards: data.data.receivingYards || [],
+              tackles: data.data.tackles || [],
+            });
           }
         }
       } catch (err) {
-        console.error('Error fetching stat leaders, using fallback:', err);
+        console.error('Error fetching stat leaders:', err);
+      } finally {
+        setStatLeadersLoading(false);
       }
-
-      // Fallback: Use placeholder data showing it's unavailable
-      // In production, this would fetch from the actual stat leaders API
-      setStatLeaders(null);
-      setStatLeadersLoading(false);
     }
 
     fetchStatLeaders();
@@ -337,12 +392,20 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-            ) : todaysGames.length > 0 ? (
+            ) : upcomingGames.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {todaysGames.slice(0, 6).map((game) => {
+                {upcomingGames.map((game) => {
                   const awayTeam = allTeams.find(t => t.id === teamSlugMapping[game.away_team.team_slug] || t.id === game.away_team.team_slug);
                   const homeTeam = allTeams.find(t => t.id === teamSlugMapping[game.home_team.team_slug] || t.id === game.home_team.team_slug);
-                  const gameTime = new Date(game.start_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+                  const gameDate = new Date(game.start_date);
+                  const gameDateTime = gameDate.toLocaleString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    timeZoneName: 'short'
+                  });
                   const isFinal = game.status === 'Final';
                   const isLive = game.status !== 'Pre-Game' && game.status !== 'Final' && (game.has_score || (game.away_team.score !== undefined && game.away_team.score !== null));
                   const hasScore = game.has_score || (game.status !== 'Pre-Game' && game.away_team.score !== undefined && game.away_team.score !== null);
@@ -409,7 +472,7 @@ export default function HomePage() {
                       {/* Game Status/Time */}
                       <div className="pt-3 border-t border-gray-200">
                         {game.status === 'Pre-Game' ? (
-                          <div className="text-xs text-gray-600 text-center">{gameTime}</div>
+                          <div className="text-xs text-gray-600 text-center">{gameDateTime}</div>
                         ) : (
                           <div className={`text-xs font-semibold text-center ${
                             isFinal ? 'text-gray-600' : 'text-green-600'
@@ -424,7 +487,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>No games scheduled for today</p>
+                <p>No upcoming games scheduled</p>
               </div>
             )}
           </div>
@@ -445,12 +508,12 @@ export default function HomePage() {
 
             {statLeadersLoading ? (
               /* Loading Skeleton */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {['Passing Yards', 'Rushing Yards', 'Receiving Yards', 'Sacks', 'Interceptions'].map((stat) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {['Passing Yards', 'Rushing Yards', 'Receiving Yards', 'Tackles'].map((stat) => (
                   <div key={stat} className="bg-gray-50 rounded-lg p-4 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-24 mb-3"></div>
                     <div className="space-y-2">
-                      {[1, 2, 3].map((i) => (
+                      {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2 flex-1">
                             <div className="w-4 h-4 bg-gray-200 rounded"></div>
@@ -463,6 +526,112 @@ export default function HomePage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            ) : statLeaders ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Passing Yards */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-xs font-bold text-gray-600 uppercase mb-3">Passing Yards</h3>
+                  <div className="space-y-2">
+                    {statLeaders.passingYards.slice(0, 5).map((leader, idx) => {
+                      const team = allTeams.find(t => t.id === leader.teamId);
+                      return (
+                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-gray-400 font-semibold w-4">{idx + 1}</span>
+                            {team && (
+                              <img
+                                src={team.logoUrl}
+                                alt={team.abbreviation}
+                                className="w-4 h-4 flex-shrink-0"
+                              />
+                            )}
+                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                          </div>
+                          <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Rushing Yards */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-xs font-bold text-gray-600 uppercase mb-3">Rushing Yards</h3>
+                  <div className="space-y-2">
+                    {statLeaders.rushingYards.slice(0, 5).map((leader, idx) => {
+                      const team = allTeams.find(t => t.id === leader.teamId);
+                      return (
+                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-gray-400 font-semibold w-4">{idx + 1}</span>
+                            {team && (
+                              <img
+                                src={team.logoUrl}
+                                alt={team.abbreviation}
+                                className="w-4 h-4 flex-shrink-0"
+                              />
+                            )}
+                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                          </div>
+                          <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Receiving Yards */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-xs font-bold text-gray-600 uppercase mb-3">Receiving Yards</h3>
+                  <div className="space-y-2">
+                    {statLeaders.receivingYards.slice(0, 5).map((leader, idx) => {
+                      const team = allTeams.find(t => t.id === leader.teamId);
+                      return (
+                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-gray-400 font-semibold w-4">{idx + 1}</span>
+                            {team && (
+                              <img
+                                src={team.logoUrl}
+                                alt={team.abbreviation}
+                                className="w-4 h-4 flex-shrink-0"
+                              />
+                            )}
+                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                          </div>
+                          <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Tackles */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-xs font-bold text-gray-600 uppercase mb-3">Tackles</h3>
+                  <div className="space-y-2">
+                    {statLeaders.tackles.slice(0, 5).map((leader, idx) => {
+                      const team = allTeams.find(t => t.id === leader.teamId);
+                      return (
+                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-gray-400 font-semibold w-4">{idx + 1}</span>
+                            {team && (
+                              <img
+                                src={team.logoUrl}
+                                alt={team.abbreviation}
+                                className="w-4 h-4 flex-shrink-0"
+                              />
+                            )}
+                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                          </div>
+                          <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">

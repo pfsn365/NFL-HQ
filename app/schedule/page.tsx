@@ -671,11 +671,13 @@ export default function SchedulePage() {
               {games.map((game) => {
                 const awayTeam = allTeams.find(t => t.id === teamSlugMapping[game.away_team.team_slug] || t.id === game.away_team.team_slug);
                 const homeTeam = allTeams.find(t => t.id === teamSlugMapping[game.home_team.team_slug] || t.id === game.home_team.team_slug);
-                const gameTime = new Date(game.start_date).toLocaleTimeString('en-US', {
+                const gameDate = new Date(game.start_date);
+                const gameTime = gameDate.toLocaleTimeString('en-US', {
                   hour: 'numeric',
                   minute: '2-digit',
                   timeZoneName: 'short'
                 });
+                const gameDayOfWeek = gameDate.toLocaleDateString('en-US', { weekday: 'short' });
 
                 const isLive = game.status !== 'Pre-Game' && game.status !== 'Final' && game.has_score;
                 const isFinal = game.status === 'Final';
@@ -1012,7 +1014,10 @@ export default function SchedulePage() {
                                           <span className={isFinal && game.away_team.is_winner ? 'font-bold' : ''}>{game.away_team.score}</span>
                                         ) : (
                                           <span className="text-gray-500 text-[10px]">
-                                            {new Date(game.start_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                                            {new Date(game.start_date).toLocaleTimeString('en-US', {
+                                              hour: 'numeric',
+                                              minute: '2-digit'
+                                            })}
                                           </span>
                                         )}
                                       </div>

@@ -104,10 +104,12 @@ export default function StatsPage() {
         const response = await fetch(getApiPath('api/nfl/stat-leaders?season=2025&limit=100&includeAllStats=true'));
 
         if (!response.ok) {
+          console.error('API Response Status:', response.status, response.statusText);
           throw new Error('Failed to fetch stat leaders');
         }
 
         const data = await response.json();
+        console.log('Stat Leaders Data:', data);
         setStatLeaders(data.data);
         if (data.allPlayerStats) {
           setAllPlayerStats(data.allPlayerStats);

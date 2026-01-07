@@ -57,6 +57,15 @@ interface TeamRecord {
   ties: number;
 }
 
+interface DetailedStats {
+  homeRecord: string;
+  awayRecord: string;
+  confRecord: string;
+  divRecord: string;
+  streak: string;
+  last10: string;
+}
+
 interface TeamStanding {
   teamId: string;
   fullName: string;
@@ -67,6 +76,12 @@ interface TeamStanding {
   recordString: string;
   divisionRank: string;
   winPercentage: number;
+  homeRecord: string;
+  awayRecord: string;
+  confRecord: string;
+  divRecord: string;
+  streak: string;
+  last10: string;
 }
 
 interface StandingsResponse {
@@ -84,8 +99,10 @@ interface SportsKeedaGame {
   status: string;
   teams: Array<{
     team_id: number;
+    location_type: 'home' | 'away';
     score?: number;
     is_winner?: boolean;
+    team_slug: string;
   }>;
 }
 
@@ -93,15 +110,54 @@ interface SportsKeedaScheduleResponse {
   schedule: SportsKeedaGame[];
 }
 
-// Function to calculate team record from Sportskeeda API directly
-async function calculateTeamRecord(teamId: string, retries = 2): Promise<TeamRecord> {
+// Team slug to conference/division mapping
+const teamMetadata: Record<string, { conference: string; division: string }> = {
+  'arizona-cardinals': { conference: 'NFC', division: 'NFC West' },
+  'atlanta-falcons': { conference: 'NFC', division: 'NFC South' },
+  'baltimore-ravens': { conference: 'AFC', division: 'AFC North' },
+  'buffalo-bills': { conference: 'AFC', division: 'AFC East' },
+  'carolina-panthers': { conference: 'NFC', division: 'NFC South' },
+  'chicago-bears': { conference: 'NFC', division: 'NFC North' },
+  'cincinnati-bengals': { conference: 'AFC', division: 'AFC North' },
+  'cleveland-browns': { conference: 'AFC', division: 'AFC North' },
+  'dallas-cowboys': { conference: 'NFC', division: 'NFC East' },
+  'denver-broncos': { conference: 'AFC', division: 'AFC West' },
+  'detroit-lions': { conference: 'NFC', division: 'NFC North' },
+  'green-bay-packers': { conference: 'NFC', division: 'NFC North' },
+  'houston-texans': { conference: 'AFC', division: 'AFC South' },
+  'indianapolis-colts': { conference: 'AFC', division: 'AFC South' },
+  'jacksonville-jaguars': { conference: 'AFC', division: 'AFC South' },
+  'kansas-city-chiefs': { conference: 'AFC', division: 'AFC West' },
+  'las-vegas-raiders': { conference: 'AFC', division: 'AFC West' },
+  'los-angeles-chargers': { conference: 'AFC', division: 'AFC West' },
+  'los-angeles-rams': { conference: 'NFC', division: 'NFC West' },
+  'miami-dolphins': { conference: 'AFC', division: 'AFC East' },
+  'minnesota-vikings': { conference: 'NFC', division: 'NFC North' },
+  'new-england-patriots': { conference: 'AFC', division: 'AFC East' },
+  'new-orleans-saints': { conference: 'NFC', division: 'NFC South' },
+  'new-york-giants': { conference: 'NFC', division: 'NFC East' },
+  'new-york-jets': { conference: 'AFC', division: 'AFC East' },
+  'philadelphia-eagles': { conference: 'NFC', division: 'NFC East' },
+  'pittsburgh-steelers': { conference: 'AFC', division: 'AFC North' },
+  'san-francisco-49ers': { conference: 'NFC', division: 'NFC West' },
+  'seattle-seahawks': { conference: 'NFC', division: 'NFC West' },
+  'tampa-bay-buccaneers': { conference: 'NFC', division: 'NFC South' },
+  'tennessee-titans': { conference: 'AFC', division: 'AFC South' },
+  'washington-commanders': { conference: 'NFC', division: 'NFC East' },
+};
+
+// Function to calculate team record and detailed stats from Sportskeeda API directly
+async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: string, retries = 2): Promise<{ record: TeamRecord; detailedStats: DetailedStats }> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const sportsKeedaTeamId = teamIdToSportsKeedaId[teamId];
 
       if (!sportsKeedaTeamId) {
         console.error(`No Sportskeeda ID for team: ${teamId}`);
-        return { wins: 0, losses: 0, ties: 0 };
+        return {
+          record: { wins: 0, losses: 0, ties: 0 },
+          detailedStats: { homeRecord: '0-0', awayRecord: '0-0', confRecord: '0-0', divRecord: '0-0', streak: '-', last10: '0-0' }
+        };
       }
 
       // Fetch directly from Sportskeeda
@@ -127,34 +183,110 @@ async function calculateTeamRecord(teamId: string, retries = 2): Promise<TeamRec
         game => game.event_type === 1 && game.status === 'Final'
       );
 
-      let wins = 0;
-      let losses = 0;
-      let ties = 0;
+      let wins = 0, losses = 0, ties = 0;
+      let homeWins = 0, homeLosses = 0, homeTies = 0;
+      let awayWins = 0, awayLosses = 0, awayTies = 0;
+      let confWins = 0, confLosses = 0, confTies = 0;
+      let divWins = 0, divLosses = 0, divTies = 0;
+
+      const gameResults: ('W' | 'L' | 'T')[] = [];
 
       for (const game of completedRegularSeasonGames) {
         const team = game.teams.find(t => t.team_id === sportsKeedaTeamId);
-        if (team && typeof team.score === 'number') {
-          if (team.is_winner) {
+        const opponent = game.teams.find(t => t.team_id !== sportsKeedaTeamId);
+
+        if (team && opponent && typeof team.score === 'number') {
+          const isHome = team.location_type === 'home';
+          const isTie = team.score === opponent.score;
+          const isWin = !isTie && team.is_winner;
+          const isLoss = !isTie && !team.is_winner;
+
+          // Opponent metadata
+          const opponentSlug = opponent.team_slug;
+          const opponentMeta = teamMetadata[opponentSlug];
+          const isConfGame = opponentMeta && opponentMeta.conference === teamConf;
+          const isDivGame = opponentMeta && opponentMeta.division === teamDiv;
+
+          // Track overall record
+          if (isWin) {
             wins++;
+            gameResults.push('W');
+          } else if (isTie) {
+            ties++;
+            gameResults.push('T');
           } else {
-            // Check if it's a tie (both teams have same score)
-            const opponent = game.teams.find(t => t.team_id !== sportsKeedaTeamId);
-            if (opponent && team.score === opponent.score) {
-              ties++;
-            } else {
-              losses++;
-            }
+            losses++;
+            gameResults.push('L');
+          }
+
+          // Track home/away
+          if (isHome) {
+            if (isWin) homeWins++;
+            else if (isTie) homeTies++;
+            else homeLosses++;
+          } else {
+            if (isWin) awayWins++;
+            else if (isTie) awayTies++;
+            else awayLosses++;
+          }
+
+          // Track conference/division
+          if (isConfGame) {
+            if (isWin) confWins++;
+            else if (isTie) confTies++;
+            else confLosses++;
+          }
+
+          if (isDivGame) {
+            if (isWin) divWins++;
+            else if (isTie) divTies++;
+            else divLosses++;
           }
         }
       }
 
-      return { wins, losses, ties };
-    } catch (error) {
-      console.error(`Error calculating record for ${teamId} (attempt ${attempt + 1}):`, error);
+      // Calculate streak
+      let streak = '-';
+      if (gameResults.length > 0) {
+        const lastResult = gameResults[gameResults.length - 1];
+        let streakCount = 1;
 
-      // If this is the last attempt, return 0-0-0
+        for (let i = gameResults.length - 2; i >= 0; i--) {
+          if (gameResults[i] === lastResult) {
+            streakCount++;
+          } else {
+            break;
+          }
+        }
+        streak = `${lastResult}${streakCount}`;
+      }
+
+      // Calculate last 10 games
+      const last10Games = gameResults.slice(-10);
+      const last10Wins = last10Games.filter(r => r === 'W').length;
+      const last10Losses = last10Games.filter(r => r === 'L').length;
+      const last10 = `${last10Wins}-${last10Losses}`;
+
+      return {
+        record: { wins, losses, ties },
+        detailedStats: {
+          homeRecord: `${homeWins}-${homeLosses}${homeTies > 0 ? `-${homeTies}` : ''}`,
+          awayRecord: `${awayWins}-${awayLosses}${awayTies > 0 ? `-${awayTies}` : ''}`,
+          confRecord: `${confWins}-${confLosses}${confTies > 0 ? `-${confTies}` : ''}`,
+          divRecord: `${divWins}-${divLosses}${divTies > 0 ? `-${divTies}` : ''}`,
+          streak,
+          last10
+        }
+      };
+    } catch (error) {
+      console.error(`Error calculating stats for ${teamId} (attempt ${attempt + 1}):`, error);
+
+      // If this is the last attempt, return defaults
       if (attempt === retries) {
-        return { wins: 0, losses: 0, ties: 0 };
+        return {
+          record: { wins: 0, losses: 0, ties: 0 },
+          detailedStats: { homeRecord: '0-0', awayRecord: '0-0', confRecord: '0-0', divRecord: '0-0', streak: '-', last10: '0-0' }
+        };
       }
 
       // Wait before retrying (exponential backoff)
@@ -162,8 +294,11 @@ async function calculateTeamRecord(teamId: string, retries = 2): Promise<TeamRec
     }
   }
 
-  // This shouldn't be reached, but return 0-0-0 as fallback
-  return { wins: 0, losses: 0, ties: 0 };
+  // This shouldn't be reached, but return defaults as fallback
+  return {
+    record: { wins: 0, losses: 0, ties: 0 },
+    detailedStats: { homeRecord: '0-0', awayRecord: '0-0', confRecord: '0-0', divRecord: '0-0', streak: '-', last10: '0-0' }
+  };
 }
 
 // Function to format record as string
@@ -200,7 +335,7 @@ async function processTeamsInBatches(teamsList: any[], batchSize = 8) {
     const batch = teamsList.slice(i, i + batchSize);
 
     const batchPromises = batch.map(async (team) => {
-      const record = await calculateTeamRecord(team.id);
+      const { record, detailedStats } = await calculateTeamStats(team.id, team.conference, team.division);
       const winPercentage = calculateWinPercentage(record);
 
       return {
@@ -212,7 +347,13 @@ async function processTeamsInBatches(teamsList: any[], batchSize = 8) {
         record,
         recordString: formatRecord(record),
         divisionRank: '', // Will be calculated after sorting
-        winPercentage
+        winPercentage,
+        homeRecord: detailedStats.homeRecord,
+        awayRecord: detailedStats.awayRecord,
+        confRecord: detailedStats.confRecord,
+        divRecord: detailedStats.divRecord,
+        streak: detailedStats.streak,
+        last10: detailedStats.last10
       };
     });
 

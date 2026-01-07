@@ -160,12 +160,12 @@ export default function StandingsClient() {
               ties: team.record.ties,
               winPct: team.winPercentage,
               gamesBack: 0, // Calculate this if needed
-              homeRecord: '0-0', // Not provided by current API
-              awayRecord: '0-0', // Not provided by current API
-              confRecord: '0-0', // Not provided by current API
-              divRecord: '0-0', // Not provided by current API
-              streak: '-',
-              last10: '0-0',
+              homeRecord: team.homeRecord || '0-0',
+              awayRecord: team.awayRecord || '0-0',
+              confRecord: team.confRecord || '0-0',
+              divRecord: team.divRecord || '0-0',
+              streak: team.streak || '-',
+              last10: team.last10 || '0-0',
             });
           }
         }
