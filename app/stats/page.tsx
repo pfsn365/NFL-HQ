@@ -394,7 +394,7 @@ export default function StatsPage() {
 
                         return (
                           <tr
-                            key={player.playerId}
+                            key={`${activeCategory}-${player.playerId}-${player.name}`}
                             onClick={() => openPlayerModal(player.playerId, player.name, player.teamId)}
                             className={`hover:bg-gray-50 transition-colors cursor-pointer ${isTop3 ? 'bg-blue-50/50' : ''}`}
                           >

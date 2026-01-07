@@ -209,7 +209,7 @@ export async function GET(request: NextRequest) {
               player_slug: player.slug || '',
               team_id: 0,
               team_slug: teamSlug,
-              position: 'RB',
+              position: 'N/A',
               games_played: player.games_played || 0,
               rushing_yards: player.yards || 0,
               rushing_touchdowns: player.touchdowns || 0,
@@ -236,7 +236,7 @@ export async function GET(request: NextRequest) {
               player_slug: player.slug || '',
               team_id: 0,
               team_slug: teamSlug,
-              position: 'WR',
+              position: 'N/A',
               games_played: player.games_played || 0,
               receiving_yards: player.yards || 0,
               receptions: player.receptions || 0,
@@ -280,6 +280,31 @@ export async function GET(request: NextRequest) {
 
     if (allPlayers.length === 0) {
       console.warn('No players found in API responses');
+    }
+
+    // Determine positions based on primary stat production
+    for (const player of allPlayers) {
+      const passingYards = player.passing_yards || 0;
+      const rushingYards = player.rushing_yards || 0;
+      const receivingYards = player.receiving_yards || 0;
+
+      // QB if they have significant passing yards
+      if (passingYards > 0) {
+        player.position = 'QB';
+      }
+      // WR/TE if receiving yards are their primary stat
+      else if (receivingYards > rushingYards && receivingYards > 0) {
+        player.position = 'WR';
+      }
+      // RB if rushing yards are their primary stat
+      else if (rushingYards > 0) {
+        player.position = 'RB';
+      }
+      // DEF stays as is
+      // If no offensive stats and position is not DEF, set to N/A
+      else if (player.position !== 'DEF') {
+        player.position = 'N/A';
+      }
     }
 
     // Transform and sort players by each category
