@@ -86,17 +86,20 @@ export default function InjuriesClient() {
 
   const teamNames = Object.keys(injuriesByTeam).sort();
 
-  // Get status badge color
+  // Get status badge color (matching team page injury report colors)
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
-    if (statusLower.includes('out')) return 'bg-red-100 text-red-800 border-red-200';
-    if (statusLower.includes('doubtful')) return 'bg-orange-100 text-orange-800 border-orange-200';
-    if (statusLower.includes('questionable')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (statusLower.includes('probable')) return 'bg-green-100 text-green-800 border-green-200';
     if (statusLower.includes('ir') || statusLower.includes('injured reserve'))
-      return 'bg-gray-900 text-white border-gray-900';
-    if (statusLower.includes('pup')) return 'bg-purple-100 text-purple-800 border-purple-200';
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-red-100 text-red-800 border-red-600';
+    if (statusLower.includes('pup') || statusLower.includes('physically unable'))
+      return 'bg-purple-50 text-purple-700 border-purple-400';
+    if (statusLower.includes('nfi') || statusLower.includes('non-football'))
+      return 'bg-indigo-50 text-indigo-700 border-indigo-400';
+    if (statusLower.includes('out')) return 'bg-red-50 text-red-700 border-red-400';
+    if (statusLower.includes('doubtful')) return 'bg-orange-50 text-orange-700 border-orange-400';
+    if (statusLower.includes('questionable')) return 'bg-yellow-50 text-yellow-700 border-yellow-400';
+    if (statusLower.includes('probable')) return 'bg-green-50 text-green-700 border-green-400';
+    return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   const getTeamInfo = (teamAbbr: string) => {
