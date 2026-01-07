@@ -322,7 +322,12 @@ export async function GET(request: NextRequest) {
         .sort((a, b) => ((b[statKey] as number) || 0) - ((a[statKey] as number) || 0))
         .slice(0, limit)
         .map(player => {
-          const fullStats = allPlayerStats.find(p => p.playerId === player.player_id)!;
+          // Use slug for lookup to avoid ID collisions
+          const fullStats = allPlayerStats.find(p =>
+            p.playerId === player.player_id &&
+            p.name === player.player_name &&
+            p.teamId === player.team_slug
+          )!;
           return {
             playerId: player.player_id,
             playerSlug: player.player_slug,
