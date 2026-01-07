@@ -284,15 +284,22 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter games by the requested date
-    // IMPORTANT: The API returns dates in IST (India Standard Time, UTC+5:30)
+    // IMPORTANT: The API returns dates in IST (India Standard Time, UTC+5:30) WITHOUT timezone indicator
+    // Example: "2025-12-02T01:15:00" is IST, not UTC
     // NFL games happen in US timezones, so we need to convert to Eastern Time for proper date matching
     const filteredGames = Array.from(allGames.values()).filter((game) => {
       try {
-        // Parse the datetime string - the API returns it in IST format
-        const gameDate = new Date(game.start_date.full);
+        // The API returns times in IST but without timezone suffix
+        // We need to explicitly treat them as IST by adding the offset
+        // IST is UTC+5:30, so we parse as UTC then subtract 5:30 to get actual UTC
+        const istDateStr = game.start_date.full;
+        const utcDate = new Date(istDateStr + 'Z'); // Parse as UTC first
 
-        // Convert to US Eastern Time to get the correct game date
-        // This ensures Monday Night Football shows on Monday, not Tuesday
+        // Now convert from "fake UTC" to real UTC by subtracting IST offset (5 hours 30 minutes)
+        const actualUtcTime = utcDate.getTime() - (5.5 * 60 * 60 * 1000);
+        const actualUtcDate = new Date(actualUtcTime);
+
+        // Now convert to US Eastern Time to get the correct game date
         const formatter = new Intl.DateTimeFormat('en-US', {
           timeZone: 'America/New_York',
           year: 'numeric',
@@ -300,7 +307,7 @@ export async function GET(request: NextRequest) {
           day: '2-digit'
         });
 
-        const parts = formatter.formatToParts(gameDate);
+        const parts = formatter.formatToParts(actualUtcDate);
         const year = parts.find(p => p.type === 'year')?.value;
         const month = parts.find(p => p.type === 'month')?.value;
         const day = parts.find(p => p.type === 'day')?.value;
