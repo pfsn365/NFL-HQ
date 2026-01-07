@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -292,18 +293,25 @@ export default function InjuriesClient() {
 
                           {/* Team */}
                           <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              {teamInfo && (
+                            {teamInfo ? (
+                              <Link
+                                href={`/teams/${teamInfo.id}/injury-report`}
+                                className="flex items-center gap-2 hover:opacity-75 transition-opacity"
+                              >
                                 <img
                                   src={teamInfo.logoUrl}
                                   alt={teamInfo.abbreviation}
                                   className="w-6 h-6 object-contain"
                                 />
-                              )}
-                              <span className="font-semibold text-[#0050A0] text-xs sm:text-sm">
+                                <span className="font-semibold text-[#0050A0] text-xs sm:text-sm">
+                                  {injury.team}
+                                </span>
+                              </Link>
+                            ) : (
+                              <span className="font-semibold text-gray-500 text-xs sm:text-sm">
                                 {injury.team}
                               </span>
-                            </div>
+                            )}
                           </td>
 
                           {/* Injury */}
@@ -339,21 +347,33 @@ export default function InjuriesClient() {
                   <div key={teamAbbr} className="bg-white rounded-lg shadow-sm overflow-hidden">
                     {/* Team Header */}
                     <div className="bg-gray-100 border-b border-gray-200 px-4 sm:px-6 py-3">
-                      <div className="flex items-center gap-3">
-                        {teamInfo && (
+                      {teamInfo ? (
+                        <Link
+                          href={`/teams/${teamInfo.id}/injury-report`}
+                          className="flex items-center gap-3 hover:opacity-75 transition-opacity"
+                        >
                           <img
                             src={teamInfo.logoUrl}
                             alt={teamInfo.abbreviation}
                             className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                           />
-                        )}
-                        <h2 className="text-lg font-bold text-gray-900">
-                          {teamInfo?.fullName || teamAbbr}
-                          <span className="ml-2 text-sm font-normal text-gray-600">
-                            ({teamInjuries.length} {teamInjuries.length === 1 ? 'injury' : 'injuries'})
-                          </span>
-                        </h2>
-                      </div>
+                          <h2 className="text-lg font-bold text-gray-900">
+                            {teamInfo.fullName}
+                            <span className="ml-2 text-sm font-normal text-gray-600">
+                              ({teamInjuries.length} {teamInjuries.length === 1 ? 'injury' : 'injuries'})
+                            </span>
+                          </h2>
+                        </Link>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <h2 className="text-lg font-bold text-gray-900">
+                            {teamAbbr}
+                            <span className="ml-2 text-sm font-normal text-gray-600">
+                              ({teamInjuries.length} {teamInjuries.length === 1 ? 'injury' : 'injuries'})
+                            </span>
+                          </h2>
+                        </div>
+                      )}
                     </div>
 
                     {/* Injuries Table */}
