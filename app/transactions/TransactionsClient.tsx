@@ -232,12 +232,12 @@ export default function TransactionsClient() {
 
                   {/* Transactions Table */}
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[640px]">
+                    <table className="w-full min-w-[640px] table-fixed">
                       <thead className="bg-[#0050A0] text-white">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-24">TEAM</th>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold">PLAYER</th>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-20">POS</th>
+                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-32">TEAM</th>
+                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-48">PLAYER</th>
+                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-24">POS</th>
                           <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold">TRANSACTION</th>
                         </tr>
                       </thead>
