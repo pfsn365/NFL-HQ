@@ -271,13 +271,8 @@ export default function SchedulePage() {
         }
 
         const data = await response.json();
-        // The API sometimes returns games from adjacent dates, so we filter strictly by date
-        const allGames = data.schedule || [];
-        const filteredGames = allGames.filter((game: Game) => {
-          const gameDate = new Date(game.start_date);
-          return getLocalDateString(gameDate) === selectedDate;
-        });
-        setGames(filteredGames);
+        // The API now correctly filters by Eastern Time timezone
+        setGames(data.schedule || []);
       } catch (err) {
         console.error('Error fetching schedule:', err);
         setError('Failed to load schedule. Please try again.');
@@ -307,11 +302,8 @@ export default function SchedulePage() {
             const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
             if (response.ok) {
               const data = await response.json();
-              const dayGames = (data.schedule || []).filter((game: Game) => {
-                const gameDate = new Date(game.start_date);
-                return getLocalDateString(gameDate) === day;
-              });
-              gamesMap[day] = dayGames;
+              // API already filters by Eastern Time timezone
+              gamesMap[day] = data.schedule || [];
             } else {
               gamesMap[day] = [];
             }
@@ -348,11 +340,8 @@ export default function SchedulePage() {
             const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
             if (response.ok) {
               const data = await response.json();
-              const dayGames = (data.schedule || []).filter((game: Game) => {
-                const gameDate = new Date(game.start_date);
-                return getLocalDateString(gameDate) === day;
-              });
-              gamesMap[day] = dayGames;
+              // API already filters by Eastern Time timezone
+              gamesMap[day] = data.schedule || [];
             } else {
               gamesMap[day] = [];
             }
