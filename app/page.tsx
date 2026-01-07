@@ -582,7 +582,6 @@ export default function HomePage() {
 
               {/* Top 3 Teams Preview */}
               <div className="space-y-2 bg-gray-50 rounded-lg p-3">
-                <div className="text-xs font-semibold text-gray-500 mb-2">TOP 3 TEAMS</div>
                 {topStandings.map((team, idx) => {
                   const teamInfo = allTeams.find(t => t.id === team.teamId);
                   return (
