@@ -47,7 +47,11 @@ interface TeamRosterResponse {
 function normalizePlayerName(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[^\w\s]/g, '')
+    // Remove common suffixes
+    .replace(/\s+(jr|sr|ii|iii|iv|v)\.?$/i, '')
+    // Remove periods, hyphens, apostrophes but keep letters with accents
+    .replace(/[.\-']/g, '')
+    // Normalize spaces
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -87,6 +91,7 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
 
     // Build a map of player names to teams from all rosters
     const playerToTeamMap = new Map<string, string>();
+    let totalRosterPlayers = 0;
 
     for (let i = 0; i < rosterResponses.length; i++) {
       const response = rosterResponses[i];
@@ -96,12 +101,16 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
           const team = allTeams[i];
 
           const allPlayers = [
-            ...rosterData.roster.activeRoster,
-            ...rosterData.roster.practiceSquad,
-            ...rosterData.roster.injuredReserve,
-            ...rosterData.roster.physicallyUnableToPerform,
-            ...rosterData.roster.nonFootballInjuryReserve,
+            ...(rosterData.roster.activeRoster || []),
+            ...(rosterData.roster.practiceSquad || []),
+            ...(rosterData.roster.injuredReserve || []),
+            ...(rosterData.roster.physicallyUnableToPerform || []),
+            ...(rosterData.roster.nonFootballInjuryReserve || []),
+            ...(rosterData.roster.suspended || []),
+            ...(rosterData.roster.exempt || []),
           ];
+
+          totalRosterPlayers += allPlayers.length;
 
           allPlayers.forEach(player => {
             const normalizedName = normalizePlayerName(player.name);
@@ -113,14 +122,21 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
       }
     }
 
+    console.log(`Built player-to-team map with ${playerToTeamMap.size} unique players from ${totalRosterPlayers} roster entries`);
+
     // Process and organize injury data by team
     const injuries: Record<string, InjuryData[]> = {}
+    let unmatchedPlayers: string[] = [];
 
     // Process each player from the API response
     Object.entries(injuryData).forEach(([playerID, playerData]: [string, any]) => {
       // Match player to team using roster data
       const normalizedInjuryName = normalizePlayerName(playerData.Name || '');
       const teamAbbr = playerToTeamMap.get(normalizedInjuryName) || 'N/A';
+
+      if (teamAbbr === 'N/A') {
+        unmatchedPlayers.push(playerData.Name);
+      }
 
       const injury: InjuryData = {
         player: playerData.Name || 'Unknown Player',
@@ -137,6 +153,9 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
       }
       injuries['ALL'].push(injury)
     })
+
+    console.log(`Matched ${Object.keys(injuryData).length - unmatchedPlayers.length} out of ${Object.keys(injuryData).length} injured players`);
+    console.log(`Unmatched players (${unmatchedPlayers.length}):`, unmatchedPlayers.slice(0, 20));
 
     return injuries
 
