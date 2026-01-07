@@ -4,17 +4,26 @@ import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 
 export default function FreeAgencyTrackerClient() {
   return (
-    <>
-      <NFLTeamsSidebar />
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="hidden lg:block lg:w-64 flex-shrink-0">
+        <NFLTeamsSidebar />
+      </aside>
 
-      <div className="min-h-screen bg-gray-50 lg:pl-64">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-[#0050A0] to-blue-700 text-white py-8">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+      {/* Mobile Sidebar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
+        <NFLTeamsSidebar isMobile={true} />
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto lg:pt-0 pt-14">
+        {/* Header Section */}
+        <div className="bg-[#0050A0] text-white py-8 px-4 sm:px-6 lg:px-8 w-full">
+          <div className="mx-auto max-w-7xl">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
               NFL Free Agency Tracker
             </h1>
-            <p className="text-blue-100 text-sm sm:text-base">
+            <p className="text-base sm:text-lg lg:text-xl opacity-90">
               Track free agents, signings, and player availability across the league
             </p>
           </div>
@@ -26,7 +35,7 @@ export default function FreeAgencyTrackerClient() {
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
             <div className="text-center py-12">
               <div className="mb-6">
@@ -83,7 +92,7 @@ export default function FreeAgencyTrackerClient() {
             </div>
           </div>
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
