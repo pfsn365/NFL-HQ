@@ -1483,7 +1483,7 @@ export default function PlayerRankingsClient() {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto lg:pt-0 pt-14">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-6 lg:pb-8">
+        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
               NFL Player Rankings Builder
