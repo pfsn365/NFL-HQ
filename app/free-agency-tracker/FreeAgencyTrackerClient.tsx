@@ -123,7 +123,7 @@ export default function FreeAgencyTrackerClient() {
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   // Data Fetching
   useEffect(() => {
@@ -386,27 +386,6 @@ export default function FreeAgencyTrackerClient() {
                     </select>
                   </div>
                 </div>
-
-                {/* Results Count */}
-                <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
-                    <strong>Showing:</strong> {startIndex + 1}-{Math.min(startIndex + itemsPerPage, sortedFreeAgents.length)} of {sortedFreeAgents.length} free agents
-                  </span>
-
-                  {/* Items Per Page */}
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">Per page:</label>
-                    <select
-                      value={itemsPerPage}
-                      onChange={e => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                      className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-sm"
-                    >
-                      <option value={20}>20</option>
-                      <option value={30}>30</option>
-                      <option value={50}>50</option>
-                    </select>
-                  </div>
-                </div>
               </div>
 
               {/* Table */}
@@ -575,11 +554,24 @@ export default function FreeAgencyTrackerClient() {
                         </button>
                       </div>
                       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
+                        <div className="flex items-center gap-4">
                           <p className="text-sm text-gray-700">
                             Page <span className="font-medium">{currentPage}</span> of{' '}
                             <span className="font-medium">{totalPages}</span>
                           </p>
+                          {/* Items Per Page */}
+                          <div className="flex items-center gap-2">
+                            <label className="text-sm text-gray-700">Per page:</label>
+                            <select
+                              value={itemsPerPage}
+                              onChange={e => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                              className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-sm bg-white"
+                            >
+                              <option value={25}>25</option>
+                              <option value={50}>50</option>
+                              <option value={100}>100</option>
+                            </select>
+                          </div>
                         </div>
                         <div>
                           <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
