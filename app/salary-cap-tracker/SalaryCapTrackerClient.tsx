@@ -209,10 +209,10 @@ export default function SalaryCapTrackerClient() {
         {/* Header */}
         <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
               NFL Salary Cap Tracker by Team
             </h1>
-            <p className="text-base md:text-lg text-white/95 max-w-2xl">
+            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
               Track cap space, active spending, and dead money for all 32 teams
             </p>
           </div>
