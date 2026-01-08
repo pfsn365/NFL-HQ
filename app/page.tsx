@@ -254,7 +254,7 @@ export default function HomePage() {
         </div>
 
         {/* Raptive Header Ad */}
-        <div className="container mx-auto px-4 min-h-[150px]">
+        <div className="container mx-auto px-4 py-8 min-h-[150px]">
           <div className="raptive-pfn-header"></div>
         </div>
 
