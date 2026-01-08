@@ -71,8 +71,9 @@ export const wildCardGames2026: StaticPlayoffGame[] = [
     state: 'MA',
     round: 'AFC Wild Card',
   },
+  // Monday, January 13, 2026
   {
-    date: '2026-01-12',
+    date: '2026-01-13',
     time: '8:15 PM ET',
     awayTeam: 'houston-texans',
     homeTeam: 'pittsburgh-steelers',
