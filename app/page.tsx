@@ -260,7 +260,7 @@ export default function HomePage() {
 
         {/* Upcoming Games Section */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Upcoming Games</h2>
               <Link
@@ -399,7 +399,7 @@ export default function HomePage() {
 
         {/* Stat Leaders Section */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Stat Leaders</h2>
               <Link
@@ -744,7 +744,7 @@ export default function HomePage() {
           </div>
 
           {/* Featured Teams Section */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
