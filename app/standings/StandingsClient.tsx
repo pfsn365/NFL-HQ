@@ -328,6 +328,18 @@ export default function StandingsClient() {
 
     // Sort division winners by record with tiebreakers (seeds 1-4)
     const seededDivisionWinners = [...divisionWinners].sort((a, b) => {
+      // Manual tiebreaker overrides based on NFL rules
+      // AFC: DEN beats NE (both 14-3) - DEN wins on common games
+      if (conference === 'AFC' && a.wins === 14 && b.wins === 14) {
+        if (a.teamId === 'denver-broncos' && b.teamId === 'new-england-patriots') return -1;
+        if (a.teamId === 'new-england-patriots' && b.teamId === 'denver-broncos') return 1;
+      }
+      // NFC: CHI beats PHI (both 11-6) - CHI wins on head-to-head
+      if (conference === 'NFC' && a.wins === 11 && b.wins === 11) {
+        if (a.teamId === 'chicago-bears' && b.teamId === 'philadelphia-eagles') return -1;
+        if (a.teamId === 'philadelphia-eagles' && b.teamId === 'chicago-bears') return 1;
+      }
+
       if (b.wins !== a.wins) return b.wins - a.wins;
       // Use conference record as tiebreaker
       const aConfWins = parseInt((a.confRecord || '0-0').split('-')[0]);
@@ -346,6 +358,18 @@ export default function StandingsClient() {
     );
     const wildCardTeams = [...nonDivisionWinners]
       .sort((a, b) => {
+        // Manual tiebreaker overrides for wild card teams
+        // AFC: HOU beats BUF (both 12-5) - HOU wins on head-to-head
+        if (conference === 'AFC' && a.wins === 12 && b.wins === 12) {
+          if (a.teamId === 'houston-texans' && b.teamId === 'buffalo-bills') return -1;
+          if (a.teamId === 'buffalo-bills' && b.teamId === 'houston-texans') return 1;
+        }
+        // NFC: LAR beats SF (both 12-5) - LAR wins on common games
+        if (conference === 'NFC' && a.wins === 12 && b.wins === 12) {
+          if (a.teamId === 'los-angeles-rams' && b.teamId === 'san-francisco-49ers') return -1;
+          if (a.teamId === 'san-francisco-49ers' && b.teamId === 'los-angeles-rams') return 1;
+        }
+
         if (b.wins !== a.wins) return b.wins - a.wins;
         // Use conference record as tiebreaker
         const aConfWins = parseInt((a.confRecord || '0-0').split('-')[0]);
