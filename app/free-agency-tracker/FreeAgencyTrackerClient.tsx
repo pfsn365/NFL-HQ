@@ -135,15 +135,27 @@ export default function FreeAgencyTrackerClient() {
         const response = await fetch(getApiPath('api/free-agents'));
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch free agents: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API Error Response:', errorData);
+          throw new Error(errorData.message || `Failed to fetch free agents: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Received data structure:', {
+          hasOutput: !!data.output,
+          isArray: Array.isArray(data.output),
+          hasError: !!data.error
+        });
+
+        if (data.error) {
+          throw new Error(data.message || data.error);
+        }
 
         if (data.output && Array.isArray(data.output)) {
           const transformed = transformFreeAgentData(data.output);
           setAllFreeAgents(transformed);
         } else {
+          console.error('Invalid data format. Received:', Object.keys(data));
           throw new Error('Invalid data format from API');
         }
       } catch (err) {
