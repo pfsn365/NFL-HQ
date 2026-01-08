@@ -562,7 +562,7 @@ export default function HomePage() {
             {/* NFL Standings Card with Preview */}
             <Link
               href="/standings"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -574,7 +574,7 @@ export default function HomePage() {
               </p>
 
               {/* Top 3 Teams Preview */}
-              <div className="space-y-2 bg-gray-50 rounded-lg p-3">
+              <div className="space-y-2 bg-gray-50 rounded-lg p-3 flex-grow">
                 {topStandings.map((team, idx) => {
                   const teamInfo = allTeams.find(t => t.id === team.teamId);
                   return (
@@ -609,7 +609,7 @@ export default function HomePage() {
             {/* Free Agency Tracker Card */}
             <Link
               href="/free-agency-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -620,7 +620,7 @@ export default function HomePage() {
                 Track NFL free agents, signings, and available players
               </p>
 
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
                 <p className="text-sm font-semibold text-gray-700">Free Agent Marketplace</p>
                 <p className="text-xs text-gray-600 mt-1">Player signings & availability</p>
               </div>
@@ -636,7 +636,7 @@ export default function HomePage() {
             {/* Power Rankings Builder Card */}
             <Link
               href="/power-rankings-builder"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -647,7 +647,7 @@ export default function HomePage() {
                 Create and customize your own NFL team power rankings
               </p>
 
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 text-center">
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
                 <p className="text-sm font-semibold text-gray-700">Drag & Drop Rankings</p>
                 <p className="text-xs text-gray-600 mt-1">Build your custom list</p>
               </div>
@@ -663,7 +663,7 @@ export default function HomePage() {
             {/* Salary Cap Tracker Card */}
             <Link
               href="/salary-cap-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -674,7 +674,7 @@ export default function HomePage() {
                 Track NFL team salary cap situations and contracts
               </p>
 
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4 text-center">
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
                 <p className="text-sm font-semibold text-gray-700">Cap Space Tracker</p>
                 <p className="text-xs text-gray-600 mt-1">Team financials</p>
               </div>
@@ -690,7 +690,7 @@ export default function HomePage() {
             {/* Injury Report Card */}
             <Link
               href="/injuries"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -701,7 +701,7 @@ export default function HomePage() {
                 Real-time injury updates and player status across all teams
               </p>
 
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-center">
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
                 <p className="text-sm font-semibold text-gray-700">Live Injury Updates</p>
                 <p className="text-xs text-gray-600 mt-1">Player availability</p>
               </div>
@@ -717,7 +717,7 @@ export default function HomePage() {
             {/* Transactions Card */}
             <Link
               href="/transactions"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -728,7 +728,7 @@ export default function HomePage() {
                 Latest trades, signings, and roster moves across the league
               </p>
 
-              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 text-center">
+              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
                 <p className="text-sm font-semibold text-gray-700">Recent Moves</p>
                 <p className="text-xs text-gray-600 mt-1">Trades & signings</p>
               </div>
