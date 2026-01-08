@@ -180,7 +180,7 @@ export default function FreeAgencyTrackerClient() {
       if (selectedSignedStatus === 'unsigned') {
         matchesSignedStatus = !agent.signed2026Team || agent.signed2026Team.trim() === '';
       } else if (selectedSignedStatus === 'signed') {
-        matchesSignedStatus = agent.signed2026Team && agent.signed2026Team.trim() !== '';
+        matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '');
       }
 
       return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus;
