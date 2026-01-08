@@ -675,7 +675,6 @@ export default function StandingsClient() {
                                 <span className="font-bold text-gray-900 text-sm">{teamInfo?.abbreviation}</span>
                                 <span className="text-xs text-gray-600 ml-2">({team.wins}-{team.losses})</span>
                               </div>
-                              <span className="text-xs text-blue-700 font-semibold">WC</span>
                             </div>
                           );
                         })}
@@ -729,7 +728,6 @@ export default function StandingsClient() {
                                 <span className="font-bold text-gray-900 text-sm">{teamInfo?.abbreviation}</span>
                                 <span className="text-xs text-gray-600 ml-2">({team.wins}-{team.losses})</span>
                               </div>
-                              <span className="text-xs text-blue-700 font-semibold">WC</span>
                             </div>
                           );
                         })}
