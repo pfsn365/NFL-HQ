@@ -739,13 +739,13 @@ export default function PowerRankingsClient() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto lg:pt-0 pt-14">
-        {/* Header Section */}
-        <div className="bg-[#0050A0] text-white py-8 px-4 sm:px-6 lg:px-8 w-full">
-          <div className="mx-auto max-w-7xl">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
+        {/* Header */}
+        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-8 lg:pb-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
               NFL Power Rankings Builder
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl opacity-90">
+            <p className="text-base md:text-lg text-white/95 max-w-2xl">
               Create your own custom NFL power rankings
             </p>
           </div>

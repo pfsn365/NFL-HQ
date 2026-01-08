@@ -241,17 +241,17 @@ export default function HomePage() {
 
       {/* Main content */}
       <main className="flex-1 lg:ml-64 min-w-0">
-        {/* Hero Section */}
-        <header style={{ backgroundColor: '#0050A0' }} className="text-white shadow-lg pt-[57px] lg:pt-0">
-          <div className="container mx-auto px-4 py-6">
-            <div className="text-center">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">NFL HQ</h1>
-              <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
-                Your destination for NFL teams, stats, rankings, and interactive tools
-              </p>
-            </div>
+        {/* Header */}
+        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-8 lg:pb-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
+              NFL HQ
+            </h1>
+            <p className="text-base md:text-lg text-white/95 max-w-2xl">
+              Your destination for NFL teams, stats, rankings, and interactive tools
+            </p>
           </div>
-        </header>
+        </div>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 min-h-[150px]">
