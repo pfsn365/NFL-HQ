@@ -118,8 +118,8 @@ export default function FreeAgencyTrackerClient() {
   const [selectedSignedStatus, setSelectedSignedStatus] = useState('all');
 
   // Sorting States
-  const [sortKey, setSortKey] = useState<SortKey>('pfsn2025Impact');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [sortKey, setSortKey] = useState<SortKey>('rank');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
