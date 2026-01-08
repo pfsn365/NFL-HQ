@@ -377,7 +377,7 @@ export default function StatsPage() {
 
                             {/* Player */}
                             <td className="px-2 sm:px-4 py-3 sm:py-4">
-                              <div className="font-semibold text-sm sm:text-base text-gray-900 group-hover:text-[#0050A0]">{player.name}</div>
+                              <div className="font-semibold text-base text-gray-900 group-hover:text-[#0050A0]">{player.name}</div>
                             </td>
 
                             {/* Position */}
@@ -402,15 +402,15 @@ export default function StatsPage() {
 
                                     className="w-5 h-5 sm:w-6 sm:h-6"
                                   />
-                                  <span className="text-gray-700 font-medium text-xs sm:text-sm">{team.abbreviation}</span>
+                                  <span className="text-gray-700 font-medium text-sm sm:text-base">{team.abbreviation}</span>
                                 </Link>
                               ) : (
-                                <span className="text-gray-600 text-xs sm:text-sm">{player.teamId}</span>
+                                <span className="text-gray-600 text-sm sm:text-base">{player.teamId}</span>
                               )}
                             </td>
 
                             {/* Games Played */}
-                            <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-gray-600 text-sm">
+                            <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-gray-600 text-base">
                               {player.gamesPlayed}
                             </td>
 

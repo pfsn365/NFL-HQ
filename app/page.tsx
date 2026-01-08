@@ -440,7 +440,7 @@ export default function HomePage() {
                     {statLeaders.passingYards.slice(0, 3).map((leader, idx) => {
                       const team = allTeams.find(t => t.id === leader.teamId);
                       return (
-                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                        <div key={leader.playerId} className="flex items-center justify-between text-base">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="text-gray-600 font-semibold w-4">{idx + 1}</span>
                             {team && (
@@ -450,7 +450,7 @@ export default function HomePage() {
                                 className="w-4 h-4 flex-shrink-0"
                               />
                             )}
-                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                            <span className="font-medium text-gray-900 truncate text-sm">{leader.name}</span>
                           </div>
                           <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
                         </div>
@@ -466,7 +466,7 @@ export default function HomePage() {
                     {statLeaders.rushingYards.slice(0, 3).map((leader, idx) => {
                       const team = allTeams.find(t => t.id === leader.teamId);
                       return (
-                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                        <div key={leader.playerId} className="flex items-center justify-between text-base">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="text-gray-600 font-semibold w-4">{idx + 1}</span>
                             {team && (
@@ -476,7 +476,7 @@ export default function HomePage() {
                                 className="w-4 h-4 flex-shrink-0"
                               />
                             )}
-                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                            <span className="font-medium text-gray-900 truncate text-sm">{leader.name}</span>
                           </div>
                           <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
                         </div>
@@ -492,7 +492,7 @@ export default function HomePage() {
                     {statLeaders.receivingYards.slice(0, 3).map((leader, idx) => {
                       const team = allTeams.find(t => t.id === leader.teamId);
                       return (
-                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                        <div key={leader.playerId} className="flex items-center justify-between text-base">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="text-gray-600 font-semibold w-4">{idx + 1}</span>
                             {team && (
@@ -502,7 +502,7 @@ export default function HomePage() {
                                 className="w-4 h-4 flex-shrink-0"
                               />
                             )}
-                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                            <span className="font-medium text-gray-900 truncate text-sm">{leader.name}</span>
                           </div>
                           <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
                         </div>
@@ -518,7 +518,7 @@ export default function HomePage() {
                     {statLeaders.tackles.slice(0, 3).map((leader, idx) => {
                       const team = allTeams.find(t => t.id === leader.teamId);
                       return (
-                        <div key={leader.playerId} className="flex items-center justify-between text-sm">
+                        <div key={leader.playerId} className="flex items-center justify-between text-base">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="text-gray-600 font-semibold w-4">{idx + 1}</span>
                             {team && (
@@ -528,7 +528,7 @@ export default function HomePage() {
                                 className="w-4 h-4 flex-shrink-0"
                               />
                             )}
-                            <span className="font-medium text-gray-900 truncate text-xs">{leader.name}</span>
+                            <span className="font-medium text-gray-900 truncate text-sm">{leader.name}</span>
                           </div>
                           <span className="font-bold text-[#0050A0] ml-2">{leader.value}</span>
                         </div>
@@ -553,7 +553,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-bold text-gray-900">
                 Interactive Tools & Features
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-base text-gray-600 mt-1">
                 Discover comprehensive NFL data, build custom rankings, and explore team information
               </p>
             </div>
@@ -569,7 +569,7 @@ export default function HomePage() {
                   NFL Standings
                 </h3>
               </div>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-gray-600 text-base mb-4">
                 Current season standings and conference rankings
               </p>
 
@@ -578,7 +578,7 @@ export default function HomePage() {
                 {topStandings.map((team, idx) => {
                   const teamInfo = allTeams.find(t => t.id === team.teamId);
                   return (
-                    <div key={team.teamId} className="flex items-center justify-between text-sm">
+                    <div key={team.teamId} className="flex items-center justify-between text-base">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <span className="text-gray-600 font-semibold w-4">{idx + 1}</span>
                         {teamInfo && (

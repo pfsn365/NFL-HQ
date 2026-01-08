@@ -284,10 +284,10 @@ export default function TransactionsClient() {
                     <table className="w-full min-w-[640px] table-fixed">
                       <thead className="bg-[#0050A0] text-white">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-32">TEAM</th>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-48">PLAYER</th>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-24">POS</th>
-                          <th className="px-4 py-3 text-left text-xs sm:text-sm font-bold">TRANSACTION</th>
+                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold w-32">TEAM</th>
+                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold w-48">PLAYER</th>
+                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold w-24">POS</th>
+                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold">TRANSACTION</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -312,13 +312,13 @@ export default function TransactionsClient() {
                                       alt={team.abbreviation}
                                       className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                                     />
-                                    <span className="font-semibold text-[#0050A0] text-xs sm:text-sm">
+                                    <span className="font-semibold text-[#0050A0] text-sm sm:text-base">
                                       {transaction.teamAbbr}
                                     </span>
                                   </Link>
                                 ) : (
                                   <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-[#0050A0] text-xs sm:text-sm">
+                                    <span className="font-semibold text-[#0050A0] text-sm sm:text-base">
                                       {transaction.teamAbbr}
                                     </span>
                                   </div>
@@ -327,7 +327,7 @@ export default function TransactionsClient() {
 
                               {/* Player */}
                               <td className="px-4 py-3">
-                                <span className="font-medium text-gray-900 text-sm">
+                                <span className="font-medium text-gray-900 text-base">
                                   {transaction.player}
                                 </span>
                               </td>
@@ -341,7 +341,7 @@ export default function TransactionsClient() {
 
                               {/* Transaction */}
                               <td className="px-4 py-3">
-                                <div className="text-sm text-gray-700">
+                                <div className="text-base text-gray-700">
                                   {transaction.transaction}
                                   {transaction.fromTeam && transaction.toTeam && (
                                     <span className="text-gray-600 ml-1">

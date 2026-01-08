@@ -482,7 +482,7 @@ export default function StandingsClient() {
               const teamInfo = getTeamInfo(team.teamName);
               return (
                 <tr key={team.teamId} className="hover:bg-gray-50 transition-colors">
-                  <td className="pl-4 sm:pl-6 pr-2 sm:pr-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 font-semibold">{index + 1}</td>
+                  <td className="pl-4 sm:pl-6 pr-2 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base text-gray-900 font-semibold">{index + 1}</td>
                   <td className="px-2 sm:px-4 py-3 sm:py-4">
                     <Link href={`/teams/${team.teamId}`} className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity">
                       {teamInfo && (
@@ -495,30 +495,30 @@ export default function StandingsClient() {
                             className="w-6 h-6 sm:w-8 sm:h-8"
                           />
                           <div className="flex flex-col">
-                            <span className="text-xs sm:text-sm font-bold text-gray-900 leading-tight">{teamInfo.abbreviation}</span>
-                            <span className="text-[10px] sm:text-xs text-gray-600 leading-tight">{getAllTeams().find(t => t.id === team.teamId)?.name}</span>
+                            <span className="text-sm sm:text-base font-bold text-gray-900 leading-tight">{teamInfo.abbreviation}</span>
+                            <span className="text-xs sm:text-sm text-gray-600 leading-tight">{getAllTeams().find(t => t.id === team.teamId)?.name}</span>
                           </div>
                         </>
                       )}
                     </Link>
                   </td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-900 font-semibold">{team.wins}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-900">{team.losses}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-900">{team.ties}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-900">{team.winPct.toFixed(3)}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-900">
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-900 font-semibold">{team.wins}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-900">{team.losses}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-900">{team.ties}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-900">{team.winPct.toFixed(3)}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-900">
                     {team.gamesBack === 0 ? '-' : team.gamesBack.toFixed(1)}
                   </td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-600">{team.homeRecord}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-600">{team.awayRecord}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-600">{team.confRecord}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-600">{team.divRecord}</td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm">
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-600">{team.homeRecord}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-600">{team.awayRecord}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-600">{team.confRecord}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-600">{team.divRecord}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base">
                     <span className={`font-semibold ${team.streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}`}>
                       {team.streak}
                     </span>
                   </td>
-                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-xs sm:text-sm text-gray-600">{team.last10}</td>
+                  <td className="px-2 sm:px-4 py-3 sm:py-4 text-center text-sm sm:text-base text-gray-600">{team.last10}</td>
                 </tr>
               );
             })}

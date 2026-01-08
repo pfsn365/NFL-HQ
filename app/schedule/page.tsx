@@ -704,13 +704,13 @@ export default function SchedulePage() {
                                     <span className="sm:hidden">{awayTeam.name}</span>
                                     <span className="hidden sm:inline">{awayTeam.fullName}</span>
                                   </div>
-                                  <div className="text-sm text-gray-600">{game.away_team.wins}-{game.away_team.losses}</div>
+                                  <div className="text-base text-gray-600">{game.away_team.wins}-{game.away_team.losses}</div>
                                 </div>
                               </>
                             ) : (
                               <div className="flex-1">
                                 <div className="font-bold text-gray-900">{game.away_team.abbr}</div>
-                                <div className="text-sm text-gray-600">{game.away_team.wins}-{game.away_team.losses}</div>
+                                <div className="text-base text-gray-600">{game.away_team.wins}-{game.away_team.losses}</div>
                               </div>
                             )}
                           </div>
@@ -722,8 +722,8 @@ export default function SchedulePage() {
                                 <img
                                   src={homeTeam.logoUrl}
                                   alt={homeTeam.fullName}
-                                  
-                                  
+
+
                                   className="w-10 h-10 flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0">
@@ -731,13 +731,13 @@ export default function SchedulePage() {
                                     <span className="sm:hidden">{homeTeam.name}</span>
                                     <span className="hidden sm:inline">{homeTeam.fullName}</span>
                                   </div>
-                                  <div className="text-sm text-gray-600">{game.home_team.wins}-{game.home_team.losses}</div>
+                                  <div className="text-base text-gray-600">{game.home_team.wins}-{game.home_team.losses}</div>
                                 </div>
                               </>
                             ) : (
                               <div className="flex-1">
                                 <div className="font-bold text-gray-900">{game.home_team.abbr}</div>
-                                <div className="text-sm text-gray-600">{game.home_team.wins}-{game.home_team.losses}</div>
+                                <div className="text-base text-gray-600">{game.home_team.wins}-{game.home_team.losses}</div>
                               </div>
                             )}
                           </div>
@@ -746,7 +746,7 @@ export default function SchedulePage() {
                         {/* Status - Center */}
                         <div className="flex items-center justify-center min-w-[100px]">
                           {game.status === 'Pre-Game' ? (
-                            <div className="text-sm text-gray-700 font-medium text-center">{gameTime}</div>
+                            <div className="text-base text-gray-700 font-medium text-center">{gameTime}</div>
                           ) : (
                             <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${
                               isLive ? 'bg-green-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700'
@@ -818,28 +818,28 @@ export default function SchedulePage() {
                                 {game.hi_pass && (
                                   <div className="flex items-center gap-2">
                                     <div className="flex-1">
-                                      <div className="text-sm font-semibold text-gray-900">{game.hi_pass.player_name}</div>
+                                      <div className="text-base font-semibold text-gray-900">{game.hi_pass.player_name}</div>
                                       <div className="text-xs text-gray-600">Passing</div>
                                     </div>
-                                    <div className="text-sm font-bold text-[#0050A0]">{game.hi_pass.value} YDS</div>
+                                    <div className="text-base font-bold text-[#0050A0]">{game.hi_pass.value} YDS</div>
                                   </div>
                                 )}
                                 {game.hi_rush && (
                                   <div className="flex items-center gap-2">
                                     <div className="flex-1">
-                                      <div className="text-sm font-semibold text-gray-900">{game.hi_rush.player_name}</div>
+                                      <div className="text-base font-semibold text-gray-900">{game.hi_rush.player_name}</div>
                                       <div className="text-xs text-gray-600">Rushing</div>
                                     </div>
-                                    <div className="text-sm font-bold text-[#0050A0]">{game.hi_rush.value} YDS</div>
+                                    <div className="text-base font-bold text-[#0050A0]">{game.hi_rush.value} YDS</div>
                                   </div>
                                 )}
                                 {game.hi_rec && (
                                   <div className="flex items-center gap-2">
                                     <div className="flex-1">
-                                      <div className="text-sm font-semibold text-gray-900">{game.hi_rec.player_name}</div>
+                                      <div className="text-base font-semibold text-gray-900">{game.hi_rec.player_name}</div>
                                       <div className="text-xs text-gray-600">Receiving</div>
                                     </div>
-                                    <div className="text-sm font-bold text-[#0050A0]">{game.hi_rec.value} YDS</div>
+                                    <div className="text-base font-bold text-[#0050A0]">{game.hi_rec.value} YDS</div>
                                   </div>
                                 )}
                               </div>
@@ -856,7 +856,7 @@ export default function SchedulePage() {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                                 <div>
-                                  <div className="text-sm font-semibold text-gray-900">{game.venue.name}</div>
+                                  <div className="text-base font-semibold text-gray-900">{game.venue.name}</div>
                                   <div className="text-xs text-gray-600">
                                     {game.venue.city}{game.venue.state ? `, ${game.venue.state.abbreviation}` : ''}
                                   </div>

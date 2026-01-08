@@ -472,7 +472,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                             />
                             <a
                               href={getTeamUrl(game.opponent, game.opponentAbbr)}
-                              className="text-sm font-medium hover:underline transition-colors"
+                              className="text-base font-medium hover:underline transition-colors"
                               style={{ color: team.primaryColor }}
                             >
                               {getTeamNickname(game.opponent, game.opponentAbbr)}
@@ -518,7 +518,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
               <h2 className="text-lg font-bold text-gray-900">{team.division} Standings</h2>
             </div>
             <div className="overflow-x-auto flex-grow">
-              <table className="w-full text-sm">
+              <table className="w-full text-base">
                 <thead>
                   <tr className="text-left border-b">
                     <th className="pb-2 text-xs font-medium text-gray-600 uppercase tracking-wider">Team</th>
@@ -624,7 +624,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                         <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
                           {getCleanPlayerName(stats.passingYards.name)}
                         </div>
-                        <div className="text-sm font-bold">{stats.passingYards.stat.toLocaleString()}</div>
+                        <div className="text-base font-bold">{stats.passingYards.stat.toLocaleString()}</div>
                       </>
                     ) : (
                       <div className="text-xs text-gray-600">No data</div>
@@ -639,7 +639,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                         <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
                           {getCleanPlayerName(stats.rushingYards.name)}
                         </div>
-                        <div className="text-sm font-bold">{stats.rushingYards.stat.toLocaleString()}</div>
+                        <div className="text-base font-bold">{stats.rushingYards.stat.toLocaleString()}</div>
                       </>
                     ) : (
                       <div className="text-xs text-gray-600">No data</div>
@@ -658,7 +658,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                         <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
                           {getCleanPlayerName(stats.receivingYards.name)}
                         </div>
-                        <div className="text-sm font-bold">{stats.receivingYards.stat.toLocaleString()}</div>
+                        <div className="text-base font-bold">{stats.receivingYards.stat.toLocaleString()}</div>
                       </>
                     ) : (
                       <div className="text-xs text-gray-600">No data</div>
@@ -673,7 +673,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                         <div className="font-medium text-xs truncate px-1" style={{ color: team.primaryColor }}>
                           {getCleanPlayerName(stats.tackles.name)}
                         </div>
-                        <div className="text-sm font-bold">{stats.tackles.stat.toLocaleString()}</div>
+                        <div className="text-base font-bold">{stats.tackles.stat.toLocaleString()}</div>
                       </>
                     ) : (
                       <div className="text-xs text-gray-600">No data</div>
@@ -751,10 +751,10 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                       <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2" style={{ color: team.primaryColor }}>
                         {article.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                      <p className="text-base text-gray-600 mb-4 line-clamp-3">
                         {article.description}
                       </p>
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between text-base">
                         <span className="text-gray-600">
                           {getRelativeTime(article.pubDate)}
                         </span>
