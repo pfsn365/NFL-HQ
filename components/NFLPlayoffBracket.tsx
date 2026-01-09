@@ -21,15 +21,8 @@ interface Matchup {
 }
 
 // Bracket progression mapping: matchupId -> { nextMatchup, slot }
+// Note: Wild Card to Divisional uses reseeding logic (handled in useEffect)
 const bracketProgression: { [key: string]: { nextMatchup: string; slot: 'team1' | 'team2' } } = {
-  // AFC Wild Card to Divisional
-  'afc-wc-1': { nextMatchup: 'afc-div-1', slot: 'team2' },  // 4v5 winner plays 1 seed
-  'afc-wc-2': { nextMatchup: 'afc-div-2', slot: 'team1' },  // 3v6 winner
-  'afc-wc-3': { nextMatchup: 'afc-div-2', slot: 'team2' },  // 2v7 winner
-  // NFC Wild Card to Divisional
-  'nfc-wc-1': { nextMatchup: 'nfc-div-1', slot: 'team2' },  // 4v5 winner plays 1 seed
-  'nfc-wc-2': { nextMatchup: 'nfc-div-2', slot: 'team1' },  // 3v6 winner
-  'nfc-wc-3': { nextMatchup: 'nfc-div-2', slot: 'team2' },  // 2v7 winner
   // AFC Divisional to Conference
   'afc-div-1': { nextMatchup: 'afc-conf', slot: 'team1' },
   'afc-div-2': { nextMatchup: 'afc-conf', slot: 'team2' },
@@ -320,19 +313,61 @@ export default function NFLPlayoffBracket() {
       return null;
     };
 
-    // Propagate winners through the bracket
-    Object.keys(bracketProgression).forEach(matchupId => {
+    // Process wild card winners for each conference with reseeding
+    const processConferenceReseeding = (conference: 'afc' | 'nfc') => {
+      const wcWinners: Team[] = [];
+
+      // Collect wild card winners
+      for (let i = 1; i <= 3; i++) {
+        const winner = processMatchup(`${conference}-wc-${i}`);
+        if (winner) {
+          wcWinners.push(winner);
+        }
+      }
+
+      // If we have all 3 wild card winners, apply reseeding
+      if (wcWinners.length === 3) {
+        // Sort winners by seed (lowest seed number = highest ranking)
+        const sortedWinners = [...wcWinners].sort((a, b) => a.seed - b.seed);
+
+        // Lowest seed (highest number) plays the 1 seed
+        const lowestSeed = sortedWinners[2]; // highest seed number
+        newData[`${conference}-div-1`].team2 = { seed: lowestSeed.seed, name: lowestSeed.name, teamId: lowestSeed.teamId };
+
+        // Other two winners play each other
+        newData[`${conference}-div-2`].team1 = { seed: sortedWinners[0].seed, name: sortedWinners[0].name, teamId: sortedWinners[0].teamId };
+        newData[`${conference}-div-2`].team2 = { seed: sortedWinners[1].seed, name: sortedWinners[1].name, teamId: sortedWinners[1].teamId };
+      }
+    };
+
+    // Apply reseeding for both conferences
+    processConferenceReseeding('afc');
+    processConferenceReseeding('nfc');
+
+    // Propagate divisional and championship winners (no reseeding here)
+    ['afc-div-1', 'afc-div-2', 'nfc-div-1', 'nfc-div-2'].forEach(matchupId => {
       const winner = processMatchup(matchupId);
-      if (winner) {
+      if (winner && bracketProgression[matchupId]) {
         const { nextMatchup, slot } = bracketProgression[matchupId];
         if (newData[nextMatchup]) {
           const existingTeam = newData[nextMatchup][slot];
-          // Preserve existing team data if it has a score (game already has results entered)
-          if (existingTeam?.score !== undefined) {
-            return;
+          if (existingTeam?.score === undefined) {
+            newData[nextMatchup][slot] = { seed: winner.seed, name: winner.name, teamId: winner.teamId };
           }
-          // Don't carry score forward - only seed, name, and teamId
-          newData[nextMatchup][slot] = { seed: winner.seed, name: winner.name, teamId: winner.teamId };
+        }
+      }
+    });
+
+    // Propagate conference championship winners to Super Bowl
+    ['afc-conf', 'nfc-conf'].forEach(matchupId => {
+      const winner = processMatchup(matchupId);
+      if (winner && bracketProgression[matchupId]) {
+        const { nextMatchup, slot } = bracketProgression[matchupId];
+        if (newData[nextMatchup]) {
+          const existingTeam = newData[nextMatchup][slot];
+          if (existingTeam?.score === undefined) {
+            newData[nextMatchup][slot] = { seed: winner.seed, name: winner.name, teamId: winner.teamId };
+          }
         }
       }
     });
@@ -359,6 +394,20 @@ export default function NFLPlayoffBracket() {
 
   // Clear picks for games that depend on this matchup
   const clearDownstreamPicks = (matchupId: string, picks: typeof userPicks) => {
+    // If a wild card game changes, clear all divisional and later picks for that conference
+    if (matchupId.includes('-wc-')) {
+      const conference = matchupId.split('-')[0]; // 'afc' or 'nfc'
+      // Clear divisional picks
+      delete picks[`${conference}-div-1`];
+      delete picks[`${conference}-div-2`];
+      // Clear conference championship
+      delete picks[`${conference}-conf`];
+      // Clear Super Bowl
+      delete picks['superbowl'];
+      return;
+    }
+
+    // For other games, use standard progression
     const progression = bracketProgression[matchupId];
     if (progression) {
       const { nextMatchup } = progression;
