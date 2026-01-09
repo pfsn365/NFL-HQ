@@ -463,7 +463,7 @@ export default function FreeAgencyTrackerClient() {
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {paginatedFreeAgents.map((agent, index) => {
-                          const teamInfo = getTeamInfo(agent.teamId);
+                          const teamInfo = getTeamInfo(mapTeamNameToId(agent.current2025Team));
                           const signed2026TeamInfo = getTeamInfo(mapTeamNameToId(agent.signed2026Team));
                           const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
 
@@ -482,9 +482,9 @@ export default function FreeAgencyTrackerClient() {
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
                                 {teamInfo ? (
-                                  <Link href={`/teams/${teamInfo.id}`} className="flex items-center gap-2 hover:text-[#0050A0]">
-                                    <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6" />
-                                    <span>{teamInfo.abbreviation}</span>
+                                  <Link href={`/teams/${teamInfo.id}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                    <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
+                                    <span className="font-medium text-[#0050A0]">{teamInfo.abbreviation}</span>
                                   </Link>
                                 ) : agent.current2025Team ? (
                                   <span className="text-gray-500 text-xs">{agent.current2025Team}</span>
@@ -505,9 +505,9 @@ export default function FreeAgencyTrackerClient() {
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
                                 {signed2026TeamInfo ? (
-                                  <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center gap-2 hover:text-[#0050A0]">
-                                    <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6" />
-                                    <span>{signed2026TeamInfo.abbreviation}</span>
+                                  <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                    <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
+                                    <span className="font-medium text-[#0050A0]">{signed2026TeamInfo.abbreviation}</span>
                                   </Link>
                                 ) : isUnsigned ? (
                                   <span className="text-gray-400">—</span>
