@@ -723,7 +723,6 @@ export default function StandingsClient() {
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                       <span className="bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm">AFC</span>
-                      American Football Conference
                     </h3>
                     <div className="space-y-3">
                       {/* Division Winners */}
@@ -776,7 +775,6 @@ export default function StandingsClient() {
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                       <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-sm">NFC</span>
-                      National Football Conference
                     </h3>
                     <div className="space-y-3">
                       {/* Division Winners */}
