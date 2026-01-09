@@ -35,13 +35,18 @@ interface RawFreeAgentData {
 type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank';
 
 // Helper Functions
-function mapTeamNameToId(fullName: string): string | undefined {
-  if (!fullName || fullName.trim() === '') return undefined;
+function mapTeamNameToId(teamName: string): string | undefined {
+  if (!teamName || teamName.trim() === '') return undefined;
 
   const allTeams = getAllTeams();
-  const normalized = fullName.trim().toLowerCase();
+  const normalized = teamName.trim().toLowerCase();
 
-  return allTeams.find(t => t.fullName.toLowerCase() === normalized)?.id;
+  // Try matching against name, fullName, and abbreviation
+  return allTeams.find(t =>
+    t.name.toLowerCase() === normalized ||
+    t.fullName.toLowerCase() === normalized ||
+    t.abbreviation.toLowerCase() === normalized
+  )?.id;
 }
 
 function getPositionColor(position: string): string {

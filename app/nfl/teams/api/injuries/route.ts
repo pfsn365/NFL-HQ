@@ -73,13 +73,20 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
       ),
       ...allTeams.map(team => {
         // Determine base URL for internal API calls (server-side only)
+        // On Vercel, use the deployment URL; locally use localhost
         const baseUrl = process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000';
+          : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-        return fetch(`${baseUrl}/nfl/teams/api/roster/${team.id}`, {
+        const url = `${baseUrl}/nfl/teams/api/roster/${team.id}`;
+        console.log(`Fetching roster for ${team.id} from: ${url}`);
+
+        return fetch(url, {
           next: { revalidate: 3600 }
-        }).catch(() => null);
+        }).catch((err) => {
+          console.error(`Failed to fetch roster for ${team.id}:`, err);
+          return null;
+        });
       })
     ]);
 
