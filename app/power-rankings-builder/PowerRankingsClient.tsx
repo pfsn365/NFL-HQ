@@ -589,12 +589,17 @@ export default function PowerRankingsClient() {
 
       // Team name
       ctx.fillStyle = '#000000';
-      const teamFontSize = selectedTeams.length > 10 ? 16 : (selectedTeams.length > 5 ? 18 : 24);
-      ctx.font = `600 ${teamFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-      const teamTextY = containerCenterY + (teamFontSize * 0.35);
+      const baseFontSize = selectedTeams.length > 5 ? 18 : 24;
 
       // Use shortened names for long team names when showing all 32 teams
       let teamName = selectedTeams.length > 10 ? rankedTeam.team.name : rankedTeam.team.fullName;
+
+      // Reduce font size for specific long team names in 32-team view
+      const isLongName = selectedTeams.length > 10 && (teamName === 'Buccaneers' || teamName === 'Commanders');
+      const teamFontSize = isLongName ? 14 : baseFontSize;
+
+      ctx.font = `600 ${teamFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+      const teamTextY = containerCenterY + (teamFontSize * 0.35);
 
       ctx.fillText(teamName, xPos + paddingX + rankWidth + 20, teamTextY);
 
