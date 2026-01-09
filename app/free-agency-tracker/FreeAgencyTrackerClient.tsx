@@ -152,6 +152,11 @@ export default function FreeAgencyTrackerClient() {
         }
 
         if (data.output && Array.isArray(data.output)) {
+          // Debug: Log first item to see actual field names
+          if (data.output.length > 0) {
+            console.log('Sample API data:', data.output[0]);
+            console.log('Available fields:', Object.keys(data.output[0]));
+          }
           const transformed = transformFreeAgentData(data.output);
           setAllFreeAgents(transformed);
         } else {
