@@ -266,7 +266,7 @@ export default function InjuriesClient() {
               </div>
 
               {/* Search */}
-              <div className="lg:col-span-2">
+              <div>
                 <label htmlFor="search" className="block text-sm font-semibold text-gray-700 mb-2">
                   Search Player:
                 </label>
@@ -303,13 +303,6 @@ export default function InjuriesClient() {
           ) : selectedTeam === 'all' ? (
             /* Single table view for all teams */
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              {/* Header */}
-              <div className="bg-gray-100 border-b border-gray-200 px-4 sm:px-6 py-3">
-                <h2 className="text-lg font-bold text-gray-900">
-                  ALL
-                </h2>
-              </div>
-
               {/* Single table with all injuries */}
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px]">
