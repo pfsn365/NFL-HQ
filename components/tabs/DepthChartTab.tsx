@@ -257,7 +257,7 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
 
       {depthChartData.offense.length > 0 && (
         <PositionTable
-          title="Offense"
+          title={`Offense | OC: ${team.offensiveCoordinator}`}
           positions={depthChartData.offense}
           team={team}
         />
@@ -265,7 +265,7 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
 
       {depthChartData.defense.length > 0 && (
         <PositionTable
-          title="Defense"
+          title={`Defense | DC: ${team.defensiveCoordinator}`}
           positions={depthChartData.defense}
           team={team}
         />
@@ -273,7 +273,7 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
 
       {depthChartData.specialTeams.length > 0 && (
         <PositionTable
-          title="Special Teams"
+          title={`Special Teams | STC: ${team.specialTeamsCoordinator}`}
           positions={depthChartData.specialTeams}
           team={team}
         />

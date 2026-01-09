@@ -14,6 +14,9 @@ export interface TeamData {
   divisionRank: string;
   generalManager: string;
   headCoach: string;
+  offensiveCoordinator: string;
+  defensiveCoordinator: string;
+  specialTeamsCoordinator: string;
   homeVenue: string;
   location: string;
   stats: {
@@ -42,6 +45,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Monti Ossenfort',
     headCoach: 'Vacant',
+    offensiveCoordinator: 'Drew Petzing',
+    defensiveCoordinator: 'Nick Rallis',
+    specialTeamsCoordinator: 'Jeff Rodgers',
     homeVenue: 'State Farm Stadium',
     location: 'Glendale, AZ',
     stats: {
@@ -74,6 +80,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Vacant',
     headCoach: 'Vacant',
+    offensiveCoordinator: 'Zac Robinson',
+    defensiveCoordinator: 'Jeff Ulbrich',
+    specialTeamsCoordinator: 'Marquice Williams',
     homeVenue: 'Mercedes-Benz Stadium',
     location: 'Atlanta, GA',
     stats: {
@@ -105,6 +114,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Eric DeCosta',
     headCoach: 'Vacant',
+    offensiveCoordinator: 'Todd Monken',
+    defensiveCoordinator: 'Zach Orr',
+    specialTeamsCoordinator: 'Chris Horton',
     homeVenue: 'M&T Bank Stadium',
     location: 'Baltimore, MD',
     stats: {
@@ -136,6 +148,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Brandon Beane',
     headCoach: 'Sean McDermott',
+    offensiveCoordinator: 'Joe Brady',
+    defensiveCoordinator: 'Bobby Babich',
+    specialTeamsCoordinator: 'Chris Tabor',
     homeVenue: 'Highmark Stadium',
     location: 'Orchard Park, NY',
     stats: {
@@ -167,6 +182,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Dan Morgan',
     headCoach: 'Dave Canales',
+    offensiveCoordinator: 'Brad Idzik',
+    defensiveCoordinator: 'Ejiro Evero',
+    specialTeamsCoordinator: 'Tracy Smith',
     homeVenue: 'Bank of America Stadium',
     location: 'Charlotte, NC',
     stats: {
@@ -198,6 +216,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Ryan Poles',
     headCoach: 'Ben Johnson',
+    offensiveCoordinator: 'Declan Doyle',
+    defensiveCoordinator: 'Dennis Allen',
+    specialTeamsCoordinator: 'Richard Hightower',
     homeVenue: 'Soldier Field',
     location: 'Chicago, IL',
     stats: {
@@ -229,6 +250,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Duke Tobin',
     headCoach: 'Zac Taylor',
+    offensiveCoordinator: 'Dan Pitcher',
+    defensiveCoordinator: 'Al Golden',
+    specialTeamsCoordinator: 'Darrin Simmons',
     homeVenue: 'Paycor Stadium',
     location: 'Cincinnati, OH',
     stats: {
@@ -260,6 +284,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Andrew Berry',
     headCoach: 'Vacant',
+    offensiveCoordinator: 'Tommy Rees',
+    defensiveCoordinator: 'Jim Schwartz',
+    specialTeamsCoordinator: 'Bubba Ventrone',
     homeVenue: 'FirstEnergy Stadium',
     location: 'Cleveland, OH',
     stats: {
@@ -291,6 +318,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Jerry Jones',
     headCoach: 'Brian Schottenheimer',
+    offensiveCoordinator: 'Brian Schottenheimer',
+    defensiveCoordinator: 'Vacant',
+    specialTeamsCoordinator: 'Nick Sorensen',
     homeVenue: 'AT&T Stadium',
     location: 'Arlington, TX',
     stats: {
@@ -322,6 +352,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'George Paton',
     headCoach: 'Sean Payton',
+    offensiveCoordinator: 'Joe Lombardi',
+    defensiveCoordinator: 'Vance Joseph',
+    specialTeamsCoordinator: 'Ben Kotwica',
     homeVenue: 'Empower Field at Mile High',
     location: 'Denver, CO',
     stats: {
@@ -353,6 +386,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Brad Holmes',
     headCoach: 'Dan Campbell',
+    offensiveCoordinator: 'Vacant',
+    defensiveCoordinator: 'Kelvin Sheppard',
+    specialTeamsCoordinator: 'Dave Fipp',
     homeVenue: 'Ford Field',
     location: 'Detroit, MI',
     stats: {
@@ -384,6 +420,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Brian Gutekunst',
     headCoach: 'Matt LaFleur',
+    offensiveCoordinator: 'Adam Stenavich',
+    defensiveCoordinator: 'Jeff Hafley',
+    specialTeamsCoordinator: 'Rich Bisaccia',
     homeVenue: 'Lambeau Field',
     location: 'Green Bay, WI',
     stats: {
@@ -415,6 +454,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Nick Caserio',
     headCoach: 'DeMeco Ryans',
+    offensiveCoordinator: 'Nick Caley',
+    defensiveCoordinator: 'Matt Burke',
+    specialTeamsCoordinator: 'Frank Ross',
     homeVenue: 'NRG Stadium',
     location: 'Houston, TX',
     stats: {
@@ -446,6 +488,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Chris Ballard',
     headCoach: 'Shane Steichen',
+    offensiveCoordinator: 'Jim Bob Cooter',
+    defensiveCoordinator: 'Lou Anarumo',
+    specialTeamsCoordinator: 'Brian Mason',
     homeVenue: 'Lucas Oil Stadium',
     location: 'Indianapolis, IN',
     stats: {
@@ -477,6 +522,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'James Gladstone',
     headCoach: 'Liam Coen',
+    offensiveCoordinator: 'Grant Udinski',
+    defensiveCoordinator: 'Anthony Campanile',
+    specialTeamsCoordinator: 'Heath Farwell',
     homeVenue: 'TIAA Bank Field',
     location: 'Jacksonville, FL',
     stats: {
@@ -508,6 +556,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Brett Veach',
     headCoach: 'Andy Reid',
+    offensiveCoordinator: 'Matt Nagy',
+    defensiveCoordinator: 'Steve Spagnuolo',
+    specialTeamsCoordinator: 'Dave Toub',
     homeVenue: 'Arrowhead Stadium',
     location: 'Kansas City, MO',
     stats: {
@@ -539,6 +590,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'John Spytek',
     headCoach: 'Vacant',
+    offensiveCoordinator: 'Vacant',
+    defensiveCoordinator: 'Patrick Graham',
+    specialTeamsCoordinator: 'Vacant',
     homeVenue: 'Allegiant Stadium',
     location: 'Las Vegas, NV',
     stats: {
@@ -570,6 +624,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Tom Telesco',
     headCoach: 'Jim Harbaugh',
+    offensiveCoordinator: 'Greg Roman',
+    defensiveCoordinator: 'Jesse Minter',
+    specialTeamsCoordinator: 'Ryan Ficken',
     homeVenue: 'SoFi Stadium',
     location: 'Los Angeles, CA',
     stats: {
@@ -601,6 +658,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Les Snead',
     headCoach: 'Sean McVay',
+    offensiveCoordinator: 'Mike LaFleur',
+    defensiveCoordinator: 'Chris Shula',
+    specialTeamsCoordinator: 'Ben Kotwica',
     homeVenue: 'SoFi Stadium',
     location: 'Los Angeles, CA',
     stats: {
@@ -632,6 +692,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Champ Kelly (Interim)',
     headCoach: 'Vacant',
+    offensiveCoordinator: 'Frank Smith',
+    defensiveCoordinator: 'Anthony Weaver',
+    specialTeamsCoordinator: 'Craig Aukerman',
     homeVenue: 'Hard Rock Stadium',
     location: 'Miami Gardens, FL',
     stats: {
@@ -663,6 +726,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Kwesi Adofo-Mensah',
     headCoach: 'Kevin O\'Connell',
+    offensiveCoordinator: 'Wes Phillips',
+    defensiveCoordinator: 'Brian Flores',
+    specialTeamsCoordinator: 'Matt Daniels',
     homeVenue: 'U.S. Bank Stadium',
     location: 'Minneapolis, MN',
     stats: {
@@ -694,6 +760,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Eliot Wolf',
     headCoach: 'Mike Vrabel',
+    offensiveCoordinator: 'Josh McDaniels',
+    defensiveCoordinator: 'Terrell Williams',
+    specialTeamsCoordinator: 'Jeremy Springer',
     homeVenue: 'Gillette Stadium',
     location: 'Foxborough, MA',
     stats: {
@@ -725,6 +794,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Mickey Loomis',
     headCoach: 'Kellen Moore',
+    offensiveCoordinator: 'Doug Nussmeier',
+    defensiveCoordinator: 'TBD',
+    specialTeamsCoordinator: 'TBD',
     homeVenue: 'Caesars Superdome',
     location: 'New Orleans, LA',
     stats: {
@@ -756,6 +828,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Joe Schoen',
     headCoach: 'Mike Kafka (Interim)',
+    offensiveCoordinator: 'Tim Kelly',
+    defensiveCoordinator: 'Charlie Bullen',
+    specialTeamsCoordinator: 'Michael Ghobrial',
     homeVenue: 'MetLife Stadium',
     location: 'East Rutherford, NJ',
     stats: {
@@ -787,6 +862,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Darren Mougey',
     headCoach: 'Aaron Glenn',
+    offensiveCoordinator: 'Tanner Engstrand',
+    defensiveCoordinator: 'Steve Wilks',
+    specialTeamsCoordinator: 'TBD',
     homeVenue: 'MetLife Stadium',
     location: 'East Rutherford, NJ',
     stats: {
@@ -818,6 +896,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Howie Roseman',
     headCoach: 'Nick Sirianni',
+    offensiveCoordinator: 'Kevin Patullo',
+    defensiveCoordinator: 'Vic Fangio',
+    specialTeamsCoordinator: 'Michael Clay',
     homeVenue: 'Lincoln Financial Field',
     location: 'Philadelphia, PA',
     stats: {
@@ -849,6 +930,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Omar Khan',
     headCoach: 'Mike Tomlin',
+    offensiveCoordinator: 'Arthur Smith',
+    defensiveCoordinator: 'Teryl Austin',
+    specialTeamsCoordinator: 'Danny Smith',
     homeVenue: 'Heinz Field',
     location: 'Pittsburgh, PA',
     stats: {
@@ -880,6 +964,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'John Lynch',
     headCoach: 'Kyle Shanahan',
+    offensiveCoordinator: 'Klay Kubiak',
+    defensiveCoordinator: 'Robert Saleh',
+    specialTeamsCoordinator: 'Brant Boyer',
     homeVenue: 'Levi\'s Stadium',
     location: 'Santa Clara, CA',
     stats: {
@@ -911,6 +998,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'John Schneider',
     headCoach: 'Mike Macdonald',
+    offensiveCoordinator: 'Klint Kubiak',
+    defensiveCoordinator: 'Aden Durde',
+    specialTeamsCoordinator: 'Jay Harbaugh',
     homeVenue: 'Lumen Field',
     location: 'Seattle, WA',
     stats: {
@@ -942,6 +1032,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Jason Licht',
     headCoach: 'Todd Bowles',
+    offensiveCoordinator: 'Vacant',
+    defensiveCoordinator: 'Todd Bowles',
+    specialTeamsCoordinator: 'Vacant',
     homeVenue: 'Raymond James Stadium',
     location: 'Tampa, FL',
     stats: {
@@ -973,6 +1066,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Mike Borgonzi',
     headCoach: 'Mike McCoy (Interim)',
+    offensiveCoordinator: 'Nick Holz',
+    defensiveCoordinator: 'Dennard Wilson',
+    specialTeamsCoordinator: 'Colt Anderson',
     homeVenue: 'Nissan Stadium',
     location: 'Nashville, TN',
     stats: {
@@ -1004,6 +1100,9 @@ export const teams: Record<string, TeamData> = {
     divisionRank: '0th',
     generalManager: 'Adam Peters',
     headCoach: 'Dan Quinn',
+    offensiveCoordinator: 'Vacant',
+    defensiveCoordinator: 'Vacant',
+    specialTeamsCoordinator: 'Larry Izzo',
     homeVenue: 'FedExField',
     location: 'Landover, MD',
     stats: {
