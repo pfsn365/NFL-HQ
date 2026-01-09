@@ -48,60 +48,60 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   // AFC Wild Card Round
   'afc-wc-1': {
     id: 'afc-wc-1',
-    team1: { seed: 5, name: 'Chargers', teamId: 'los-angeles-chargers' },
-    team2: { seed: 4, name: 'Texans', teamId: 'houston-texans' },
+    team1: { seed: 4, name: 'Steelers', teamId: 'pittsburgh-steelers' },
+    team2: { seed: 5, name: 'Texans', teamId: 'houston-texans' },
     round: 'Wild Card',
-    date: 'Jan 11',
+    date: 'Jan 12',
     completed: false,
   },
   'afc-wc-2': {
     id: 'afc-wc-2',
-    team1: { seed: 6, name: 'Steelers', teamId: 'pittsburgh-steelers' },
-    team2: { seed: 3, name: 'Ravens', teamId: 'baltimore-ravens' },
+    team1: { seed: 3, name: 'Jaguars', teamId: 'jacksonville-jaguars' },
+    team2: { seed: 6, name: 'Bills', teamId: 'buffalo-bills' },
     round: 'Wild Card',
     date: 'Jan 11',
     completed: false,
   },
   'afc-wc-3': {
     id: 'afc-wc-3',
-    team1: { seed: 7, name: 'Broncos', teamId: 'denver-broncos' },
-    team2: { seed: 2, name: 'Bills', teamId: 'buffalo-bills' },
+    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots' },
+    team2: { seed: 7, name: 'Chargers', teamId: 'los-angeles-chargers' },
     round: 'Wild Card',
-    date: 'Jan 12',
+    date: 'Jan 11',
     completed: false,
   },
   // NFC Wild Card Round
   'nfc-wc-1': {
     id: 'nfc-wc-1',
-    team1: { seed: 7, name: 'Packers', teamId: 'green-bay-packers' },
-    team2: { seed: 2, name: 'Eagles', teamId: 'philadelphia-eagles' },
+    team1: { seed: 4, name: 'Panthers', teamId: 'carolina-panthers' },
+    team2: { seed: 5, name: 'Rams', teamId: 'los-angeles-rams' },
     round: 'Wild Card',
-    date: 'Jan 12',
+    date: 'Jan 10',
     completed: false,
   },
   'nfc-wc-2': {
     id: 'nfc-wc-2',
-    team1: { seed: 6, name: 'Commanders', teamId: 'washington-commanders' },
-    team2: { seed: 3, name: 'Buccaneers', teamId: 'tampa-bay-buccaneers' },
+    team1: { seed: 3, name: 'Eagles', teamId: 'philadelphia-eagles' },
+    team2: { seed: 6, name: '49ers', teamId: 'san-francisco-49ers' },
     round: 'Wild Card',
-    date: 'Jan 12',
+    date: 'Jan 11',
     completed: false,
   },
   'nfc-wc-3': {
     id: 'nfc-wc-3',
-    team1: { seed: 5, name: 'Vikings', teamId: 'minnesota-vikings' },
-    team2: { seed: 4, name: 'Rams', teamId: 'los-angeles-rams' },
+    team1: { seed: 2, name: 'Bears', teamId: 'chicago-bears' },
+    team2: { seed: 7, name: 'Packers', teamId: 'green-bay-packers' },
     round: 'Wild Card',
-    date: 'Jan 13',
+    date: 'Jan 10',
     completed: false,
   },
   // AFC Divisional Round
   'afc-div-1': {
     id: 'afc-div-1',
-    team1: { seed: 1, name: 'Chiefs', teamId: 'kansas-city-chiefs' },
+    team1: { seed: 1, name: 'Broncos', teamId: 'denver-broncos' },
     team2: null,
     round: 'Divisional',
-    date: 'Jan 18',
+    date: 'Jan 16-17',
     completed: false,
   },
   'afc-div-2': {
@@ -109,7 +109,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: null,
     team2: null,
     round: 'Divisional',
-    date: 'Jan 19',
+    date: 'Jan 16-17',
     completed: false,
   },
   'afc-div-3': {
@@ -123,10 +123,10 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   // NFC Divisional Round
   'nfc-div-1': {
     id: 'nfc-div-1',
-    team1: { seed: 1, name: 'Lions', teamId: 'detroit-lions' },
+    team1: { seed: 1, name: 'Seahawks', teamId: 'seattle-seahawks' },
     team2: null,
     round: 'Divisional',
-    date: 'Jan 18',
+    date: 'Jan 16-17',
     completed: false,
   },
   'nfc-div-2': {
@@ -134,7 +134,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: null,
     team2: null,
     round: 'Divisional',
-    date: 'Jan 19',
+    date: 'Jan 16-17',
     completed: false,
   },
   'nfc-div-3': {
@@ -151,7 +151,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: null,
     team2: null,
     round: 'AFC Championship',
-    date: 'Jan 26',
+    date: 'Jan 24',
     completed: false,
   },
   'nfc-conf': {
@@ -159,7 +159,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: null,
     team2: null,
     round: 'NFC Championship',
-    date: 'Jan 26',
+    date: 'Jan 24',
     completed: false,
   },
   // Super Bowl
@@ -167,8 +167,8 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     id: 'superbowl',
     team1: null,
     team2: null,
-    round: 'Super Bowl LIX',
-    date: 'Feb 9',
+    round: 'Super Bowl LX',
+    date: 'Feb 8',
     completed: false,
   },
 };
@@ -402,9 +402,10 @@ export default function NFLPlayoffBracket() {
   const hasAnyPicks = Object.keys(userPicks).length > 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden w-fit mx-auto">
-      <div className="px-4 py-2 border-b border-gray-200 flex items-center justify-between" style={{ backgroundColor: '#0050A0' }}>
-        <h3 className="text-lg font-bold text-white">2025-26 NFL Playoff Bracket</h3>
+    <div className="max-w-6xl mx-auto">
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden w-fit mx-auto">
+        <div className="px-4 py-2 border-b border-gray-200 flex items-center justify-between" style={{ backgroundColor: '#0050A0' }}>
+          <h3 className="text-lg font-bold text-white">2025-26 NFL Playoff Bracket</h3>
         <button
           onClick={() => setUserPicks({})}
           className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${hasAnyPicks ? 'bg-white/20 text-white hover:bg-white/30' : 'invisible'}`}
@@ -454,7 +455,7 @@ export default function NFLPlayoffBracket() {
 
             {/* Super Bowl Center */}
             <div className="flex flex-col w-[200px] justify-center">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center mb-2">Super Bowl LIX</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center mb-2">Super Bowl LX</div>
               <MatchupCard matchup={displayData['superbowl']} userPick={userPicks['superbowl']} onPickWinner={handlePickWinner} canPick />
               <div className="mt-3 text-center">
                 <div className={`inline-block rounded-lg px-4 py-2 ${champion ? 'bg-yellow-100 border border-yellow-300' : 'bg-gray-100 border border-gray-200'}`}>
@@ -511,7 +512,7 @@ export default function NFLPlayoffBracket() {
           {/* Champion Banner */}
           <div className={`rounded-lg p-4 text-center ${champion ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50 border border-gray-200'}`}>
             <span className={`font-semibold text-sm ${champion ? 'text-yellow-800' : 'text-gray-500'}`}>
-              {userPicks['superbowl'] && !finalMatchup.completed ? 'Your Champion Pick' : 'Super Bowl LIX Champion'}
+              {userPicks['superbowl'] && !finalMatchup.completed ? 'Your Champion Pick' : 'Super Bowl LX Champion'}
             </span>
             {champion ? (
               <div className="flex items-center justify-center gap-2 mt-2">
@@ -525,7 +526,7 @@ export default function NFLPlayoffBracket() {
 
           {/* Super Bowl */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Super Bowl LIX - Feb 9</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Super Bowl LX - Feb 8</h4>
             <MatchupCard matchup={displayData['superbowl']} userPick={userPicks['superbowl']} onPickWinner={handlePickWinner} canPick />
           </div>
 
@@ -588,6 +589,7 @@ export default function NFLPlayoffBracket() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
