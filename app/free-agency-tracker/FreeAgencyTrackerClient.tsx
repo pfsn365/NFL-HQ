@@ -62,7 +62,7 @@ function getPositionColor(position: string): string {
   if (pos === 'WR' || pos === 'TE') return 'bg-blue-100 text-blue-700 border-blue-200';
 
   // Offensive Line
-  if (pos === 'OT' || pos === 'OG' || pos === 'C' || pos === 'OL' || pos === 'G' || pos === 'T')
+  if (pos === 'OT' || pos === 'OG' || pos === 'OC' || pos === 'C' || pos === 'OL' || pos === 'G' || pos === 'T')
     return 'bg-amber-100 text-amber-700 border-amber-200';
 
   // Defensive Line
@@ -411,10 +411,10 @@ export default function FreeAgencyTrackerClient() {
                       <thead style={{ backgroundColor: '#0050A0' }}>
                         <tr>
                           <th
-                            className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider cursor-pointer hover:bg-[#003d7a]"
+                            className="px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wider cursor-pointer hover:bg-[#003d7a]"
                             onClick={() => handleSort('rank')}
                           >
-                            <div className="flex items-center">
+                            <div className="flex items-center justify-center">
                               Rank
                               <SortIndicator column="rank" />
                             </div>
@@ -451,7 +451,7 @@ export default function FreeAgencyTrackerClient() {
                             onClick={() => handleSort('pfsn2025Impact')}
                           >
                             <div className="flex items-center justify-center">
-                              Impact
+                              Impact Grade
                               <SortIndicator column="pfsn2025Impact" />
                             </div>
                           </th>
@@ -480,7 +480,7 @@ export default function FreeAgencyTrackerClient() {
 
                           return (
                             <tr key={`${agent.rank}-${agent.name}`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
                                 {agent.rank}
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
