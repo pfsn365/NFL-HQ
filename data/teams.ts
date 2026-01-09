@@ -41,7 +41,7 @@ export const teams: Record<string, TeamData> = {
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'Monti Ossenfort',
-    headCoach: 'Jonathan Gannon',
+    headCoach: 'Vacant',
     homeVenue: 'State Farm Stadium',
     location: 'Glendale, AZ',
     stats: {
@@ -73,7 +73,7 @@ export const teams: Record<string, TeamData> = {
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'Terry Fontenot',
-    headCoach: 'Raheem Morris',
+    headCoach: 'Vacant',
     homeVenue: 'Mercedes-Benz Stadium',
     location: 'Atlanta, GA',
     stats: {
@@ -104,7 +104,7 @@ export const teams: Record<string, TeamData> = {
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'Eric DeCosta',
-    headCoach: 'John Harbaugh',
+    headCoach: 'Vacant',
     homeVenue: 'M&T Bank Stadium',
     location: 'Baltimore, MD',
     stats: {
@@ -259,7 +259,7 @@ export const teams: Record<string, TeamData> = {
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'Andrew Berry',
-    headCoach: 'Kevin Stefanski',
+    headCoach: 'Vacant',
     homeVenue: 'FirstEnergy Stadium',
     location: 'Cleveland, OH',
     stats: {
@@ -538,7 +538,7 @@ export const teams: Record<string, TeamData> = {
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'John Spytek',
-    headCoach: 'Pete Carroll',
+    headCoach: 'Vacant',
     homeVenue: 'Allegiant Stadium',
     location: 'Las Vegas, NV',
     stats: {
@@ -631,7 +631,7 @@ export const teams: Record<string, TeamData> = {
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'Chris Grier',
-    headCoach: 'Mike McDaniel',
+    headCoach: 'Vacant',
     homeVenue: 'Hard Rock Stadium',
     location: 'Miami Gardens, FL',
     stats: {
