@@ -714,7 +714,7 @@ export default function StandingsClient() {
           </div>
 
           {/* Playoff Picture */}
-          {!isLoading && (conferenceView === 'conference' || conferenceView === 'all') && (
+          {!isLoading && conferenceView === 'all' && (
             <div className="mb-8">
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Playoff Picture</h2>

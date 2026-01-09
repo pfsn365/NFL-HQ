@@ -88,6 +88,7 @@ interface TeamStanding {
   strengthOfSchedule?: number;
   headToHead?: Record<string, { wins: number; losses: number; ties: number }>;
   opponentsBeaten?: string[];
+  allOpponents?: string[]; // All opponents played (for common games)
   strengthOfVictory?: number; // Win percentage of teams beaten
 }
 
@@ -444,7 +445,8 @@ async function processTeamsInBatches(teamsList: any[], batchSize = 8) {
         strengthOfSchedule: 0, // Will be populated later
         strengthOfVictory: 0, // Will be populated later
         headToHead: detailedStats.headToHead,
-        opponentsBeaten: detailedStats.opponentsBeaten
+        opponentsBeaten: detailedStats.opponentsBeaten,
+        allOpponents: detailedStats.allOpponents
       };
     });
 
@@ -516,6 +518,32 @@ export async function GET() {
       return (wins + ties * 0.5) / totalGames;
     };
 
+    // Helper function to find common opponents between teams
+    const findCommonOpponents = (teamA: TeamStanding, teamB: TeamStanding): string[] => {
+      if (!teamA.allOpponents || !teamB.allOpponents) return [];
+      const setA = new Set(teamA.allOpponents);
+      const setB = new Set(teamB.allOpponents);
+      return teamA.allOpponents.filter(opponent => setB.has(opponent));
+    };
+
+    // Helper function to calculate record against common opponents
+    const getCommonGamesRecord = (team: TeamStanding, commonOpponents: string[]): { wins: number; losses: number; ties: number } => {
+      let wins = 0, losses = 0, ties = 0;
+
+      if (!team.headToHead) return { wins, losses, ties };
+
+      commonOpponents.forEach(opponentId => {
+        const h2h = team.headToHead?.[opponentId];
+        if (h2h) {
+          wins += h2h.wins;
+          losses += h2h.losses;
+          ties += h2h.ties;
+        }
+      });
+
+      return { wins, losses, ties };
+    };
+
     // Sort each division and assign ranks (NFL Division Tiebreaker Procedure)
     Object.keys(divisions).forEach(division => {
       divisions[division].sort((a, b) => {
@@ -544,7 +572,24 @@ export async function GET() {
           return bDivPct - aDivPct;
         }
 
-        // Step 4: Common games - Skip for now (need additional data)
+        // Step 4: Common games (best won-lost-tied percentage in common games, minimum of four)
+        const commonOpponents = findCommonOpponents(a, b);
+        if (commonOpponents.length >= 4) {
+          const aCommonRecord = getCommonGamesRecord(a, commonOpponents);
+          const bCommonRecord = getCommonGamesRecord(b, commonOpponents);
+
+          const aTotalCommon = aCommonRecord.wins + aCommonRecord.losses + aCommonRecord.ties;
+          const bTotalCommon = bCommonRecord.wins + bCommonRecord.losses + bCommonRecord.ties;
+
+          if (aTotalCommon > 0 && bTotalCommon > 0) {
+            const aCommonPct = (aCommonRecord.wins + aCommonRecord.ties * 0.5) / aTotalCommon;
+            const bCommonPct = (bCommonRecord.wins + bCommonRecord.ties * 0.5) / bTotalCommon;
+
+            if (bCommonPct !== aCommonPct) {
+              return bCommonPct - aCommonPct;
+            }
+          }
+        }
 
         // Step 5: Conference record (best won-lost-tied percentage in games played within the conference)
         const aConfPct = parseRecordWinPct(a.confRecord);
