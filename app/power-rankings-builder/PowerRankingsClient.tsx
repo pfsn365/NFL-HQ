@@ -39,15 +39,27 @@ const getOrdinalSuffix = (num: number): string => {
 // Source: https://staticd.profootballnetwork.com/skm/assets/pfn/pfsn-logo-white-ver-2.png
 const PFSN_LOGO_DATA_URL = 'data:image/png;base64,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';
 
+// Hardcoded rankings order (2025 season)
+const RANKINGS_ORDER = [
+  'denver-broncos', 'seattle-seahawks', 'new-england-patriots', 'jacksonville-jaguars',
+  'buffalo-bills', 'houston-texans', 'los-angeles-rams', 'san-francisco-49ers',
+  'philadelphia-eagles', 'chicago-bears', 'los-angeles-chargers', 'pittsburgh-steelers',
+  'green-bay-packers', 'minnesota-vikings', 'detroit-lions', 'carolina-panthers',
+  'baltimore-ravens', 'indianapolis-colts', 'tampa-bay-buccaneers', 'atlanta-falcons',
+  'dallas-cowboys', 'miami-dolphins', 'kansas-city-chiefs', 'cincinnati-bengals',
+  'new-orleans-saints', 'cleveland-browns', 'washington-commanders', 'new-york-giants',
+  'new-york-jets', 'las-vegas-raiders', 'tennessee-titans', 'arizona-cardinals'
+];
+
 export default function PowerRankingsClient() {
   const allTeams = getAllTeams();
 
   // Initialize rankings with teams (will be updated with live records)
   const [rankings, setRankings] = useState<RankedTeam[]>(() => {
     const sortedTeams = [...allTeams].sort((a, b) => {
-      const [aWins] = a.record.split('-').map(Number);
-      const [bWins] = b.record.split('-').map(Number);
-      return bWins - aWins; // Best teams first
+      const aIndex = RANKINGS_ORDER.indexOf(a.id);
+      const bIndex = RANKINGS_ORDER.indexOf(b.id);
+      return aIndex - bIndex;
     });
 
     return sortedTeams.map((team, index) => ({
@@ -308,7 +320,7 @@ export default function PowerRankingsClient() {
       await Promise.all(
         allTeams.map(async (team) => {
           try {
-            const proxyUrl = `/nfl-hq/api/proxy-image?url=${encodeURIComponent(team.logoUrl)}`;
+            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(team.logoUrl)}`;
             const response = await fetch(proxyUrl);
             if (!response.ok) throw new Error('Failed to fetch logo');
 
@@ -653,9 +665,9 @@ export default function PowerRankingsClient() {
 
   const resetRankings = () => {
     const sortedTeams = [...allTeams].sort((a, b) => {
-      const [aWins] = a.record.split('-').map(Number);
-      const [bWins] = b.record.split('-').map(Number);
-      return bWins - aWins;
+      const aIndex = RANKINGS_ORDER.indexOf(a.id);
+      const bIndex = RANKINGS_ORDER.indexOf(b.id);
+      return aIndex - bIndex;
     });
 
     const newRankings = sortedTeams.map((team, index) => ({

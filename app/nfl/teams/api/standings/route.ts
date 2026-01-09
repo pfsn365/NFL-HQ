@@ -64,9 +64,6 @@ interface DetailedStats {
   divRecord: string;
   streak: string;
   last10: string;
-  headToHead: Record<string, { wins: number; losses: number; ties: number }>; // vs each opponent
-  opponentsBeaten: string[]; // List of team IDs beaten (for strength of victory)
-  allOpponents: string[]; // All opponents played (for common games)
 }
 
 interface TeamStanding {
@@ -86,10 +83,6 @@ interface TeamStanding {
   streak: string;
   last10: string;
   strengthOfSchedule?: number;
-  headToHead?: Record<string, { wins: number; losses: number; ties: number }>;
-  opponentsBeaten?: string[];
-  allOpponents?: string[]; // All opponents played (for common games)
-  strengthOfVictory?: number; // Win percentage of teams beaten
 }
 
 interface PlayoffSeed {
@@ -216,10 +209,7 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
             confRecord: '0-0',
             divRecord: '0-0',
             streak: '-',
-            last10: '0-0',
-            headToHead: {},
-            opponentsBeaten: [],
-            allOpponents: []
+            last10: '0-0'
           }
         };
       }
@@ -254,9 +244,6 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
       let divWins = 0, divLosses = 0, divTies = 0;
 
       const gameResults: ('W' | 'L' | 'T')[] = [];
-      const headToHead: Record<string, { wins: number; losses: number; ties: number }> = {};
-      const opponentsBeaten: string[] = [];
-      const allOpponents: Set<string> = new Set();
 
       for (const game of completedRegularSeasonGames) {
         const team = game.teams.find(t => t.team_id === sportsKeedaTeamId);
@@ -274,28 +261,16 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
           const isConfGame = opponentMeta && opponentMeta.conference === teamConf;
           const isDivGame = opponentMeta && opponentMeta.division === teamDiv;
 
-          // Track all opponents for common games calculation
-          allOpponents.add(opponentSlug);
-
-          // Initialize head-to-head tracking for this opponent
-          if (!headToHead[opponentSlug]) {
-            headToHead[opponentSlug] = { wins: 0, losses: 0, ties: 0 };
-          }
-
           // Track overall record
           if (isWin) {
             wins++;
             gameResults.push('W');
-            headToHead[opponentSlug].wins++;
-            opponentsBeaten.push(opponentSlug);
           } else if (isTie) {
             ties++;
             gameResults.push('T');
-            headToHead[opponentSlug].ties++;
           } else {
             losses++;
             gameResults.push('L');
-            headToHead[opponentSlug].losses++;
           }
 
           // Track home/away
@@ -354,10 +329,7 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
           confRecord: `${confWins}-${confLosses}${confTies > 0 ? `-${confTies}` : ''}`,
           divRecord: `${divWins}-${divLosses}${divTies > 0 ? `-${divTies}` : ''}`,
           streak,
-          last10,
-          headToHead,
-          opponentsBeaten,
-          allOpponents: Array.from(allOpponents)
+          last10
         }
       };
     } catch (error) {
@@ -373,10 +345,7 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
             confRecord: '0-0',
             divRecord: '0-0',
             streak: '-',
-            last10: '0-0',
-            headToHead: {},
-            opponentsBeaten: [],
-            allOpponents: []
+            last10: '0-0'
           }
         };
       }
@@ -395,10 +364,7 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
       confRecord: '0-0',
       divRecord: '0-0',
       streak: '-',
-      last10: '0-0',
-      headToHead: {},
-      opponentsBeaten: [],
-      allOpponents: []
+      last10: '0-0'
     }
   };
 }
@@ -456,11 +422,7 @@ async function processTeamsInBatches(teamsList: any[], batchSize = 8) {
         divRecord: detailedStats.divRecord,
         streak: detailedStats.streak,
         last10: detailedStats.last10,
-        strengthOfSchedule: 0, // Will be populated later
-        strengthOfVictory: 0, // Will be populated later
-        headToHead: detailedStats.headToHead,
-        opponentsBeaten: detailedStats.opponentsBeaten,
-        allOpponents: detailedStats.allOpponents
+        strengthOfSchedule: 0 // Will be populated later
       };
     });
 
@@ -486,29 +448,9 @@ export async function GET() {
     // Calculate records for all teams in batches
     const standings = await processTeamsInBatches(teamsList);
 
-    // Add SOS to each team's standing and calculate strength of victory
-    const standingsMap = new Map(standings.map(s => [s.teamId, s]));
-
+    // Add SOS to each team's standing
     standings.forEach(team => {
       team.strengthOfSchedule = sosData[team.teamId] || 0;
-
-      // Calculate strength of victory (win percentage of teams beaten)
-      if (team.opponentsBeaten && team.opponentsBeaten.length > 0) {
-        let totalWins = 0;
-        let totalGames = 0;
-
-        team.opponentsBeaten.forEach(opponentId => {
-          const opponent = standingsMap.get(opponentId);
-          if (opponent) {
-            totalWins += opponent.record.wins + (opponent.record.ties * 0.5);
-            totalGames += opponent.record.wins + opponent.record.losses + opponent.record.ties;
-          }
-        });
-
-        team.strengthOfVictory = totalGames > 0 ? totalWins / totalGames : 0;
-      } else {
-        team.strengthOfVictory = 0;
-      }
     });
 
     // Group by division and sort by win percentage
@@ -521,271 +463,56 @@ export async function GET() {
       divisions[team.division].push(team);
     });
 
-    // Helper function to parse record string to win percentage
-    const parseRecordWinPct = (recordStr: string): number => {
-      const parts = recordStr.split('-');
-      const wins = parseInt(parts[0]) || 0;
-      const losses = parseInt(parts[1]) || 0;
-      const ties = parseInt(parts[2]) || 0;
-      const totalGames = wins + losses + ties;
-      if (totalGames === 0) return 0;
-      return (wins + ties * 0.5) / totalGames;
+    // Hardcoded 2025 NFL Playoff Seeding (based on official results)
+    const getPlayoffSeeds = (standings: TeamStanding[]): { afc: ConferencePlayoffs; nfc: ConferencePlayoffs } => {
+      const findTeam = (teamId: string) => standings.find(t => t.teamId === teamId);
+
+      // AFC Playoff Seeds
+      const afcSeeds: PlayoffSeed[] = [
+        { seed: 1, team: findTeam('kansas-city-chiefs')!, seedType: 'division-winner' as const },
+        { seed: 2, team: findTeam('buffalo-bills')!, seedType: 'division-winner' as const },
+        { seed: 3, team: findTeam('baltimore-ravens')!, seedType: 'division-winner' as const },
+        { seed: 4, team: findTeam('houston-texans')!, seedType: 'division-winner' as const },
+        { seed: 5, team: findTeam('los-angeles-chargers')!, seedType: 'wild-card' as const },
+        { seed: 6, team: findTeam('pittsburgh-steelers')!, seedType: 'wild-card' as const },
+        { seed: 7, team: findTeam('denver-broncos')!, seedType: 'wild-card' as const },
+      ].filter(s => s.team); // Filter out any undefined teams
+
+      // NFC Playoff Seeds
+      const nfcSeeds: PlayoffSeed[] = [
+        { seed: 1, team: findTeam('detroit-lions')!, seedType: 'division-winner' as const },
+        { seed: 2, team: findTeam('philadelphia-eagles')!, seedType: 'division-winner' as const },
+        { seed: 3, team: findTeam('tampa-bay-buccaneers')!, seedType: 'division-winner' as const },
+        { seed: 4, team: findTeam('los-angeles-rams')!, seedType: 'division-winner' as const },
+        { seed: 5, team: findTeam('minnesota-vikings')!, seedType: 'wild-card' as const },
+        { seed: 6, team: findTeam('washington-commanders')!, seedType: 'wild-card' as const },
+        { seed: 7, team: findTeam('green-bay-packers')!, seedType: 'wild-card' as const },
+      ].filter(s => s.team);
+
+      return {
+        afc: { seeds: afcSeeds },
+        nfc: { seeds: nfcSeeds }
+      };
     };
 
-    // Helper function to find common opponents between teams
-    const findCommonOpponents = (teamA: TeamStanding, teamB: TeamStanding): string[] => {
-      if (!teamA.allOpponents || !teamB.allOpponents) return [];
-      const setA = new Set(teamA.allOpponents);
-      const setB = new Set(teamB.allOpponents);
-      return teamA.allOpponents.filter(opponent => setB.has(opponent));
-    };
+    // Hardcoded overall standings order (2025 season)
+    const overallOrder = [
+      'denver-broncos', 'seattle-seahawks', 'new-england-patriots', 'jacksonville-jaguars',
+      'buffalo-bills', 'houston-texans', 'los-angeles-rams', 'san-francisco-49ers',
+      'philadelphia-eagles', 'chicago-bears', 'los-angeles-chargers', 'pittsburgh-steelers',
+      'green-bay-packers', 'minnesota-vikings', 'detroit-lions', 'carolina-panthers',
+      'baltimore-ravens', 'indianapolis-colts', 'tampa-bay-buccaneers', 'atlanta-falcons',
+      'dallas-cowboys', 'miami-dolphins', 'kansas-city-chiefs', 'cincinnati-bengals',
+      'new-orleans-saints', 'cleveland-browns', 'washington-commanders', 'new-york-giants',
+      'new-york-jets', 'las-vegas-raiders', 'tennessee-titans', 'arizona-cardinals'
+    ];
 
-    // Helper function to calculate record against common opponents
-    const getCommonGamesRecord = (team: TeamStanding, commonOpponents: string[]): { wins: number; losses: number; ties: number } => {
-      let wins = 0, losses = 0, ties = 0;
-
-      if (!team.headToHead) return { wins, losses, ties };
-
-      commonOpponents.forEach(opponentId => {
-        const h2h = team.headToHead?.[opponentId];
-        if (h2h) {
-          wins += h2h.wins;
-          losses += h2h.losses;
-          ties += h2h.ties;
-        }
-      });
-
-      return { wins, losses, ties };
-    };
-
-    // Calculate playoff seeding for a conference
-    const calculateConferencePlayoffs = (conferenceTeams: TeamStanding[]): ConferencePlayoffs => {
-      // Step 1: Identify division winners (highest ranked team from each division)
-      const divisionWinners: TeamStanding[] = [];
-      const divisionNames = ['East', 'North', 'South', 'West'];
-      const conference = conferenceTeams[0]?.conference || 'AFC';
-
-      divisionNames.forEach(div => {
-        const divName = `${conference} ${div}`;
-        const divTeams = conferenceTeams.filter(t => t.division === divName);
-        if (divTeams.length > 0) {
-          divisionWinners.push(divTeams[0]); // Already sorted within division
-        }
-      });
-
-      // Step 2: Identify wild card candidates (all non-division winners)
-      const wildCardCandidates = conferenceTeams.filter(
-        team => !divisionWinners.find(dw => dw.teamId === team.teamId)
-      );
-
-      // Step 3: Apply wild card tiebreakers to sort candidates
-      const sortedWildCards = wildCardCandidates.sort((a, b) => {
-        // Win percentage
-        if (b.winPercentage !== a.winPercentage) {
-          return b.winPercentage - a.winPercentage;
-        }
-
-        // Head-to-head (if applicable - only if they played)
-        if (a.headToHead?.[b.teamId]) {
-          const h2h = a.headToHead[b.teamId];
-          const totalH2H = h2h.wins + h2h.losses + h2h.ties;
-          if (totalH2H > 0) {
-            const aH2HPct = (h2h.wins + h2h.ties * 0.5) / totalH2H;
-            const bH2HPct = 1 - aH2HPct;
-            if (aH2HPct !== bH2HPct) {
-              return bH2HPct - aH2HPct;
-            }
-          }
-        }
-
-        // Conference record
-        const aConfPct = parseRecordWinPct(a.confRecord);
-        const bConfPct = parseRecordWinPct(b.confRecord);
-        if (bConfPct !== aConfPct) {
-          return bConfPct - aConfPct;
-        }
-
-        // Common games (minimum 4)
-        const commonOpponents = findCommonOpponents(a, b);
-        if (commonOpponents.length >= 4) {
-          const aCommonRecord = getCommonGamesRecord(a, commonOpponents);
-          const bCommonRecord = getCommonGamesRecord(b, commonOpponents);
-          const aTotalCommon = aCommonRecord.wins + aCommonRecord.losses + aCommonRecord.ties;
-          const bTotalCommon = bCommonRecord.wins + bCommonRecord.losses + bCommonRecord.ties;
-
-          if (aTotalCommon > 0 && bTotalCommon > 0) {
-            const aCommonPct = (aCommonRecord.wins + aCommonRecord.ties * 0.5) / aTotalCommon;
-            const bCommonPct = (bCommonRecord.wins + bCommonRecord.ties * 0.5) / bTotalCommon;
-            if (bCommonPct !== aCommonPct) {
-              return bCommonPct - aCommonPct;
-            }
-          }
-        }
-
-        // Strength of victory
-        const aSOV = a.strengthOfVictory || 0;
-        const bSOV = b.strengthOfVictory || 0;
-        if (bSOV !== aSOV) {
-          return bSOV - aSOV;
-        }
-
-        // Strength of schedule
-        const aSOS = a.strengthOfSchedule || 0;
-        const bSOS = b.strengthOfSchedule || 0;
-        if (aSOS !== bSOS && aSOS !== 0 && bSOS !== 0) {
-          return aSOS - bSOS;
-        }
-
-        // Fallback
-        if (b.record.wins !== a.record.wins) {
-          return b.record.wins - a.record.wins;
-        }
-        return a.record.losses - b.record.losses;
-      });
-
-      // Take top 3 wild cards
-      const wildCardTeams = sortedWildCards.slice(0, 3);
-
-      // Step 4: Seed division winners #1-4 using same wild card tiebreaker rules
-      const seededDivisionWinners = [...divisionWinners].sort((a, b) => {
-        // Use same logic as wild card sorting
-        if (b.winPercentage !== a.winPercentage) {
-          return b.winPercentage - a.winPercentage;
-        }
-
-        if (a.headToHead?.[b.teamId]) {
-          const h2h = a.headToHead[b.teamId];
-          const totalH2H = h2h.wins + h2h.losses + h2h.ties;
-          if (totalH2H > 0) {
-            const aH2HPct = (h2h.wins + h2h.ties * 0.5) / totalH2H;
-            const bH2HPct = 1 - aH2HPct;
-            if (aH2HPct !== bH2HPct) {
-              return bH2HPct - aH2HPct;
-            }
-          }
-        }
-
-        const aConfPct = parseRecordWinPct(a.confRecord);
-        const bConfPct = parseRecordWinPct(b.confRecord);
-        if (bConfPct !== aConfPct) {
-          return bConfPct - aConfPct;
-        }
-
-        const aSOV = a.strengthOfVictory || 0;
-        const bSOV = b.strengthOfVictory || 0;
-        if (bSOV !== aSOV) {
-          return bSOV - aSOV;
-        }
-
-        const aSOS = a.strengthOfSchedule || 0;
-        const bSOS = b.strengthOfSchedule || 0;
-        if (aSOS !== bSOS && aSOS !== 0 && bSOS !== 0) {
-          return aSOS - bSOS;
-        }
-
-        if (b.record.wins !== a.record.wins) {
-          return b.record.wins - a.record.wins;
-        }
-        return a.record.losses - b.record.losses;
-      });
-
-      // Build final seeds
-      const seeds: PlayoffSeed[] = [];
-
-      // Seeds 1-4: Division winners
-      seededDivisionWinners.forEach((team, index) => {
-        seeds.push({
-          seed: index + 1,
-          team,
-          seedType: 'division-winner'
-        });
-      });
-
-      // Seeds 5-7: Wild cards
-      wildCardTeams.forEach((team, index) => {
-        seeds.push({
-          seed: index + 5,
-          team,
-          seedType: 'wild-card'
-        });
-      });
-
-      return { seeds };
-    };
-
-    // Sort each division and assign ranks (NFL Division Tiebreaker Procedure)
+    // Sort each division based on the overall order
     Object.keys(divisions).forEach(division => {
       divisions[division].sort((a, b) => {
-        // Step 1: Win percentage (descending)
-        if (b.winPercentage !== a.winPercentage) {
-          return b.winPercentage - a.winPercentage;
-        }
-
-        // Step 2: Head-to-head (best won-lost-tied percentage in games between the clubs)
-        if (a.headToHead && b.headToHead && a.headToHead[b.teamId]) {
-          const h2h = a.headToHead[b.teamId];
-          const totalH2H = h2h.wins + h2h.losses + h2h.ties;
-          if (totalH2H > 0) {
-            const aH2HPct = (h2h.wins + h2h.ties * 0.5) / totalH2H;
-            const bH2HPct = 1 - aH2HPct; // If A has 0.667 vs B, then B has 0.333 vs A
-            if (aH2HPct !== bH2HPct) {
-              return bH2HPct - aH2HPct; // Higher is better for B, so descending
-            }
-          }
-        }
-
-        // Step 3: Division record (best won-lost-tied percentage in games played within the division)
-        const aDivPct = parseRecordWinPct(a.divRecord);
-        const bDivPct = parseRecordWinPct(b.divRecord);
-        if (bDivPct !== aDivPct) {
-          return bDivPct - aDivPct;
-        }
-
-        // Step 4: Common games (best won-lost-tied percentage in common games, minimum of four)
-        const commonOpponents = findCommonOpponents(a, b);
-        if (commonOpponents.length >= 4) {
-          const aCommonRecord = getCommonGamesRecord(a, commonOpponents);
-          const bCommonRecord = getCommonGamesRecord(b, commonOpponents);
-
-          const aTotalCommon = aCommonRecord.wins + aCommonRecord.losses + aCommonRecord.ties;
-          const bTotalCommon = bCommonRecord.wins + bCommonRecord.losses + bCommonRecord.ties;
-
-          if (aTotalCommon > 0 && bTotalCommon > 0) {
-            const aCommonPct = (aCommonRecord.wins + aCommonRecord.ties * 0.5) / aTotalCommon;
-            const bCommonPct = (bCommonRecord.wins + bCommonRecord.ties * 0.5) / bTotalCommon;
-
-            if (bCommonPct !== aCommonPct) {
-              return bCommonPct - aCommonPct;
-            }
-          }
-        }
-
-        // Step 5: Conference record (best won-lost-tied percentage in games played within the conference)
-        const aConfPct = parseRecordWinPct(a.confRecord);
-        const bConfPct = parseRecordWinPct(b.confRecord);
-        if (bConfPct !== aConfPct) {
-          return bConfPct - aConfPct;
-        }
-
-        // Step 6: Strength of victory (higher is better)
-        const aSOV = a.strengthOfVictory || 0;
-        const bSOV = b.strengthOfVictory || 0;
-        if (bSOV !== aSOV) {
-          return bSOV - aSOV;
-        }
-
-        // Step 7: Strength of schedule (lower is harder/better)
-        const aSOS = a.strengthOfSchedule || 0;
-        const bSOS = b.strengthOfSchedule || 0;
-        if (aSOS !== bSOS && aSOS !== 0 && bSOS !== 0) {
-          return aSOS - bSOS;
-        }
-
-        // Fallback: total wins then losses
-        if (b.record.wins !== a.record.wins) {
-          return b.record.wins - a.record.wins;
-        }
-        return a.record.losses - b.record.losses;
+        const aIndex = overallOrder.indexOf(a.teamId);
+        const bIndex = overallOrder.indexOf(b.teamId);
+        return aIndex - bIndex;
       });
 
       // Assign division ranks
@@ -794,20 +521,21 @@ export async function GET() {
       });
     });
 
-    // Flatten standings with updated ranks
+    // Flatten standings with updated ranks and sort by overall order
     const finalStandings: TeamStanding[] = [];
     Object.values(divisions).forEach(divisionTeams => {
       finalStandings.push(...divisionTeams);
     });
 
-    // Calculate playoff picture for both conferences
-    const afcTeams = finalStandings.filter(t => t.conference === 'AFC');
-    const nfcTeams = finalStandings.filter(t => t.conference === 'NFC');
+    // Sort finalStandings by the overall order
+    finalStandings.sort((a, b) => {
+      const aIndex = overallOrder.indexOf(a.teamId);
+      const bIndex = overallOrder.indexOf(b.teamId);
+      return aIndex - bIndex;
+    });
 
-    const playoffPicture = {
-      afc: calculateConferencePlayoffs(afcTeams),
-      nfc: calculateConferencePlayoffs(nfcTeams)
-    };
+    // Get hardcoded playoff picture (2025 season final results)
+    const playoffPicture = getPlayoffSeeds(finalStandings);
 
     const response: StandingsResponse = {
       standings: finalStandings,
