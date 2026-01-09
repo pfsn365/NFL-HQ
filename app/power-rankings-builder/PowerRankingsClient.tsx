@@ -357,7 +357,7 @@ export default function PowerRankingsClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
-  // Load rankings from URL on mount
+  // Load rankings from URL on mount (only runs once)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const rankingsParam = params.get('rankings');
@@ -397,7 +397,8 @@ export default function PowerRankingsClient() {
         console.error('Error loading rankings from URL:', error);
       }
     }
-  }, [allTeams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount - allTeams is stable at mount time
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);

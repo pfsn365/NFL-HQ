@@ -256,108 +256,75 @@ export default function SchedulePage() {
   const [expandedGame, setExpandedGame] = useState<string | null>(null);
   const [expandedWeeklyGame, setExpandedWeeklyGame] = useState<string | null>(null);
 
-  // Fetch games for selected date
+  // Consolidated fetch based on view mode - prevents multiple concurrent API calls
   useEffect(() => {
-    async function fetchGames() {
+    async function fetchScheduleData() {
       setLoading(true);
       setError(null);
+
+      // Clear expanded states when data changes
       setExpandedGame(null);
+      setExpandedWeeklyGame(null);
 
       try {
-        const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${selectedDate}`));
+        if (viewMode === 'daily') {
+          // Fetch single day
+          const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${selectedDate}`));
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch schedule');
+          if (!response.ok) {
+            throw new Error('Failed to fetch schedule');
+          }
+
+          const data = await response.json();
+          setGames(data.schedule || []);
+
+        } else if (viewMode === 'weekly') {
+          // Fetch week range
+          const weekRange = getWeekRange(selectedDate);
+          const gamesMap: Record<string, Game[]> = {};
+
+          await Promise.all(
+            weekRange.days.map(async (day) => {
+              const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
+              if (response.ok) {
+                const data = await response.json();
+                gamesMap[day] = data.schedule || [];
+              } else {
+                gamesMap[day] = [];
+              }
+            })
+          );
+
+          setWeeklyGames(gamesMap);
+
+        } else if (viewMode === 'monthly') {
+          // Fetch entire month
+          const monthDays = getMonthDays(selectedDate);
+          const gamesMap: Record<string, Game[]> = {};
+
+          await Promise.all(
+            monthDays.map(async (day) => {
+              const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
+              if (response.ok) {
+                const data = await response.json();
+                gamesMap[day] = data.schedule || [];
+              } else {
+                gamesMap[day] = [];
+              }
+            })
+          );
+
+          setMonthlyGames(gamesMap);
         }
-
-        const data = await response.json();
-        // The API now correctly filters by Eastern Time timezone
-        setGames(data.schedule || []);
       } catch (err) {
-        console.error('Error fetching schedule:', err);
-        setError('Failed to load schedule. Please try again.');
+        console.error(`Error fetching ${viewMode} schedule:`, err);
+        setError(`Failed to load ${viewMode} schedule. Please try again.`);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchGames();
-  }, [selectedDate]);
-
-  // Fetch weekly data
-  useEffect(() => {
-    if (viewMode !== 'weekly') return;
-
-    async function fetchWeeklyGames() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const weekRange = getWeekRange(selectedDate);
-        const gamesMap: Record<string, Game[]> = {};
-
-        // Fetch games for each day of the week
-        await Promise.all(
-          weekRange.days.map(async (day) => {
-            const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
-            if (response.ok) {
-              const data = await response.json();
-              // API already filters by Eastern Time timezone
-              gamesMap[day] = data.schedule || [];
-            } else {
-              gamesMap[day] = [];
-            }
-          })
-        );
-
-        setWeeklyGames(gamesMap);
-      } catch (err) {
-        console.error('Error fetching weekly schedule:', err);
-        setError('Failed to load weekly schedule. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchWeeklyGames();
-  }, [viewMode, selectedDate]);
-
-  // Fetch monthly data
-  useEffect(() => {
-    if (viewMode !== 'monthly') return;
-
-    async function fetchMonthlyGames() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const monthDays = getMonthDays(selectedDate);
-        const gamesMap: Record<string, Game[]> = {};
-
-        // Fetch games for each day of the month
-        await Promise.all(
-          monthDays.map(async (day) => {
-            const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
-            if (response.ok) {
-              const data = await response.json();
-              // API already filters by Eastern Time timezone
-              gamesMap[day] = data.schedule || [];
-            } else {
-              gamesMap[day] = [];
-            }
-          })
-        );
-
-        setMonthlyGames(gamesMap);
-      } catch (err) {
-        console.error('Error fetching monthly schedule:', err);
-        setError('Failed to load monthly schedule. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchMonthlyGames();
+    fetchScheduleData();
   }, [viewMode, selectedDate]);
 
   // Navigate dates
