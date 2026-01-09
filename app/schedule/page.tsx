@@ -953,7 +953,7 @@ export default function SchedulePage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-                  <div className="grid grid-flow-col auto-cols-[280px] md:grid-cols-7 md:auto-cols-auto gap-4 min-w-min md:min-w-0">
+                  <div className="grid grid-flow-col auto-cols-[minmax(240px,1fr)] sm:auto-cols-[minmax(260px,1fr)] md:grid-cols-7 md:auto-cols-auto gap-2 sm:gap-3 md:gap-4 min-w-min md:min-w-0">
                   {getWeekRange(selectedDate).days.map((day) => {
                     const dayDate = new Date(day + 'T12:00:00');
                     const dayGames = weeklyGames[day] || [];

@@ -426,7 +426,71 @@ export default function StandingsClient() {
   const StandingsTable = ({ teams, conferenceName }: { teams: StandingData[], conferenceName?: string }) => (
     <div className="mb-8">
       {conferenceName && <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{conferenceName}</h2>}
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
+
+      {/* Mobile Card Layout - Hidden on md+ */}
+      <div className="block md:hidden space-y-4">
+        {teams.map((team, index) => {
+          const teamInfo = getTeamInfo(team.teamName);
+          return (
+            <div key={team.teamId} className="bg-white rounded-lg border border-gray-200 p-4">
+              {/* Team header with logo/name */}
+              <Link href={`/teams/${team.teamId}`} className="flex items-center gap-3 mb-3">
+                <span className="text-lg font-bold text-gray-900">#{index + 1}</span>
+                {teamInfo && (
+                  <>
+                    <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-8 h-8" />
+                    <div className="flex-1">
+                      <div className="font-bold text-gray-900">{teamInfo.abbreviation}</div>
+                      <div className="text-sm text-gray-600">{getAllTeams().find(t => t.id === team.teamId)?.name}</div>
+                    </div>
+                  </>
+                )}
+              </Link>
+
+              {/* Key stats in 3-column grid */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-gray-50 p-2 rounded">
+                  <div className="text-xs text-gray-600">Record</div>
+                  <div className="font-bold text-gray-900">{team.wins}-{team.losses}-{team.ties}</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded">
+                  <div className="text-xs text-gray-600">Win %</div>
+                  <div className="font-bold text-gray-900">{team.winPct.toFixed(3)}</div>
+                </div>
+                <div className="bg-gray-50 p-2 rounded">
+                  <div className="text-xs text-gray-600">GB</div>
+                  <div className="font-bold text-gray-900">{team.gamesBack === 0 ? '-' : team.gamesBack.toFixed(1)}</div>
+                </div>
+              </div>
+
+              {/* Secondary stats in 4-column grid */}
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                <div className="text-center">
+                  <div className="text-[10px] text-gray-600">HOME</div>
+                  <div className="text-xs font-semibold text-gray-900">{team.homeRecord}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[10px] text-gray-600">AWAY</div>
+                  <div className="text-xs font-semibold text-gray-900">{team.awayRecord}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[10px] text-gray-600">STREAK</div>
+                  <div className={`text-xs font-semibold ${team.streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}`}>
+                    {team.streak}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-[10px] text-gray-600">L10</div>
+                  <div className="text-xs font-semibold text-gray-900">{team.last10}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Table - Hidden on mobile */}
+      <div className="hidden md:block overflow-x-auto -mx-4 sm:mx-0">
         <table className="min-w-[900px] w-full bg-white rounded-lg overflow-hidden shadow-sm">
           <thead style={{ backgroundColor: '#0050A0' }}>
             <tr>

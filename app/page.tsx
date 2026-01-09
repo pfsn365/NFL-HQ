@@ -432,7 +432,7 @@ export default function HomePage() {
                 ))}
               </div>
             ) : statLeaders ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {/* Passing Yards */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-xs font-bold text-gray-600 uppercase mb-3">Passing Yards</h3>
@@ -762,7 +762,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4">
               {featuredTeams.map((team) => (
                 <Link
                   key={team.id}

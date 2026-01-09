@@ -338,16 +338,16 @@ export default function StatsPage() {
                   <p className="text-gray-600 mb-2">No players found</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto -mx-6 sm:mx-0">
-                  <table className="w-full min-w-[640px]">
+                <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:mx-0">
+                  <table className="w-full min-w-[480px] sm:min-w-[560px] md:min-w-[640px]">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th className="pl-4 sm:pl-6 pr-2 sm:pr-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-12 sm:w-16">Rank</th>
-                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Player</th>
-                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20 sm:w-24">Position</th>
-                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Team</th>
-                        <th className="px-2 sm:px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-16 sm:w-20">GP</th>
-                        <th className="px-4 sm:px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider w-20 sm:w-24">
+                        <th className="pl-3 sm:pl-4 md:pl-6 pr-2 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-10 sm:w-12 md:w-16">Rank</th>
+                        <th className="px-2 sm:px-3 md:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Player</th>
+                        <th className="px-2 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-16 sm:w-20 md:w-24">Position</th>
+                        <th className="px-2 sm:px-3 md:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20 sm:w-24">Team</th>
+                        <th className="px-2 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-12 sm:w-16 md:w-20">GP</th>
+                        <th className="px-3 sm:px-4 md:px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider w-16 sm:w-20 md:w-24">
                           {showPerGame ? `${activeCategoryInfo.abbr}/G` : activeCategoryInfo.abbr}
                         </th>
                       </tr>
@@ -364,7 +364,7 @@ export default function StatsPage() {
                             className={`hover:bg-gray-50 transition-colors cursor-pointer ${isTop3 ? 'bg-blue-50/50' : ''}`}
                           >
                             {/* Rank */}
-                            <td className="pl-4 sm:pl-6 pr-2 sm:pr-4 py-3 sm:py-4">
+                            <td className="pl-3 sm:pl-4 md:pl-6 pr-2 py-3 sm:py-4">
                               <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${
                                 index === 0 ? 'bg-yellow-400 text-yellow-900' :
                                 index === 1 ? 'bg-gray-500 text-white' :
@@ -376,19 +376,19 @@ export default function StatsPage() {
                             </td>
 
                             {/* Player */}
-                            <td className="px-2 sm:px-4 py-3 sm:py-4">
+                            <td className="px-2 sm:px-3 md:px-4 py-3 sm:py-4">
                               <div className="font-semibold text-base text-gray-900 group-hover:text-[#0050A0]">{player.name}</div>
                             </td>
 
                             {/* Position */}
-                            <td className="px-2 sm:px-4 py-3 sm:py-4">
+                            <td className="px-2 py-3 sm:py-4">
                               <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md border text-[10px] sm:text-xs font-semibold ${getPositionColor(player.position)}`}>
                                 {player.position}
                               </span>
                             </td>
 
                             {/* Team */}
-                            <td className="px-2 sm:px-4 py-3 sm:py-4">
+                            <td className="px-2 sm:px-3 md:px-4 py-3 sm:py-4">
                               {team ? (
                                 <Link
                                   href={`/teams/${team.id}`}

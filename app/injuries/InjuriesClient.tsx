@@ -180,7 +180,7 @@ export default function InjuriesClient() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           {/* Filters and Search */}
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Team Filter */}
               <div>
                 <label htmlFor="team-filter" className="block text-sm font-semibold text-gray-700 mb-2">
