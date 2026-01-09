@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { getAllTeams } from '@/data/teams';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import NFLPlayoffBracket from '@/components/NFLPlayoffBracket';
 import { useState, useEffect } from 'react';
 import { getApiPath } from '@/utils/api';
 
@@ -225,6 +226,11 @@ export default function HomePage() {
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 py-8 min-h-[150px]">
           <div className="raptive-pfn-header"></div>
+        </div>
+
+        {/* NFL Playoff Bracket */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <NFLPlayoffBracket />
         </div>
 
         {/* Upcoming Games Section */}
