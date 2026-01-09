@@ -589,7 +589,7 @@ export default function PowerRankingsClient() {
 
       // Team name
       ctx.fillStyle = '#000000';
-      const teamFontSize = selectedTeams.length > 5 ? 18 : 24;
+      const teamFontSize = selectedTeams.length > 10 ? 16 : (selectedTeams.length > 5 ? 18 : 24);
       ctx.font = `600 ${teamFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
       const teamTextY = containerCenterY + (teamFontSize * 0.35);
 
