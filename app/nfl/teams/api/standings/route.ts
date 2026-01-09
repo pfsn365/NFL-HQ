@@ -82,6 +82,7 @@ interface TeamStanding {
   divRecord: string;
   streak: string;
   last10: string;
+  strengthOfSchedule?: number;
 }
 
 interface StandingsResponse {
@@ -108,6 +109,38 @@ interface SportsKeedaGame {
 
 interface SportsKeedaScheduleResponse {
   schedule: SportsKeedaGame[];
+}
+
+// Fetch strength of schedule data from draft order API
+async function fetchStrengthOfSchedule(): Promise<Record<string, number>> {
+  try {
+    const response = await fetch('https://statics.sportskeeda.com/assets/sheets/tools/draft-order/draft_order.json', {
+      next: { revalidate: 3600 }
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch SOS data');
+      return {};
+    }
+
+    const data = await response.json();
+    const sosMap: Record<string, number> = {};
+
+    // Skip header row (index 0) and process team data
+    data.slice(1).forEach((row: any[]) => {
+      const teamSlug = row[11]; // originalTeamSlug is at index 11
+      const sos = parseFloat(row[8]); // sos is at index 8
+
+      if (teamSlug && !isNaN(sos)) {
+        sosMap[teamSlug] = sos;
+      }
+    });
+
+    return sosMap;
+  } catch (error) {
+    console.error('Error fetching SOS data:', error);
+    return {};
+  }
 }
 
 // Team slug to conference/division mapping
@@ -353,7 +386,8 @@ async function processTeamsInBatches(teamsList: any[], batchSize = 8) {
         confRecord: detailedStats.confRecord,
         divRecord: detailedStats.divRecord,
         streak: detailedStats.streak,
-        last10: detailedStats.last10
+        last10: detailedStats.last10,
+        strengthOfSchedule: 0 // Will be populated later
       };
     });
 
@@ -373,8 +407,16 @@ export async function GET() {
   try {
     const teamsList = Object.values(teams);
 
+    // Fetch strength of schedule data
+    const sosData = await fetchStrengthOfSchedule();
+
     // Calculate records for all teams in batches
     const standings = await processTeamsInBatches(teamsList);
+
+    // Add SOS to each team's standing
+    standings.forEach(team => {
+      team.strengthOfSchedule = sosData[team.teamId] || 0;
+    });
 
     // Group by division and sort by win percentage
     const divisions: { [division: string]: TeamStanding[] } = {};
@@ -386,6 +428,12 @@ export async function GET() {
       divisions[team.division].push(team);
     });
 
+    // Helper function to parse record string to win count
+    const parseRecordWins = (recordStr: string): number => {
+      const parts = recordStr.split('-');
+      return parseInt(parts[0]) || 0;
+    };
+
     // Sort each division and assign ranks
     Object.keys(divisions).forEach(division => {
       divisions[division].sort((a, b) => {
@@ -394,12 +442,33 @@ export async function GET() {
           return b.winPercentage - a.winPercentage;
         }
 
-        // Secondary sort: wins (descending)
+        // Secondary sort: conference record wins (descending)
+        const aConfWins = parseRecordWins(a.confRecord);
+        const bConfWins = parseRecordWins(b.confRecord);
+        if (bConfWins !== aConfWins) {
+          return bConfWins - aConfWins;
+        }
+
+        // Tertiary sort: division record wins (descending)
+        const aDivWins = parseRecordWins(a.divRecord);
+        const bDivWins = parseRecordWins(b.divRecord);
+        if (bDivWins !== aDivWins) {
+          return bDivWins - aDivWins;
+        }
+
+        // Quaternary sort: strength of schedule (ascending - lower is harder schedule)
+        const aSOS = a.strengthOfSchedule || 0;
+        const bSOS = b.strengthOfSchedule || 0;
+        if (aSOS !== bSOS) {
+          return aSOS - bSOS;
+        }
+
+        // Quinary sort: total wins (descending)
         if (b.record.wins !== a.record.wins) {
           return b.record.wins - a.record.wins;
         }
 
-        // Tertiary sort: losses (ascending)
+        // Final sort: losses (ascending)
         return a.record.losses - b.record.losses;
       });
 

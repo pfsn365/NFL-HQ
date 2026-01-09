@@ -27,12 +27,10 @@ export default function HomePage() {
     .filter((team): team is NonNullable<typeof team> => team !== undefined);
 
   // Top 5 standings - fetch from API
-  const [topStandings, setTopStandings] = useState([
-    { teamId: 'kansas-city-chiefs', teamName: 'Kansas City Chiefs', wins: 15, losses: 1 },
-    { teamId: 'detroit-lions', teamName: 'Detroit Lions', wins: 13, losses: 3 },
-    { teamId: 'philadelphia-eagles', teamName: 'Philadelphia Eagles', wins: 12, losses: 4 },
-    { teamId: 'buffalo-bills', teamName: 'Buffalo Bills', wins: 11, losses: 5 },
-    { teamId: 'baltimore-ravens', teamName: 'Baltimore Ravens', wins: 11, losses: 5 }
+  const [topStandings, setTopStandings] = useState<Array<{ teamId: string; teamName: string; wins: number; losses: number; ties?: number; winPct: number }>>([
+    { teamId: 'kansas-city-chiefs', teamName: 'Kansas City Chiefs', wins: 15, losses: 1, winPct: 0.938 },
+    { teamId: 'detroit-lions', teamName: 'Detroit Lions', wins: 13, losses: 3, winPct: 0.813 },
+    { teamId: 'philadelphia-eagles', teamName: 'Philadelphia Eagles', wins: 12, losses: 4, winPct: 0.750 }
   ]);
 
   // Team records map for upcoming games
@@ -49,23 +47,25 @@ export default function HomePage() {
         const data = await response.json();
 
         // Collect all teams from the standings API response
-        const allTeamsData: Array<{ teamId: string; teamName: string; wins: number; losses: number; winPct: number }> = [];
+        const allTeamsData: Array<{ teamId: string; teamName: string; wins: number; losses: number; ties?: number; winPct: number }> = [];
         const recordsMap: Record<string, string> = {};
 
         if (data.standings && Array.isArray(data.standings)) {
           for (const team of data.standings) {
+            const wins = team.record?.wins || 0;
+            const losses = team.record?.losses || 0;
+            const ties = team.record?.ties || 0;
+
             allTeamsData.push({
               teamId: team.teamId,
               teamName: team.fullName,
-              wins: team.record?.wins || 0,
-              losses: team.record?.losses || 0,
+              wins,
+              losses,
+              ties,
               winPct: team.winPercentage || 0
             });
 
             // Build records map for all teams
-            const wins = team.record?.wins || 0;
-            const losses = team.record?.losses || 0;
-            const ties = team.record?.ties || 0;
             recordsMap[team.teamId] = ties > 0 ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
           }
         }
@@ -558,7 +558,9 @@ export default function HomePage() {
                           </>
                         )}
                       </div>
-                      <span className="font-bold text-gray-900 ml-2">{team.wins}-{team.losses}</span>
+                      <span className="font-bold text-gray-900 ml-2">
+                        {team.ties && team.ties > 0 ? `${team.wins}-${team.losses}-${team.ties}` : `${team.wins}-${team.losses}`}
+                      </span>
                     </div>
                   );
                 })}
