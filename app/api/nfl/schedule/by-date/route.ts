@@ -4,24 +4,27 @@ import { getAllTeams } from '@/data/teams';
 
 // Function to determine cache revalidation time based on NFL game schedule
 function getRevalidationTime(): number {
-  // Get current time in Pacific Time
-  const now = new Date();
-  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-  const dayOfWeek = pacificTime.getDay(); // 0 = Sunday, 1 = Monday, etc.
-  const hour = pacificTime.getHours();
+  // Off-season: cache for 24 hours since season is over
+  return 86400; // 24 hours
 
-  // Saturday (6) or Sunday (0): Update every hour all day
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    return 3600; // 1 hour
-  }
-
-  // Monday (1) or Thursday (4): Update every hour from 6 PM to midnight PT (game window)
-  if ((dayOfWeek === 1 || dayOfWeek === 4) && hour >= 18 && hour <= 23) {
-    return 3600; // 1 hour
-  }
-
-  // All other times: Update every 6 hours (less frequent)
-  return 21600; // 6 hours
+  // During season, uncomment below for dynamic caching:
+  // const now = new Date();
+  // const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  // const dayOfWeek = pacificTime.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  // const hour = pacificTime.getHours();
+  //
+  // // Saturday (6) or Sunday (0): Update every hour all day
+  // if (dayOfWeek === 0 || dayOfWeek === 6) {
+  //   return 3600; // 1 hour
+  // }
+  //
+  // // Monday (1) or Thursday (4): Update every hour from 6 PM to midnight PT (game window)
+  // if ((dayOfWeek === 1 || dayOfWeek === 4) && hour >= 18 && hour <= 23) {
+  //   return 3600; // 1 hour
+  // }
+  //
+  // // All other times: Update every 6 hours (less frequent)
+  // return 21600; // 6 hours
 }
 
 // Function to convert static playoff games to API format

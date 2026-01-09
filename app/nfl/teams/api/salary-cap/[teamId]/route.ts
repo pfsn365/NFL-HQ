@@ -94,7 +94,7 @@ async function scrapePFNSalaryCapData(teamId: string): Promise<{
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
         },
-        next: { revalidate: 604800 } // Cache for 1 week (7 days)
+        next: { revalidate: 86400 } // Cache for 24 hours
       }
     );
 
@@ -202,7 +202,7 @@ export async function GET(
           headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
           },
-          next: { revalidate: 604800 } // Cache for 1 week (7 days)
+          next: { revalidate: 86400 } // Cache for 24 hours
         }
       );
 

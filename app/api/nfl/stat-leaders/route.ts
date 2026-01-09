@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
               headers: {
                 'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
               },
-              next: { revalidate: 3600 }
+              next: { revalidate: 86400 } // Cache for 24 hours
             }
           ),
           fetch(

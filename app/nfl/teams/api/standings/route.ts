@@ -129,7 +129,7 @@ interface SportsKeedaScheduleResponse {
 async function fetchStrengthOfSchedule(): Promise<Record<string, number>> {
   try {
     const response = await fetch('https://statics.sportskeeda.com/assets/sheets/tools/draft-order/draft_order.json', {
-      next: { revalidate: 3600 }
+      next: { revalidate: 86400 } // Cache for 24 hours
     });
 
     if (!response.ok) {
@@ -221,7 +221,7 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
           headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
           },
-          next: { revalidate: 3600 }, // Cache for 1 hour
+          next: { revalidate: 86400 }, // Cache for 24 hours
           signal: AbortSignal.timeout(10000) // 10 second timeout
         }
       );

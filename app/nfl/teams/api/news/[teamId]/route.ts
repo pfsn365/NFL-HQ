@@ -63,7 +63,7 @@ export async function GET(
         'Content-Type': 'application/json',
         'User-Agent': 'NFL Team Pages/1.0'
       },
-      next: { revalidate: 1800 } // Cache for 30 minutes
+      next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!response.ok) {

@@ -68,7 +68,7 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
           headers: {
             'Accept': 'application/json',
           },
-          next: { revalidate: 300 }
+          next: { revalidate: 10800 } // Cache for 3 hours
         }
       ),
       ...allTeams.map(team => {
@@ -82,7 +82,7 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
         console.log(`Fetching roster for ${team.id} from: ${url}`);
 
         return fetch(url, {
-          next: { revalidate: 3600 }
+          next: { revalidate: 86400 } // Cache for 24 hours
         }).catch((err) => {
           console.error(`Failed to fetch roster for ${team.id}:`, err);
           return null;
