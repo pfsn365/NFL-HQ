@@ -621,7 +621,7 @@ export default function PowerRankingsClient() {
     return canvas;
   };
 
-  const handleDownload = async (count: 5 | 10 | 30) => {
+  const handleDownload = async (count: 5 | 10 | 32) => {
     if (!logosLoaded) {
       alert('Logos are still loading. Please wait a moment and try again.');
       return;
@@ -639,7 +639,7 @@ export default function PowerRankingsClient() {
       }
 
       const link = document.createElement('a');
-      link.download = `NBA_Power_Rankings_${Date.now()}.png`;
+      link.download = `NFL_Power_Rankings_${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
     } catch (error) {
