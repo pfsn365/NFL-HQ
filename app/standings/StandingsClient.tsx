@@ -669,10 +669,10 @@ export default function StandingsClient() {
 
           {/* Conference Filter */}
           <div className="mb-6">
-            <div className="inline-flex rounded-lg border border-gray-300 bg-white p-1">
+            <div className="inline-flex flex-wrap sm:flex-nowrap rounded-lg border border-gray-300 bg-white p-1 gap-1 sm:gap-0">
               <button
                 onClick={() => setConferenceView('all')}
-                className={`px-6 py-2 rounded-md text-sm font-semibold transition-colors ${
+                className={`px-3 sm:px-4 md:px-6 py-2 rounded-md text-xs sm:text-sm font-semibold transition-colors min-h-[44px] flex items-center justify-center ${
                   conferenceView === 'all'
                     ? 'bg-[#0050A0] text-white'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -682,7 +682,7 @@ export default function StandingsClient() {
               </button>
               <button
                 onClick={() => setConferenceView('conference')}
-                className={`px-6 py-2 rounded-md text-sm font-semibold transition-colors ${
+                className={`px-3 sm:px-4 md:px-6 py-2 rounded-md text-xs sm:text-sm font-semibold transition-colors min-h-[44px] flex items-center justify-center ${
                   conferenceView === 'conference'
                     ? 'bg-[#0050A0] text-white'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -692,7 +692,7 @@ export default function StandingsClient() {
               </button>
               <button
                 onClick={() => setConferenceView('AFC')}
-                className={`px-6 py-2 rounded-md text-sm font-semibold transition-colors ${
+                className={`px-3 sm:px-4 md:px-6 py-2 rounded-md text-xs sm:text-sm font-semibold transition-colors min-h-[44px] flex items-center justify-center ${
                   conferenceView === 'AFC'
                     ? 'bg-[#0050A0] text-white'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -702,7 +702,7 @@ export default function StandingsClient() {
               </button>
               <button
                 onClick={() => setConferenceView('NFC')}
-                className={`px-6 py-2 rounded-md text-sm font-semibold transition-colors ${
+                className={`px-3 sm:px-4 md:px-6 py-2 rounded-md text-xs sm:text-sm font-semibold transition-colors min-h-[44px] flex items-center justify-center ${
                   conferenceView === 'NFC'
                     ? 'bg-[#0050A0] text-white'
                     : 'text-gray-700 hover:bg-gray-100'

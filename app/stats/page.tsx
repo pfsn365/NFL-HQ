@@ -563,7 +563,7 @@ export default function StatsPage() {
       {/* Player Detail Modal */}
       {isModalOpen && selectedPlayer && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-3 sm:px-4 pt-4 pb-20 text-center sm:p-0">
+          <div className="flex items-center justify-center min-h-screen px-2 sm:px-4 pt-4 pb-20 text-center sm:p-0">
             {/* Backdrop */}
             <div
               className="fixed inset-0 bg-black/60 transition-opacity"
@@ -571,17 +571,17 @@ export default function StatsPage() {
             />
 
             {/* Modal */}
-            <div className="relative bg-white rounded-xl sm:rounded-2xl shadow-xl transform transition-all w-full max-w-lg mx-auto">
+            <div className="relative bg-white rounded-lg sm:rounded-xl shadow-xl transform transition-all w-full max-w-[calc(100vw-16px)] sm:max-w-[calc(100vw-32px)] md:max-w-lg mx-auto">
               {/* Header */}
-              <div className="bg-[#0050A0] text-white px-6 py-4 rounded-t-2xl">
+              <div className="bg-[#0050A0] text-white px-4 sm:px-6 py-4 rounded-t-lg sm:rounded-t-xl">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {getTeamInfo(selectedPlayer.teamId) && (
                       <img
                         src={getTeamInfo(selectedPlayer.teamId)!.logoUrl}
                         alt={getTeamInfo(selectedPlayer.teamId)!.abbreviation}
-                        
-                        
+
+
                         className="w-10 h-10"
                       />
                     )}
@@ -594,7 +594,8 @@ export default function StatsPage() {
                   </div>
                   <button
                     onClick={closePlayerModal}
-                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                    aria-label="Close player details"
+                    className="p-2 hover:bg-white/20 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -604,7 +605,7 @@ export default function StatsPage() {
               </div>
 
               {/* Stats Grid */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-sm text-gray-600">
                     {selectedPlayer.gamesPlayed} Games Played

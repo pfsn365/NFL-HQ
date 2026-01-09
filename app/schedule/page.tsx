@@ -510,7 +510,7 @@ export default function SchedulePage() {
               <div className="flex items-center gap-2 justify-center">
                 <button
                   onClick={goToPreviousDay}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   aria-label="Previous day"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,14 +522,14 @@ export default function SchedulePage() {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className={`px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-gray-900 text-sm sm:text-base flex-1 max-w-[200px] ${
+                  className={`px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-gray-900 text-sm sm:text-base flex-1 max-w-[200px] min-h-[44px] ${
                     isToday ? 'border-[#0050A0] bg-blue-50 ring-2 ring-[#0050A0]' : 'border-gray-300'
                   }`}
                 />
 
                 <button
                   onClick={goToNextDay}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   aria-label="Next day"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -566,13 +566,13 @@ export default function SchedulePage() {
               <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <button
                   onClick={goToPreviousWeek}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0 min-h-[44px]"
                   aria-label="Previous week"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  <span className="hidden sm:inline text-sm font-medium text-gray-700">Previous</span>
+                  <span className="hidden md:inline text-sm font-medium text-gray-700">Previous</span>
                 </button>
 
                 <div className="text-center flex-1 min-w-0">
@@ -588,10 +588,10 @@ export default function SchedulePage() {
 
                 <button
                   onClick={goToNextWeek}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0 min-h-[44px]"
                   aria-label="Next week"
                 >
-                  <span className="hidden sm:inline text-sm font-medium text-gray-700">Next</span>
+                  <span className="hidden md:inline text-sm font-medium text-gray-700">Next</span>
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -606,13 +606,13 @@ export default function SchedulePage() {
               <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <button
                   onClick={goToPreviousMonth}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0 min-h-[44px]"
                   aria-label="Previous month"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  <span className="hidden sm:inline text-sm font-medium text-gray-700">Previous</span>
+                  <span className="hidden md:inline text-sm font-medium text-gray-700">Previous</span>
                 </button>
 
                 <div className="text-center flex-1 min-w-0">
@@ -623,10 +623,10 @@ export default function SchedulePage() {
 
                 <button
                   onClick={goToNextMonth}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0 min-h-[44px]"
                   aria-label="Next month"
                 >
-                  <span className="hidden sm:inline text-sm font-medium text-gray-700">Next</span>
+                  <span className="hidden md:inline text-sm font-medium text-gray-700">Next</span>
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
