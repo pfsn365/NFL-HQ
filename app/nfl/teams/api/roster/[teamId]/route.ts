@@ -100,9 +100,6 @@ export async function GET(
     const response = await fetch(
       `https://api.sportskeeda.com/v1/taxonomy/${sportsKeedaSlug}`,
       {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
-        },
         next: { revalidate: 86400 } // Cache for 24 hours
       }
     );
