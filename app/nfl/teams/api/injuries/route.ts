@@ -80,8 +80,8 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
 
         // Include basePath in production (nfl-hq is our basePath)
         const apiPath = process.env.VERCEL_URL
-          ? `/nfl-hq/api/nfl/teams/api/roster/${team.id}`
-          : `/api/nfl/teams/api/roster/${team.id}`;
+          ? `/nfl-hq/nfl/teams/api/roster/${team.id}`
+          : `/nfl/teams/api/roster/${team.id}`;
 
         const url = `${baseUrl}${apiPath}`;
         console.log(`Fetching roster for ${team.id} from: ${url}`);

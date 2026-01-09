@@ -220,8 +220,8 @@ export async function GET(
 
     // Include basePath in production (nfl-hq is our basePath)
     const apiPath = process.env.VERCEL_URL
-      ? `/nfl-hq/api/nfl/teams/api/roster/${teamId}`
-      : `/api/nfl/teams/api/roster/${teamId}`;
+      ? `/nfl-hq/nfl/teams/api/roster/${teamId}`
+      : `/nfl/teams/api/roster/${teamId}`;
 
     const rosterUrl = `${baseUrl}${apiPath}`;
 
