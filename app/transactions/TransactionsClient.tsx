@@ -281,13 +281,13 @@ export default function TransactionsClient() {
 
                   {/* Transactions Table */}
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[640px] table-fixed">
+                    <table className="w-full min-w-[800px] table-fixed">
                       <thead className="bg-[#0050A0] text-white">
                         <tr>
-                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold w-32">TEAM</th>
-                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold w-48">PLAYER</th>
-                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold w-24">POS</th>
-                          <th className="px-4 py-3 text-left text-sm sm:text-base font-bold">TRANSACTION</th>
+                          <th className="px-6 py-3 text-left text-sm sm:text-base font-bold w-44">TEAM</th>
+                          <th className="px-6 py-3 text-left text-sm sm:text-base font-bold w-64">PLAYER</th>
+                          <th className="px-6 py-3 text-left text-sm sm:text-base font-bold w-32">POS</th>
+                          <th className="px-6 py-3 text-left text-sm sm:text-base font-bold">TRANSACTION</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -301,7 +301,7 @@ export default function TransactionsClient() {
                               } hover:bg-blue-50 transition-colors`}
                             >
                               {/* Team */}
-                              <td className="px-4 py-3">
+                              <td className="px-6 py-3">
                                 {team ? (
                                   <Link
                                     href={`/teams/${team.id}`}
@@ -326,21 +326,21 @@ export default function TransactionsClient() {
                               </td>
 
                               {/* Player */}
-                              <td className="px-4 py-3">
+                              <td className="px-6 py-3">
                                 <span className="font-medium text-gray-900 text-base">
                                   {transaction.player}
                                 </span>
                               </td>
 
                               {/* Position */}
-                              <td className="px-4 py-3">
+                              <td className="px-6 py-3">
                                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(transaction.position)}`}>
                                   {transaction.position}
                                 </span>
                               </td>
 
                               {/* Transaction */}
-                              <td className="px-4 py-3">
+                              <td className="px-6 py-3">
                                 <div className="text-base text-gray-700">
                                   {transaction.transaction}
                                   {transaction.fromTeam && transaction.toTeam && (
