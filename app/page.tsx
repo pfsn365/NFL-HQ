@@ -35,6 +35,9 @@ export default function HomePage() {
     { teamId: 'baltimore-ravens', teamName: 'Baltimore Ravens', wins: 11, losses: 5 }
   ]);
 
+  // Team records map for upcoming games
+  const [teamRecords, setTeamRecords] = useState<Record<string, string>>({});
+
   // Fetch live standings
   useEffect(() => {
     async function fetchTopStandings() {
@@ -47,6 +50,7 @@ export default function HomePage() {
 
         // Collect all teams from the standings API response
         const allTeamsData: Array<{ teamId: string; teamName: string; wins: number; losses: number; winPct: number }> = [];
+        const recordsMap: Record<string, string> = {};
 
         if (data.standings && Array.isArray(data.standings)) {
           for (const team of data.standings) {
@@ -57,6 +61,12 @@ export default function HomePage() {
               losses: team.record?.losses || 0,
               winPct: team.winPercentage || 0
             });
+
+            // Build records map for all teams
+            const wins = team.record?.wins || 0;
+            const losses = team.record?.losses || 0;
+            const ties = team.record?.ties || 0;
+            recordsMap[team.teamId] = ties > 0 ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
           }
         }
 
@@ -68,6 +78,9 @@ export default function HomePage() {
         if (top3.length > 0) {
           setTopStandings(top3);
         }
+
+        // Set team records map
+        setTeamRecords(recordsMap);
       } catch (err) {
         console.error('Error fetching homepage standings:', err);
       }
@@ -290,7 +303,7 @@ export default function HomePage() {
                             />
                             <div className="flex-1">
                               <div className="font-semibold text-gray-900 text-sm">{game.away_team.abbr}</div>
-                              <div className="text-xs text-gray-600">{game.away_team.wins}-{game.away_team.losses}</div>
+                              <div className="text-xs text-gray-600">{teamRecords[awayTeam.id] || '0-0'}</div>
                             </div>
                           </>
                         )}
@@ -315,7 +328,7 @@ export default function HomePage() {
                             />
                             <div className="flex-1">
                               <div className="font-semibold text-gray-900 text-sm">{game.home_team.abbr}</div>
-                              <div className="text-xs text-gray-600">{game.home_team.wins}-{game.home_team.losses}</div>
+                              <div className="text-xs text-gray-600">{teamRecords[homeTeam.id] || '0-0'}</div>
                             </div>
                           </>
                         )}
