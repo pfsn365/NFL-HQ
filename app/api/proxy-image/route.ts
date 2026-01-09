@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Only allow PFN CDN URLs for security
-    if (!url.includes('staticd.profootballnetwork.com')) {
-      return NextResponse.json({ error: 'Only PFN CDN URLs are allowed' }, { status: 403 });
+    if (!url.includes('profootballnetwork.com')) {
+      return NextResponse.json({ error: 'Only PFN URLs are allowed' }, { status: 403 });
     }
 
     // Fetch the image from the external URL

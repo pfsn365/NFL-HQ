@@ -350,6 +350,7 @@ export default function PowerRankingsClient() {
       setLogoDataUrls(urls);
       setLogoImages(images);
       setLogosLoaded(true);
+      console.log('All logos preloaded:', Object.keys(urls).length);
     };
 
     preloadLogos();
@@ -615,7 +616,7 @@ export default function PowerRankingsClient() {
     const footerPadding = 30;
     ctx.fillStyle = '#ffffff';
     ctx.font = '600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    ctx.fillText('nfl-hq.vercel.app/power-rankings-builder', footerPadding, footerY + 38);
+    ctx.fillText('https://www.profootballnetwork.com/nfl-hq/power-rankings-builder', footerPadding, footerY + 38);
 
     // PFSN Logo on the right (square aspect ratio)
     if (pfsnLogoImage) {
