@@ -213,6 +213,18 @@ export async function GET(
     const { teamId } = await params;
 
     // Fetch both injury data and team roster in parallel
+    // Determine base URL and API path for internal API calls
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3003';
+
+    // Include basePath in production (nfl-hq is our basePath)
+    const apiPath = process.env.VERCEL_URL
+      ? `/nfl-hq/api/nfl/teams/api/roster/${teamId}`
+      : `/api/nfl/teams/api/roster/${teamId}`;
+
+    const rosterUrl = `${baseUrl}${apiPath}`;
+
     const [injuryResponse, rosterResponse] = await Promise.all([
       fetch(
         'https://www.rotoballer.com/api/rbapps/nfl-injuries.php?partner=prosportsnetwork&key=x63sLHVNR4a37LvBetiiBXvmEs6XKpVQS1scgVoYf3kxXZ4Kl8bC2BahiSsP',
@@ -223,7 +235,7 @@ export async function GET(
           next: { revalidate: 10800 } // Cache for 3 hours
         }
       ),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3003'}/nfl/teams/api/roster/${teamId}`, {
+      fetch(rosterUrl, {
         next: { revalidate: 86400 } // Cache for 24 hours
       })
     ]);

@@ -78,7 +78,12 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
           ? `https://${process.env.VERCEL_URL}`
           : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-        const url = `${baseUrl}/nfl/teams/api/roster/${team.id}`;
+        // Include basePath in production (nfl-hq is our basePath)
+        const apiPath = process.env.VERCEL_URL
+          ? `/nfl-hq/api/nfl/teams/api/roster/${team.id}`
+          : `/api/nfl/teams/api/roster/${team.id}`;
+
+        const url = `${baseUrl}${apiPath}`;
         console.log(`Fetching roster for ${team.id} from: ${url}`);
 
         return fetch(url, {
