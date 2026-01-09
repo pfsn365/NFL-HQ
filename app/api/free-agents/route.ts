@@ -30,6 +30,9 @@ export async function GET() {
     const headers = rawData[0]; // First row is headers
     const rows = rawData.slice(1); // Remaining rows are data
 
+    // Debug: Log headers to identify field names
+    console.log('Free Agents API Headers:', headers);
+
     // Convert to array of objects
     const output = rows.map((row: any[]) => {
       const obj: any = {};
