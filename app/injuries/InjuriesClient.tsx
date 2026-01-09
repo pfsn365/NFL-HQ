@@ -22,6 +22,7 @@ export default function InjuriesClient() {
   const [loading, setLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState('all');
   const [selectedPosition, setSelectedPosition] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [lastUpdated, setLastUpdated] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,12 +79,13 @@ export default function InjuriesClient() {
 
       const matchesTeam = selectedTeam === 'all' || injury.team === selectedTeam;
       const matchesPosition = selectedPosition === 'all' || injury.position === selectedPosition;
+      const matchesStatus = selectedStatus === 'all' || injury.status.toLowerCase().includes(selectedStatus.toLowerCase());
       const matchesSearch =
         searchQuery === '' ||
         injury.player.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesTeam && matchesPosition && matchesSearch;
+      return matchesTeam && matchesPosition && matchesStatus && matchesSearch;
     });
-  }, [injuries, selectedTeam, selectedPosition, searchQuery]);
+  }, [injuries, selectedTeam, selectedPosition, selectedStatus, searchQuery]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredInjuries.length / itemsPerPage);
@@ -94,7 +96,7 @@ export default function InjuriesClient() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTeam, selectedPosition, searchQuery]);
+  }, [selectedTeam, selectedPosition, selectedStatus, searchQuery]);
 
   // Group injuries by team
   const injuriesByTeam = useMemo(() => {
@@ -239,6 +241,27 @@ export default function InjuriesClient() {
                       {pos}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              {/* Status Filter */}
+              <div>
+                <label htmlFor="status-filter" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Status:
+                </label>
+                <select
+                  id="status-filter"
+                  value={selectedStatus}
+                  onChange={e => setSelectedStatus(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="out">Out</option>
+                  <option value="ir">Injured Reserve</option>
+                  <option value="questionable">Questionable</option>
+                  <option value="doubtful">Doubtful</option>
+                  <option value="pup">PUP</option>
+                  <option value="nfi">NFI</option>
                 </select>
               </div>
 
