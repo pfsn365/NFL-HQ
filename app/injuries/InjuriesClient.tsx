@@ -284,9 +284,6 @@ export default function InjuriesClient() {
               <div className="bg-gray-100 border-b border-gray-200 px-4 sm:px-6 py-3">
                 <h2 className="text-lg font-bold text-gray-900">
                   ALL
-                  <span className="ml-2 text-sm font-normal text-gray-600">
-                    ({filteredInjuries.length} {filteredInjuries.length === 1 ? 'injury' : 'injuries'})
-                  </span>
                 </h2>
               </div>
 

@@ -64,6 +64,9 @@ interface DetailedStats {
   divRecord: string;
   streak: string;
   last10: string;
+  headToHead: Record<string, { wins: number; losses: number; ties: number }>; // vs each opponent
+  opponentsBeaten: string[]; // List of team IDs beaten (for strength of victory)
+  allOpponents: string[]; // All opponents played (for common games)
 }
 
 interface TeamStanding {
@@ -83,6 +86,9 @@ interface TeamStanding {
   streak: string;
   last10: string;
   strengthOfSchedule?: number;
+  headToHead?: Record<string, { wins: number; losses: number; ties: number }>;
+  opponentsBeaten?: string[];
+  strengthOfVictory?: number; // Win percentage of teams beaten
 }
 
 interface StandingsResponse {
@@ -189,7 +195,17 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
         console.error(`No Sportskeeda ID for team: ${teamId}`);
         return {
           record: { wins: 0, losses: 0, ties: 0 },
-          detailedStats: { homeRecord: '0-0', awayRecord: '0-0', confRecord: '0-0', divRecord: '0-0', streak: '-', last10: '0-0' }
+          detailedStats: {
+            homeRecord: '0-0',
+            awayRecord: '0-0',
+            confRecord: '0-0',
+            divRecord: '0-0',
+            streak: '-',
+            last10: '0-0',
+            headToHead: {},
+            opponentsBeaten: [],
+            allOpponents: []
+          }
         };
       }
 
@@ -223,6 +239,9 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
       let divWins = 0, divLosses = 0, divTies = 0;
 
       const gameResults: ('W' | 'L' | 'T')[] = [];
+      const headToHead: Record<string, { wins: number; losses: number; ties: number }> = {};
+      const opponentsBeaten: string[] = [];
+      const allOpponents: Set<string> = new Set();
 
       for (const game of completedRegularSeasonGames) {
         const team = game.teams.find(t => t.team_id === sportsKeedaTeamId);
@@ -240,16 +259,28 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
           const isConfGame = opponentMeta && opponentMeta.conference === teamConf;
           const isDivGame = opponentMeta && opponentMeta.division === teamDiv;
 
+          // Track all opponents for common games calculation
+          allOpponents.add(opponentSlug);
+
+          // Initialize head-to-head tracking for this opponent
+          if (!headToHead[opponentSlug]) {
+            headToHead[opponentSlug] = { wins: 0, losses: 0, ties: 0 };
+          }
+
           // Track overall record
           if (isWin) {
             wins++;
             gameResults.push('W');
+            headToHead[opponentSlug].wins++;
+            opponentsBeaten.push(opponentSlug);
           } else if (isTie) {
             ties++;
             gameResults.push('T');
+            headToHead[opponentSlug].ties++;
           } else {
             losses++;
             gameResults.push('L');
+            headToHead[opponentSlug].losses++;
           }
 
           // Track home/away
@@ -308,7 +339,10 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
           confRecord: `${confWins}-${confLosses}${confTies > 0 ? `-${confTies}` : ''}`,
           divRecord: `${divWins}-${divLosses}${divTies > 0 ? `-${divTies}` : ''}`,
           streak,
-          last10
+          last10,
+          headToHead,
+          opponentsBeaten,
+          allOpponents: Array.from(allOpponents)
         }
       };
     } catch (error) {
@@ -318,7 +352,17 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
       if (attempt === retries) {
         return {
           record: { wins: 0, losses: 0, ties: 0 },
-          detailedStats: { homeRecord: '0-0', awayRecord: '0-0', confRecord: '0-0', divRecord: '0-0', streak: '-', last10: '0-0' }
+          detailedStats: {
+            homeRecord: '0-0',
+            awayRecord: '0-0',
+            confRecord: '0-0',
+            divRecord: '0-0',
+            streak: '-',
+            last10: '0-0',
+            headToHead: {},
+            opponentsBeaten: [],
+            allOpponents: []
+          }
         };
       }
 
@@ -330,7 +374,17 @@ async function calculateTeamStats(teamId: string, teamConf: string, teamDiv: str
   // This shouldn't be reached, but return defaults as fallback
   return {
     record: { wins: 0, losses: 0, ties: 0 },
-    detailedStats: { homeRecord: '0-0', awayRecord: '0-0', confRecord: '0-0', divRecord: '0-0', streak: '-', last10: '0-0' }
+    detailedStats: {
+      homeRecord: '0-0',
+      awayRecord: '0-0',
+      confRecord: '0-0',
+      divRecord: '0-0',
+      streak: '-',
+      last10: '0-0',
+      headToHead: {},
+      opponentsBeaten: [],
+      allOpponents: []
+    }
   };
 }
 
@@ -387,7 +441,10 @@ async function processTeamsInBatches(teamsList: any[], batchSize = 8) {
         divRecord: detailedStats.divRecord,
         streak: detailedStats.streak,
         last10: detailedStats.last10,
-        strengthOfSchedule: 0 // Will be populated later
+        strengthOfSchedule: 0, // Will be populated later
+        strengthOfVictory: 0, // Will be populated later
+        headToHead: detailedStats.headToHead,
+        opponentsBeaten: detailedStats.opponentsBeaten
       };
     });
 
@@ -413,9 +470,29 @@ export async function GET() {
     // Calculate records for all teams in batches
     const standings = await processTeamsInBatches(teamsList);
 
-    // Add SOS to each team's standing
+    // Add SOS to each team's standing and calculate strength of victory
+    const standingsMap = new Map(standings.map(s => [s.teamId, s]));
+
     standings.forEach(team => {
       team.strengthOfSchedule = sosData[team.teamId] || 0;
+
+      // Calculate strength of victory (win percentage of teams beaten)
+      if (team.opponentsBeaten && team.opponentsBeaten.length > 0) {
+        let totalWins = 0;
+        let totalGames = 0;
+
+        team.opponentsBeaten.forEach(opponentId => {
+          const opponent = standingsMap.get(opponentId);
+          if (opponent) {
+            totalWins += opponent.record.wins + (opponent.record.ties * 0.5);
+            totalGames += opponent.record.wins + opponent.record.losses + opponent.record.ties;
+          }
+        });
+
+        team.strengthOfVictory = totalGames > 0 ? totalWins / totalGames : 0;
+      } else {
+        team.strengthOfVictory = 0;
+      }
     });
 
     // Group by division and sort by win percentage
@@ -428,47 +505,72 @@ export async function GET() {
       divisions[team.division].push(team);
     });
 
-    // Helper function to parse record string to win count
-    const parseRecordWins = (recordStr: string): number => {
+    // Helper function to parse record string to win percentage
+    const parseRecordWinPct = (recordStr: string): number => {
       const parts = recordStr.split('-');
-      return parseInt(parts[0]) || 0;
+      const wins = parseInt(parts[0]) || 0;
+      const losses = parseInt(parts[1]) || 0;
+      const ties = parseInt(parts[2]) || 0;
+      const totalGames = wins + losses + ties;
+      if (totalGames === 0) return 0;
+      return (wins + ties * 0.5) / totalGames;
     };
 
-    // Sort each division and assign ranks
+    // Sort each division and assign ranks (NFL Division Tiebreaker Procedure)
     Object.keys(divisions).forEach(division => {
       divisions[division].sort((a, b) => {
-        // Primary sort: win percentage (descending)
+        // Step 1: Win percentage (descending)
         if (b.winPercentage !== a.winPercentage) {
           return b.winPercentage - a.winPercentage;
         }
 
-        // Secondary sort: conference record wins (descending)
-        const aConfWins = parseRecordWins(a.confRecord);
-        const bConfWins = parseRecordWins(b.confRecord);
-        if (bConfWins !== aConfWins) {
-          return bConfWins - aConfWins;
+        // Step 2: Head-to-head (best won-lost-tied percentage in games between the clubs)
+        if (a.headToHead && b.headToHead && a.headToHead[b.teamId]) {
+          const h2h = a.headToHead[b.teamId];
+          const totalH2H = h2h.wins + h2h.losses + h2h.ties;
+          if (totalH2H > 0) {
+            const aH2HPct = (h2h.wins + h2h.ties * 0.5) / totalH2H;
+            const bH2HPct = 1 - aH2HPct; // If A has 0.667 vs B, then B has 0.333 vs A
+            if (aH2HPct !== bH2HPct) {
+              return bH2HPct - aH2HPct; // Higher is better for B, so descending
+            }
+          }
         }
 
-        // Tertiary sort: division record wins (descending)
-        const aDivWins = parseRecordWins(a.divRecord);
-        const bDivWins = parseRecordWins(b.divRecord);
-        if (bDivWins !== aDivWins) {
-          return bDivWins - aDivWins;
+        // Step 3: Division record (best won-lost-tied percentage in games played within the division)
+        const aDivPct = parseRecordWinPct(a.divRecord);
+        const bDivPct = parseRecordWinPct(b.divRecord);
+        if (bDivPct !== aDivPct) {
+          return bDivPct - aDivPct;
         }
 
-        // Quaternary sort: strength of schedule (ascending - lower is harder schedule)
+        // Step 4: Common games - Skip for now (need additional data)
+
+        // Step 5: Conference record (best won-lost-tied percentage in games played within the conference)
+        const aConfPct = parseRecordWinPct(a.confRecord);
+        const bConfPct = parseRecordWinPct(b.confRecord);
+        if (bConfPct !== aConfPct) {
+          return bConfPct - aConfPct;
+        }
+
+        // Step 6: Strength of victory (higher is better)
+        const aSOV = a.strengthOfVictory || 0;
+        const bSOV = b.strengthOfVictory || 0;
+        if (bSOV !== aSOV) {
+          return bSOV - aSOV;
+        }
+
+        // Step 7: Strength of schedule (lower is harder/better)
         const aSOS = a.strengthOfSchedule || 0;
         const bSOS = b.strengthOfSchedule || 0;
-        if (aSOS !== bSOS) {
+        if (aSOS !== bSOS && aSOS !== 0 && bSOS !== 0) {
           return aSOS - bSOS;
         }
 
-        // Quinary sort: total wins (descending)
+        // Fallback: total wins then losses
         if (b.record.wins !== a.record.wins) {
           return b.record.wins - a.record.wins;
         }
-
-        // Final sort: losses (ascending)
         return a.record.losses - b.record.losses;
       });
 
