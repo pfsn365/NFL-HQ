@@ -489,7 +489,7 @@ function SchedulePageContent() {
               <select
                 onChange={(e) => {
                   if (e.target.value) {
-                    window.location.href = `/teams/${e.target.value}/schedule`;
+                    window.location.href = `/nfl-hq/teams/${e.target.value}/schedule`;
                   }
                 }}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-gray-900 bg-white"
