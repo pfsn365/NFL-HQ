@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import OptimizedImage from '../OptimizedImage';
 import { TeamData, getAllTeams } from '@/data/teams';
 import { trackNewsClick, trackStandingsView, trackScheduleView } from '@/utils/ga-events';
-import { getApiPath } from '@/utils/api';
 
 // Helper function to clean player names for display and URLs
 const getCleanPlayerName = (playerName: string) => {
@@ -169,7 +168,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
       setError(null);
 
       // Use the team-specific API endpoint that works for all teams
-      const response = await fetch(getApiPath(`nfl/teams/api/overview-articles/${team.id}`));
+      const response = await fetch(`/nfl-hq/nfl/teams/api/overview-articles/${team.id}`);
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -196,7 +195,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
       setScheduleLoading(true);
       setScheduleError(null);
 
-      const response = await fetch(getApiPath(`nfl/teams/api/schedule/${team.id}`));
+      const response = await fetch(`/nfl-hq/nfl/teams/api/schedule/${team.id}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -256,7 +255,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
       setStatsLoading(true);
       setStatsError(null);
 
-      const response = await fetch(getApiPath(`nfl/teams/api/stats/${team.id}`));
+      const response = await fetch(`/nfl-hq/nfl/teams/api/stats/${team.id}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -289,7 +288,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
       const divisionTeams = getDivisionTeams(team);
       const standingsPromises = divisionTeams.map(async (divisionTeam) => {
         try {
-          const response = await fetch(getApiPath(`nfl/teams/api/schedule/${divisionTeam.id}`));
+          const response = await fetch(`/nfl-hq/nfl/teams/api/schedule/${divisionTeam.id}`);
           if (!response.ok) {
             throw new Error(`Failed to fetch schedule for ${divisionTeam.name}`);
           }
@@ -587,7 +586,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
               </table>
             </div>
             <a
-              href="/standings"
+              href="/nfl-hq/standings"
               className="block w-full mt-4 px-4 py-3 text-sm sm:text-base font-medium text-white rounded-lg hover:opacity-90 transition-opacity text-center min-h-[48px] flex items-center justify-center cursor-pointer"
               style={{ backgroundColor: team.primaryColor }}
             >
