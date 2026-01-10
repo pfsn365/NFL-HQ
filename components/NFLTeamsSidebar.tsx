@@ -122,7 +122,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
             <div className="px-4 py-2 border-b border-gray-800">
               <div className="grid grid-cols-1 gap-1">
                 <a
-                  href="/nfl-hq/"
+                  href="/"
                   className={`block p-2 rounded text-sm transition-colors ${
                     normalizePath(pathname) === '' || normalizePath(pathname) === '/'
                       ? 'bg-[#0050A0] text-white'
@@ -132,7 +132,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                   <div className="text-xs">Home</div>
                 </a>
                 <a
-                  href="/nfl-hq/teams"
+                  href="/teams"
                   className={`block p-2 rounded text-sm transition-colors ${
                     normalizePath(pathname) === '/teams'
                       ? 'bg-[#0050A0] text-white'
@@ -300,7 +300,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
           {/* Home Button */}
           <li>
             <a
-              href="/nfl-hq/"
+              href="/"
               className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
                 normalizePath(pathname) === '' || normalizePath(pathname) === '/'
                   ? 'bg-[#0050A0] text-white'
@@ -330,7 +330,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
           {/* Browse All Teams Button */}
           <li className="mb-4">
             <a
-              href="/nfl-hq/teams"
+              href="/teams"
               className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
                 normalizePath(pathname) === '/teams'
                   ? 'bg-[#0050A0] text-white'

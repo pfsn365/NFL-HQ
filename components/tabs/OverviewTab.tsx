@@ -586,7 +586,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
               </table>
             </div>
             <a
-              href="/nfl-hq/standings"
+              href="/standings"
               className="block w-full mt-4 px-4 py-3 text-sm sm:text-base font-medium text-white rounded-lg hover:opacity-90 transition-opacity text-center min-h-[48px] flex items-center justify-center cursor-pointer"
               style={{ backgroundColor: team.primaryColor }}
             >

@@ -239,7 +239,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Upcoming Games</h2>
               <Link
-                href="/nfl-hq/schedule"
+                href="/schedule"
                 className="text-[#0050A0] hover:text-blue-700 font-semibold text-sm transition-colors"
               >
                 View All Upcoming Games →
