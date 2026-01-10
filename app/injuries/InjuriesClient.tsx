@@ -28,26 +28,87 @@ export default function InjuriesClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
+  // Function to normalize name for matching
+  function normalizePlayerName(name: string): string {
+    return name
+      .toLowerCase()
+      .replace(/\s+(jr|sr|ii|iii|iv|v)\.?$/i, '')
+      .replace(/[.\-']/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   useEffect(() => {
-    async function fetchInjuries() {
+    async function fetchInjuriesAndRosters() {
       setLoading(true);
       try {
-        const response = await fetch(getApiPath('nfl/teams/api/injuries'));
-        if (!response.ok) throw new Error('Failed to fetch injuries');
+        // Fetch injuries
+        const injuryResponse = await fetch(getApiPath('nfl/teams/api/injuries'));
+        if (!injuryResponse.ok) throw new Error('Failed to fetch injuries');
 
-        const data = await response.json();
-        if (data.success && data.injuries && data.injuries.ALL) {
-          setInjuries(data.injuries.ALL);
-          setLastUpdated(
-            data.lastUpdated
-              ? new Date(data.lastUpdated).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
-              : new Date().toLocaleDateString()
-          );
+        const injuryData = await injuryResponse.json();
+
+        if (!injuryData.success || !injuryData.injuries || !injuryData.injuries.ALL) {
+          throw new Error('Invalid injury data format');
         }
+
+        const rawInjuries = injuryData.injuries.ALL;
+
+        // Fetch all team rosters in parallel (using client-side getApiPath which works)
+        const rosterPromises = allTeams.map(team =>
+          fetch(getApiPath(`nfl/teams/api/roster/${team.id}`))
+            .then(res => res.ok ? res.json() : null)
+            .catch(() => null)
+        );
+
+        const rosterResponses = await Promise.all(rosterPromises);
+
+        // Build player-to-team map from rosters
+        const playerToTeamMap = new Map<string, string>();
+
+        rosterResponses.forEach((rosterData, index) => {
+          if (rosterData && rosterData.roster) {
+            const team = allTeams[index];
+            const allPlayers = [
+              ...(rosterData.roster.activeRoster || []),
+              ...(rosterData.roster.practiceSquad || []),
+              ...(rosterData.roster.injuredReserve || []),
+              ...(rosterData.roster.physicallyUnableToPerform || []),
+              ...(rosterData.roster.nonFootballInjuryReserve || []),
+              ...(rosterData.roster.suspended || []),
+              ...(rosterData.roster.exempt || []),
+            ];
+
+            allPlayers.forEach((player: any) => {
+              const normalizedName = normalizePlayerName(player.name);
+              playerToTeamMap.set(normalizedName, team.abbreviation);
+            });
+          }
+        });
+
+        console.log(`[INJURIES CLIENT] Built player-to-team map with ${playerToTeamMap.size} players`);
+
+        // Match injuries to teams
+        const injuriesWithTeams = rawInjuries.map((injury: any) => {
+          const normalizedName = normalizePlayerName(injury.player);
+          const teamAbbr = playerToTeamMap.get(normalizedName) || injury.team || 'N/A';
+
+          return {
+            ...injury,
+            team: teamAbbr
+          };
+        });
+
+        setInjuries(injuriesWithTeams);
+        setLastUpdated(
+          injuryData.lastUpdated
+            ? new Date(injuryData.lastUpdated).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })
+            : new Date().toLocaleDateString()
+        );
       } catch (error) {
         console.error('Error fetching injuries:', error);
       } finally {
@@ -55,7 +116,7 @@ export default function InjuriesClient() {
       }
     }
 
-    fetchInjuries();
+    fetchInjuriesAndRosters();
   }, []);
 
   // Get unique positions for filter in specified order
