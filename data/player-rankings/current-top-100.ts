@@ -1,4 +1,4 @@
-// Top 100 Current NBA Players (2024-25 Season)
+// Top 100 Current NFL Players (2025-26 Season)
 // Realistic ranking based on current performance and impact
 
 export const CURRENT_TOP_100_IDS = [

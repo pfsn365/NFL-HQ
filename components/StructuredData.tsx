@@ -96,7 +96,7 @@ export default function StructuredData() {
         "description": "Comprehensive database of all 32 NFL teams including standings, stats, rosters, schedules, news, and injury reports. Updated daily with live NFL data.",
         "url": "https://www.profootballnetwork.com/nfl-hq",
         "keywords": ["NFL Teams", "NFL Standings", "NFL Stats", "NFL Rosters", "NFL Schedules", "NFL News", "NFL Injuries"],
-        "temporalCoverage": "2024/..",
+        "temporalCoverage": "2025/..",
         "isAccessibleForFree": true,
         "license": "https://www.profootballnetwork.com/terms-of-service",
         "creator": {

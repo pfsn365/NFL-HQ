@@ -92,7 +92,7 @@ export function getTabSEO(team: TeamData): Record<string, SEOConfig> {
       }
     },
     roster: {
-      title: `${team.fullName} Roster 2024-25 - Players, Positions & Impact+ Ratings`,
+      title: `${team.fullName} Roster 2025-26 - Players, Positions & Impact+ Ratings`,
       description: `Complete ${team.fullName} roster with player positions, Impact+ ratings, and detailed player information for offense and defense.`,
       keywords: [
         `${team.name} roster`,
@@ -103,13 +103,13 @@ export function getTabSEO(team: TeamData): Record<string, SEOConfig> {
         `${team.name} depth chart`
       ],
       openGraph: {
-        title: `${team.fullName} Roster 2024-25`,
+        title: `${team.fullName} Roster 2025-26`,
         description: `Complete roster with player positions and Impact+ ratings.`,
         type: "website"
       }
     },
     schedule: {
-      title: `${team.fullName} Schedule 2024-25 - Games, Results & Upcoming Matches`,
+      title: `${team.fullName} Schedule 2025-26 - Games, Results & Upcoming Matches`,
       description: `${team.fullName} complete schedule including preseason results, regular season games, game times, and opponent information.`,
       keywords: [
         `${team.name} schedule`,
@@ -120,7 +120,7 @@ export function getTabSEO(team: TeamData): Record<string, SEOConfig> {
         `${team.homeVenue} games`
       ],
       openGraph: {
-        title: `${team.fullName} Schedule 2024-25`,
+        title: `${team.fullName} Schedule 2025-26`,
         description: `Complete schedule with game results and upcoming matches.`,
         type: "website"
       }
