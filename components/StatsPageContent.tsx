@@ -377,7 +377,13 @@ export default function StatsPageContent() {
 
                             {/* Player */}
                             <td className="px-2 sm:px-3 md:px-4 py-3 sm:py-4">
-                              <div className="font-semibold text-base text-gray-900 group-hover:text-[#0050A0]">{player.name}</div>
+                              <Link
+                                href={`/players/${player.playerSlug}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="font-semibold text-base text-[#0050A0] hover:underline"
+                              >
+                                {player.name}
+                              </Link>
                             </td>
 
                             {/* Position */}
@@ -701,15 +707,13 @@ export default function StatsPageContent() {
                   )}
                 </div>
 
-                {/* Team Link */}
-                {getTeamInfo(selectedPlayer.teamId) && (
-                  <Link
-                    href={`/teams/${selectedPlayer.teamId}`}
-                    className="mt-4 block w-full text-center bg-[#0050A0] text-white py-3 rounded-lg font-semibold hover:bg-[#003d7a] transition-colors"
-                  >
-                    View {getTeamInfo(selectedPlayer.teamId)!.name} Homepage
-                  </Link>
-                )}
+                {/* Player Profile Link */}
+                <Link
+                  href={`/players/${selectedPlayer.name.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}`}
+                  className="mt-4 block w-full text-center bg-[#0050A0] text-white py-3 rounded-lg font-semibold hover:bg-[#003d7a] transition-colors"
+                >
+                  View {selectedPlayer.name} Profile
+                </Link>
               </div>
             </div>
           </div>

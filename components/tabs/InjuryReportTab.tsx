@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 
@@ -381,15 +382,13 @@ export default function InjuryReportTab({ team }: InjuryReportTabProps) {
             <div key={index} className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 sm:p-4 rounded-lg ${bgClass}`}>
               <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
                 <div className="text-sm sm:text-base font-medium">
-                  <a
-                    href={getPFSNUrl(playerInjury.player.name)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={`/players/${playerInjury.player.slug}`}
                     className="hover:underline cursor-pointer"
                     style={{ color: team.primaryColor }}
                   >
                     {playerInjury.player.name}
-                  </a>
+                  </Link>
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600">
                   #{playerInjury.player.jerseyNumber} • {playerInjury.player.position}

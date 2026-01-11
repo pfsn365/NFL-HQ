@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 
-// Helper function to generate PFSN URL
-const getPFSNUrl = (playerName: string) => {
-  return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
+// Helper function to generate player slug for internal links
+const generatePlayerSlug = (playerName: string) => {
+  return playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
 };
 
 // Helper function to generate team URL (using PFSN team pages)
@@ -278,15 +279,13 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
                         className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="p-3 text-gray-700">{transaction.date}</td>
                       <td className="p-3">
-                        <a 
-                          href={getPFSNUrl(transaction.player)}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <Link
+                          href={`/players/${generatePlayerSlug(transaction.player)}`}
                           className="font-medium hover:underline cursor-pointer"
                           style={{ color: team.primaryColor }}
                         >
                           {transaction.player}
-                        </a>
+                        </Link>
                       </td>
                       <td className="p-3 text-gray-700">{transaction.position}</td>
                       <td className="p-3 text-gray-700">

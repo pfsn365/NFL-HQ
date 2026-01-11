@@ -35,6 +35,15 @@ interface RawFreeAgentData {
 type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank';
 
 // Helper Functions
+function generatePlayerSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[.\s]+/g, '-')
+    .replace(/[^\w-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 function mapTeamNameToId(teamName: string): string | undefined {
   if (!teamName || teamName.trim() === '') return undefined;
 
@@ -506,8 +515,13 @@ export default function FreeAgencyTrackerClient() {
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
                                 {agent.rank}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {agent.name}
+                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                <Link
+                                  href={`/players/${generatePlayerSlug(agent.name)}`}
+                                  className="text-[#0050A0] hover:underline"
+                                >
+                                  {agent.name}
+                                </Link>
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-center">
                                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
