@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import { getAllTeams } from '@/data/teams';
 
 interface PlayerProfile {
   name: string;
@@ -191,6 +192,22 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   const [selectedGameLogSeason, setSelectedGameLogSeason] = useState<number | null>(null);
   const [gameLogData, setGameLogData] = useState<PlayerProfile['gameLog'] | null>(null);
   const [gameLogLoading, setGameLogLoading] = useState(false);
+
+  // Create a lookup map for team names to team data
+  const teamsByName = useMemo(() => {
+    const allTeams = getAllTeams();
+    const lookup: Record<string, { id: string; logoUrl: string }> = {};
+    allTeams.forEach(team => {
+      lookup[team.fullName.toLowerCase()] = { id: team.id, logoUrl: team.logoUrl };
+      // Also add by city + name for variations like "Los Angeles Chargers" vs "LA Chargers"
+      lookup[team.name.toLowerCase()] = { id: team.id, logoUrl: team.logoUrl };
+    });
+    return lookup;
+  }, []);
+
+  const getTeamByName = (name: string) => {
+    return teamsByName[name.toLowerCase()] || null;
+  };
 
   useEffect(() => {
     async function fetchPlayer() {
@@ -619,7 +636,31 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                       >
                         <td className="py-3 px-2 font-medium text-gray-900 whitespace-nowrap">{game.week}</td>
                         <td className="py-3 px-2 text-gray-700 whitespace-nowrap">
-                          <span className="text-gray-500">{game.homeAway}</span> {game.opponent}
+                          {(() => {
+                            const opponentTeam = getTeamByName(game.opponent);
+                            return (
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-500">{game.homeAway}</span>
+                                {game.opponentLogo && (
+                                  <img
+                                    src={game.opponentLogo}
+                                    alt={game.opponent}
+                                    className="w-5 h-5 object-contain"
+                                  />
+                                )}
+                                {opponentTeam ? (
+                                  <Link
+                                    href={`/teams/${opponentTeam.id}`}
+                                    className="hover:text-blue-600 hover:underline"
+                                  >
+                                    {game.opponent}
+                                  </Link>
+                                ) : (
+                                  <span>{game.opponent}</span>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td className="py-3 px-2 text-center whitespace-nowrap">
                           <span className={`font-medium ${game.result.startsWith('W') ? 'text-green-600' : game.result.startsWith('L') ? 'text-red-600' : 'text-gray-600'}`}>
