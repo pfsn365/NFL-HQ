@@ -989,10 +989,10 @@ function SchedulePageContent() {
                                   <div key={game.event_id} className={`border rounded-lg overflow-hidden ${isLive ? 'border-green-400 ring-1 ring-green-400' : 'border-gray-200'}`}>
                                     <button
                                       onClick={() => setExpandedWeeklyGame(isExpanded ? null : game.event_id)}
-                                      className="w-full text-xs p-2 hover:bg-gray-50 hover:border-[#0050A0] transition-colors relative"
+                                      className={`w-full text-xs p-2 hover:bg-gray-50 hover:border-[#0050A0] transition-colors relative ${isLive ? 'pt-5' : ''}`}
                                     >
                                       {isLive && (
-                                        <div className="absolute top-1 right-1 flex items-center gap-0.5">
+                                        <div className="absolute top-0.5 right-1 flex items-center gap-0.5 bg-green-100 px-1 rounded">
                                           <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                                           <span className="text-[8px] font-bold text-green-600 uppercase">Live</span>
                                         </div>
