@@ -512,7 +512,7 @@ async function fetchPositionGradesFromSheet(position: string): Promise<SheetPlay
 
       const player = getCol(mapping.playerCol)?.trim() || '';
       const scoreStr = getCol(mapping.scoreCol)?.trim() || '0';
-      const grade = getCol(mapping.gradeCol)?.trim() || '';
+      const extractedGrade = getCol(mapping.gradeCol)?.trim() || '';
       const seasonRankStr = getCol(mapping.seasonRankCol)?.trim() || '0';
       const overallRankStr = getCol(mapping.overallRankCol)?.trim() || '0';
 
@@ -521,9 +521,12 @@ async function fetchPositionGradesFromSheet(position: string): Promise<SheetPlay
       const seasonRank = parseInt(seasonRankStr) || 0;
       const overallRank = parseInt(overallRankStr) || seasonRank;
 
+      // Validate grade - if invalid, derive from score
+      const grade = isValidGrade(extractedGrade) ? extractedGrade.toUpperCase() : deriveGradeFromScore(score);
+
       // Skip invalid rows (header rows that slipped through, or empty player names)
       if (!player || player.toLowerCase() === 'player' || player.toLowerCase().includes('season')) continue;
-      if (seasonRank <= 0 && overallRank <= 0) continue;
+      if (seasonRank <= 0 && overallRank <= 0 && score <= 0) continue;
 
       players.push({
         player,
@@ -561,6 +564,28 @@ function parseCSVLine(line: string): string[] {
   result.push(current);
 
   return result;
+}
+
+// Validate if a string is a valid grade (A, A+, A-, B, B+, B-, C, C+, C-, D, D+, D-, F)
+function isValidGrade(grade: string): boolean {
+  const validGrades = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
+  return validGrades.includes(grade.trim().toUpperCase());
+}
+
+// Derive grade from score
+function deriveGradeFromScore(score: number): string {
+  if (score >= 90) return 'A';
+  if (score >= 85) return 'A-';
+  if (score >= 80) return 'B+';
+  if (score >= 75) return 'B';
+  if (score >= 70) return 'B-';
+  if (score >= 65) return 'C+';
+  if (score >= 60) return 'C';
+  if (score >= 55) return 'C-';
+  if (score >= 50) return 'D+';
+  if (score >= 45) return 'D';
+  if (score >= 40) return 'D-';
+  return 'F';
 }
 
 async function fetchPFSNImpact(): Promise<PFSNResponse | null> {
