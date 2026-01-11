@@ -80,11 +80,11 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   },
   'nfc-wc-3': {
     id: 'nfc-wc-3',
-    team1: { seed: 2, name: 'Bears', teamId: 'chicago-bears' },
-    team2: { seed: 7, name: 'Packers', teamId: 'green-bay-packers' },
+    team1: { seed: 2, name: 'Bears', teamId: 'chicago-bears', score: 31 },
+    team2: { seed: 7, name: 'Packers', teamId: 'green-bay-packers', score: 27 },
     round: 'Wild Card',
     date: 'Jan 10',
-    completed: false,
+    completed: true,
   },
   // AFC Divisional Round
   'afc-div-1': {
