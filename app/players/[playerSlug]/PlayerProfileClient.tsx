@@ -205,14 +205,22 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   useEffect(() => {
     async function fetchArticles() {
       try {
-        // Use the player slug for the RSS feed URL
-        const rssUrl = `https://www.profootballnetwork.com/tag/${playerSlug}/feed/`;
-        const response = await fetch(getApiPath(`api/proxy-rss?url=${encodeURIComponent(rssUrl)}`));
+        // Clean the slug for players like "a-j-brown" -> "aj-brown"
+        const cleanedSlug = playerSlug.replace(/([a-z])-([a-z])-/g, '$1$2-');
 
-        if (!response.ok) return;
+        // Try cleaned slug first (e.g., "aj-brown")
+        let rssUrl = `https://www.profootballnetwork.com/tag/${cleanedSlug}/feed/`;
+        let response = await fetch(getApiPath(`api/proxy-rss?url=${encodeURIComponent(rssUrl)}`));
+        let data = response.ok ? await response.json() : null;
 
-        const data = await response.json();
-        if (data.articles && Array.isArray(data.articles)) {
+        // If no articles found and slug was cleaned, try original slug
+        if ((!data?.articles || data.articles.length === 0) && cleanedSlug !== playerSlug) {
+          rssUrl = `https://www.profootballnetwork.com/tag/${playerSlug}/feed/`;
+          response = await fetch(getApiPath(`api/proxy-rss?url=${encodeURIComponent(rssUrl)}`));
+          data = response.ok ? await response.json() : null;
+        }
+
+        if (data?.articles && Array.isArray(data.articles)) {
           setArticles(data.articles);
         }
       } catch (err) {
