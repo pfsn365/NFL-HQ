@@ -496,10 +496,10 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-center mt-3 pt-3 border-t border-gray-100 text-sm">
+                  <div className="flex justify-center mt-3 pt-3 border-t border-gray-100 text-base">
                     <div>
                       <span className="text-gray-500">Season Rank</span>
-                      <span className="font-bold text-gray-900 ml-1">#{player.pfsnImpact.seasonRank}</span>
+                      <span className="font-bold text-gray-900 ml-1.5">#{player.pfsnImpact.seasonRank}</span>
                     </div>
                   </div>
                 </div>
