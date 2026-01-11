@@ -357,7 +357,8 @@ async function fetchESPNGameLog(athleteId: string): Promise<ESPNGameLog | null> 
     if (!seasonType) return null;
 
     const categories = seasonType.categories || [];
-    const events = seasonType.events || {};
+    // Events are at the top level of data, not inside seasonType
+    const events = data.events || {};
 
     // Find the main stats category (usually the first one with stats)
     const mainCategory = categories.find((cat: Record<string, unknown>) =>
@@ -366,22 +367,27 @@ async function fetchESPNGameLog(athleteId: string): Promise<ESPNGameLog | null> 
 
     if (!mainCategory) return null;
 
-    // Get stat labels from the category
-    const statLabels: Array<{ name: string; label: string }> = (mainCategory.labels || []).map(
+    // Get stat labels - use top-level labels/names if available, otherwise from category
+    const labels = data.labels || mainCategory.labels || [];
+    const names = data.names || mainCategory.names || [];
+    const statLabels: Array<{ name: string; label: string }> = labels.map(
       (label: string, index: number) => ({
-        name: mainCategory.names?.[index] || label,
+        name: names[index] || label,
         label: label,
       })
     );
 
-    // Parse game entries
+    // Parse game entries - mainCategory.events is array of {eventId, stats} objects
     const games: ESPNGameLogEntry[] = [];
 
-    for (const eventId of mainCategory.events || []) {
+    for (const eventData of mainCategory.events || []) {
+      // eventData is {eventId: string, stats: string[]}
+      const eventId = eventData.eventId || eventData;
       const event = events[eventId];
       if (!event) continue;
 
-      const gameStats = mainCategory.totals?.[mainCategory.events.indexOf(eventId)] || [];
+      // Stats are in eventData.stats, not in mainCategory.totals
+      const gameStats = eventData.stats || [];
       const statsMap: Record<string, string> = {};
 
       statLabels.forEach((label, index) => {
@@ -393,7 +399,7 @@ async function fetchESPNGameLog(athleteId: string): Promise<ESPNGameLog | null> 
         date: event.gameDate || '',
         opponent: event.opponent?.displayName || event.opponent?.abbreviation || 'TBD',
         opponentLogo: event.opponent?.logo || '',
-        homeAway: event.homeAway === 'home' ? 'vs' : '@',
+        homeAway: event.atVs === 'vs' ? 'vs' : '@',
         result: event.gameResult || '-',
         stats: statsMap,
       });
