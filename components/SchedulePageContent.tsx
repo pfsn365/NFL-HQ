@@ -151,6 +151,7 @@ interface Game {
   start_date: string;
   status: string;
   has_score: boolean;
+  is_live?: boolean;
   away_team: {
     team_slug: string;
     abbr: string;
@@ -159,6 +160,7 @@ interface Game {
     losses: number;
     score?: number;
     is_winner?: boolean;
+    has_possession?: boolean;
   };
   home_team: {
     team_slug: string;
@@ -168,6 +170,11 @@ interface Game {
     losses: number;
     score?: number;
     is_winner?: boolean;
+    has_possession?: boolean;
+  };
+  situation?: {
+    down_distance?: string;
+    is_red_zone?: boolean;
   };
   venue?: {
     name: string;
@@ -704,13 +711,16 @@ function SchedulePageInner() {
                         <div className="flex-1 space-y-3">
                           {/* Away Team */}
                           <div className="flex items-center gap-3">
+                            {isLive && game.away_team.has_possession && (
+                              <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse flex-shrink-0" title="Has possession"></span>
+                            )}
                             {awayTeam ? (
                               <>
                                 <img
                                   src={awayTeam.logoUrl}
                                   alt={awayTeam.fullName}
-                                  
-                                  
+
+
                                   className="w-10 h-10 flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0">
@@ -731,6 +741,9 @@ function SchedulePageInner() {
 
                           {/* Home Team */}
                           <div className="flex items-center gap-3">
+                            {isLive && game.home_team.has_possession && (
+                              <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse flex-shrink-0" title="Has possession"></span>
+                            )}
                             {homeTeam ? (
                               <>
                                 <img
@@ -811,6 +824,24 @@ function SchedulePageInner() {
                           </div>
                         )}
                       </div>
+
+                      {/* Live Situation - Down & Distance, Red Zone */}
+                      {isLive && game.situation && (game.situation.down_distance || game.situation.is_red_zone) && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="flex items-center gap-2">
+                            {game.situation.is_red_zone && (
+                              <span className="px-2 py-1 bg-red-100 text-red-700 font-bold text-xs rounded-full">
+                                RED ZONE
+                              </span>
+                            )}
+                            {game.situation.down_distance && (
+                              <span className="text-sm text-gray-600 font-medium">
+                                {game.situation.down_distance}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Click hint on mobile */}
                       {hasDetails && !isExpanded && (

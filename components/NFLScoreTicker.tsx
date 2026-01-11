@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getApiPath } from '@/utils/api';
 
 interface TickerGame {
@@ -109,9 +110,10 @@ export default function NFLScoreTicker() {
                 const isPreGame = !game.isLive && !game.isFinal;
 
                 return (
-                  <div
+                  <Link
                     key={game.id}
-                    className={`flex items-center px-3 py-2 ${
+                    href={`/gameday#game-${game.id}`}
+                    className={`flex items-center px-3 py-2 hover:bg-white/10 transition-colors cursor-pointer ${
                       index === 0 ? 'pl-4' : ''
                     } ${
                       index !== games.length - 1 ? 'border-r border-white/20' : 'pr-4'
@@ -180,7 +182,7 @@ export default function NFLScoreTicker() {
                         <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" title="Possession" />
                       )}
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
