@@ -464,7 +464,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               <dt className="text-xs text-gray-500 uppercase tracking-wide">Draft</dt>
               <dd className="font-medium text-gray-900">
                 {player.draft
-                  ? `${player.draft.year} Rd ${player.draft.round}, Pick ${player.draft.pick}`
+                  ? `${player.draft.year}: Rd ${player.draft.round}, Pick ${player.draft.pick}`
                   : 'Undrafted'}
               </dd>
             </div>
