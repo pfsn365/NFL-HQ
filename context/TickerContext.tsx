@@ -29,6 +29,12 @@ interface TickerContextType {
   lastUpdated: Date | null;
 }
 
+// Module-level cache that persists across component re-mounts
+let cachedGames: TickerGame[] = [];
+let cachedLastUpdated: Date | null = null;
+let hasFetchedOnce = false;
+let pollInterval: NodeJS.Timeout | null = null;
+
 const TickerContext = createContext<TickerContextType>({
   games: [],
   loading: true,
@@ -40,36 +46,46 @@ export function useTickerContext() {
 }
 
 export function TickerProvider({ children }: { children: ReactNode }) {
-  const [games, setGames] = useState<TickerGame[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [hasFetched, setHasFetched] = useState(false);
+  // Initialize state from cache
+  const [games, setGames] = useState<TickerGame[]>(cachedGames);
+  const [loading, setLoading] = useState(!hasFetchedOnce);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(cachedLastUpdated);
 
   const fetchGames = useCallback(async () => {
     try {
       const response = await fetch(getApiPath('api/nfl/espn-scoreboard?ticker=true'));
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
-      setGames(data.games || []);
-      setLastUpdated(new Date());
+      const newGames = data.games || [];
+
+      // Update both state and cache
+      cachedGames = newGames;
+      cachedLastUpdated = new Date();
+      hasFetchedOnce = true;
+
+      setGames(newGames);
+      setLastUpdated(cachedLastUpdated);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching live scores:', error);
-    } finally {
       setLoading(false);
-      setHasFetched(true);
     }
   }, []);
 
   useEffect(() => {
-    // Only fetch if we haven't fetched yet
-    if (!hasFetched) {
+    // Only fetch if we haven't fetched before (globally)
+    if (!hasFetchedOnce) {
       fetchGames();
     }
 
-    // Set up polling interval
-    const interval = setInterval(fetchGames, 30000);
-    return () => clearInterval(interval);
-  }, [fetchGames, hasFetched]);
+    // Set up polling interval (only once globally)
+    if (!pollInterval) {
+      pollInterval = setInterval(fetchGames, 30000);
+    }
+
+    // Don't clear interval on unmount - keep polling globally
+    return () => {};
+  }, [fetchGames]);
 
   return (
     <TickerContext.Provider value={{ games, loading, lastUpdated }}>
