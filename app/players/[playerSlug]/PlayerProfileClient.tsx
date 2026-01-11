@@ -28,11 +28,7 @@ interface PlayerProfile {
   college: string;
   experience: number;
   experienceLabel: string;
-  draft: {
-    year: number;
-    round: number;
-    pick: number;
-  } | null;
+  draft: string | null;
   birthDate: string;
   birthPlace: string;
   status: string;
@@ -520,9 +516,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
             <div>
               <dt className="text-xs text-gray-500 uppercase tracking-wide">Draft</dt>
               <dd className="font-medium text-gray-900">
-                {player.draft
-                  ? `${player.draft.year}: Rd ${player.draft.round}, Pick ${player.draft.pick}`
-                  : 'Undrafted'}
+                {player.draft || 'Undrafted'}
               </dd>
             </div>
           </div>

@@ -3,6 +3,35 @@ import { teams } from '@/data/teams';
 
 const ALL_TEAM_IDS = Object.keys(teams);
 
+// State abbreviation to full name mapping
+const STATE_ABBREVIATIONS: Record<string, string> = {
+  'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+  'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+  'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+  'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+  'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+  'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+  'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+  'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+  'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+  'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming',
+  'DC': 'District of Columbia',
+};
+
+function expandStateAbbreviation(location: string): string {
+  // Match pattern like "City, ST" and expand ST to full state name
+  const match = location.match(/^(.+),\s*([A-Z]{2})$/);
+  if (match) {
+    const city = match[1];
+    const stateAbbr = match[2];
+    const fullState = STATE_ABBREVIATIONS[stateAbbr];
+    if (fullState) {
+      return `${city}, ${fullState}`;
+    }
+  }
+  return location;
+}
+
 interface RosterPlayer {
   name: string;
   slug: string;
@@ -56,6 +85,8 @@ interface ESPNStat {
 interface ESPNStats {
   displayName: string;
   statistics: ESPNStat[];
+  displayDraft: string | null;
+  displayBirthPlace: string | null;
 }
 
 interface ESPNGameLogEntry {
@@ -321,6 +352,14 @@ async function fetchESPNAthleteStats(athleteId: string): Promise<ESPNStats | nul
 
     if (!statsSummary || !statsSummary.statistics) return null;
 
+    // Format displayDraft: "2017: Rd 1, Pk 10 (KC)" -> "2017: Round 1, Pick 10 (KC)"
+    let displayDraft: string | null = null;
+    if (data.athlete?.displayDraft) {
+      displayDraft = data.athlete.displayDraft
+        .replace(/Rd (\d+)/, 'Round $1')
+        .replace(/Pk (\d+)/, 'Pick $1');
+    }
+
     return {
       displayName: statsSummary.displayName || '',
       statistics: statsSummary.statistics.map((stat: Record<string, unknown>) => ({
@@ -331,6 +370,8 @@ async function fetchESPNAthleteStats(athleteId: string): Promise<ESPNStats | nul
         value: Number(stat.value) || 0,
         displayValue: String(stat.displayValue || '0'),
       })),
+      displayDraft,
+      displayBirthPlace: data.athlete?.displayBirthPlace || null,
     };
   } catch (error) {
     console.error('Error fetching ESPN athlete stats:', error);
@@ -888,9 +929,9 @@ export async function GET(
       college: foundPlayer.college,
       experience: foundPlayer.experience,
       experienceLabel: foundPlayer.experience === 0 ? 'Rookie' : `${foundPlayer.experience} ${foundPlayer.experience === 1 ? 'Year' : 'Years'}`,
-      draft: foundPlayer.draft,
+      draft: espnStats?.displayDraft || (foundPlayer.draft ? `${foundPlayer.draft.year}: Round ${foundPlayer.draft.round}, Pick ${foundPlayer.draft.pick}` : null),
       birthDate: foundPlayer.birthDate,
-      birthPlace: foundPlayer.birthPlace,
+      birthPlace: espnStats?.displayBirthPlace ? expandStateAbbreviation(espnStats.displayBirthPlace) : foundPlayer.birthPlace,
       status: foundPlayer.status,
       headshotUrl,
 
