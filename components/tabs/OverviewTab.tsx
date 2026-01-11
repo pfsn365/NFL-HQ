@@ -210,9 +210,12 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
         throw new Error('Invalid schedule data received');
       }
 
-      // Filter to regular season games only
+      // Separate regular season and postseason games
       const regularSeasonGames = data.schedule.filter(
         (game: ScheduleGame) => game.eventType === 'Regular Season'
+      );
+      const postseasonGames = data.schedule.filter(
+        (game: ScheduleGame) => game.eventType !== 'Regular Season' && game.eventType !== 'Preseason'
       );
 
       // Find the current week or most recent week with results
@@ -225,8 +228,19 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
 
       let relevantGames: ScheduleGame[];
 
-      if (currentWeekIndex === -1) {
-        // No upcoming games - show last 5 games of the season
+      // Check if regular season is complete (all games have results or are bye weeks)
+      const regularSeasonComplete = regularSeasonGames.every((game: ScheduleGame) =>
+        game.result !== null || game.opponentAbbr === 'BYE'
+      );
+
+      if (regularSeasonComplete && postseasonGames.length > 0) {
+        // Regular season is over and team has postseason games
+        // Show last 3 regular season games + all postseason games (up to 5 total)
+        const lastRegularGames = regularSeasonGames.slice(-3);
+        const combinedGames = [...lastRegularGames, ...postseasonGames];
+        relevantGames = combinedGames.slice(-5);
+      } else if (currentWeekIndex === -1) {
+        // No upcoming regular season games - show last 5 games of the season
         relevantGames = regularSeasonGames.slice(-5);
       } else {
         // Show 2 games before current week and 2 games after (total 5 games)
@@ -344,9 +358,12 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
   // Update state when props change
   useEffect(() => {
     if (passedSchedule && passedSchedule.length > 0) {
-      // Filter to regular season games and get relevant 5 games
+      // Separate regular season and postseason games
       const regularSeasonGames = passedSchedule.filter(
         (game: ScheduleGame) => game.eventType === 'Regular Season'
+      );
+      const postseasonGames = passedSchedule.filter(
+        (game: ScheduleGame) => game.eventType !== 'Regular Season' && game.eventType !== 'Preseason'
       );
 
       const now = new Date();
@@ -358,7 +375,17 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
 
       let relevantGames: ScheduleGame[];
 
-      if (currentWeekIndex === -1) {
+      // Check if regular season is complete
+      const regularSeasonComplete = regularSeasonGames.every((game: ScheduleGame) =>
+        game.result !== null || game.opponentAbbr === 'BYE'
+      );
+
+      if (regularSeasonComplete && postseasonGames.length > 0) {
+        // Regular season is over and team has postseason games
+        const lastRegularGames = regularSeasonGames.slice(-3);
+        const combinedGames = [...lastRegularGames, ...postseasonGames];
+        relevantGames = combinedGames.slice(-5);
+      } else if (currentWeekIndex === -1) {
         relevantGames = regularSeasonGames.slice(-5);
       } else {
         const startIndex = Math.max(0, currentWeekIndex - 2);

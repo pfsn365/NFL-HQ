@@ -1,14 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
-
-// Helper function to generate PFSN URL
-const getPFSNUrl = (playerName: string) => {
-  return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
-};
 
 interface Player {
   name: string;
@@ -314,15 +310,13 @@ export default function RosterTab({ team }: RosterTabProps) {
                                   </span>
                                 </div>
                                 <div className="flex flex-col">
-                                  <a
-                                    href={getPFSNUrl(player.name)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                  <Link
+                                    href={`/players/${player.slug}`}
                                     className="font-medium hover:underline whitespace-nowrap cursor-pointer"
                                     style={{ color: team.primaryColor }}
                                   >
                                     {player.name}
-                                  </a>
+                                  </Link>
                                   {player.isInjured && activeSection !== 'injuredReserve' && (
                                     <span className="text-xs text-red-600 font-medium">
                                       Injured

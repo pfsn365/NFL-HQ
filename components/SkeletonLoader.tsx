@@ -1,9 +1,17 @@
 interface SkeletonLoaderProps {
-  type?: 'table' | 'cards' | 'full';
+  type?: 'table' | 'cards' | 'full' | 'inline';
   rows?: number;
+  className?: string;
 }
 
-export default function SkeletonLoader({ type = 'table', rows = 8 }: SkeletonLoaderProps) {
+export default function SkeletonLoader({ type = 'table', rows = 8, className }: SkeletonLoaderProps) {
+  // Inline skeleton - simple animated placeholder with custom className
+  if (type === 'inline' || className) {
+    return (
+      <div className={`bg-gray-200 rounded animate-pulse ${className || ''}`}></div>
+    );
+  }
+
   if (type === 'full') {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
