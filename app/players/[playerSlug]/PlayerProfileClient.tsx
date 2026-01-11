@@ -380,17 +380,12 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                       <div className={`text-3xl font-bold ${getScoreColor(player.pfsnImpact.score)}`}>
                         {player.pfsnImpact.score}
                       </div>
-                      <div className="text-xs text-gray-500">Impact Score</div>
                     </div>
                   </div>
-                  <div className="flex justify-center gap-6 mt-3 pt-3 border-t border-gray-100 text-xs">
+                  <div className="flex justify-center mt-3 pt-3 border-t border-gray-100 text-xs">
                     <div>
-                      <span className="text-gray-500">Season</span>
+                      <span className="text-gray-500">Season Rank</span>
                       <span className="font-semibold text-gray-900 ml-1">#{player.pfsnImpact.seasonRank}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">All-Time</span>
-                      <span className="font-semibold text-gray-900 ml-1">#{player.pfsnImpact.overallRank}</span>
                     </div>
                   </div>
                 </div>
