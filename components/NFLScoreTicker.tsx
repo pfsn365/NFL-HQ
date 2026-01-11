@@ -51,13 +51,13 @@ export default function NFLScoreTicker() {
   if (loading) {
     return (
       <>
-        <div className="fixed top-0 right-0 left-0 lg:left-64 bg-black text-white py-2 px-4 z-40">
+        <div className="hidden lg:block fixed top-0 right-0 left-64 bg-black text-white py-2 px-4 z-40">
           <div className="flex items-center justify-center gap-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             <span className="text-sm">Loading scores...</span>
           </div>
         </div>
-        <div className="h-10" /> {/* Spacer for fixed ticker */}
+        <div className="hidden lg:block h-10" /> {/* Spacer for fixed ticker - desktop only */}
       </>
     );
   }
@@ -65,19 +65,20 @@ export default function NFLScoreTicker() {
   if (games.length === 0) {
     return (
       <>
-        <div className="fixed top-0 right-0 left-0 lg:left-64 bg-black text-white py-2 px-4 z-40">
+        <div className="hidden lg:block fixed top-0 right-0 left-64 bg-black text-white py-2 px-4 z-40">
           <div className="flex items-center justify-center gap-2">
             <span className="text-sm">No games scheduled today</span>
           </div>
         </div>
-        <div className="h-10" /> {/* Spacer for fixed ticker */}
+        <div className="hidden lg:block h-10" /> {/* Spacer for fixed ticker - desktop only */}
       </>
     );
   }
 
   return (
     <>
-      <div className="fixed top-0 right-0 left-0 lg:left-64 bg-black text-white z-40">
+      {/* Desktop ticker - fixed at top, offset by sidebar */}
+      <div className="hidden lg:block fixed top-0 right-0 left-64 bg-black text-white z-40">
         <div className="flex items-center">
           {/* Scrollable Games Container */}
           <div className="overflow-x-auto scrollbar-hide flex-1">
@@ -173,7 +174,7 @@ export default function NFLScoreTicker() {
           }
         `}</style>
       </div>
-      <div className="h-10" /> {/* Spacer for fixed ticker */}
+      <div className="hidden lg:block h-10" /> {/* Spacer for fixed ticker - desktop only */}
     </>
   );
 }
