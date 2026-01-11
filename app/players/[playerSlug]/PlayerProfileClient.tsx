@@ -380,7 +380,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
             {/* Player Info */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-8 mb-4 lg:mb-0">
               {/* Headshot */}
-              <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-full flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0 bg-[#0050A0]">
+              <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-full flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0 bg-white">
                 {!imageError ? (
                   <Image
                     src={player.headshotUrl}
