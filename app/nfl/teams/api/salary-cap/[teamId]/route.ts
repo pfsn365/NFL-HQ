@@ -69,22 +69,22 @@ interface TransformedSalaryCapData {
   players: TransformedPlayer[];
 }
 
-// Map team IDs to PFN display names
-const teamIdToPFNName: Record<string, string> = {
+// Map team IDs to PFSN display names
+const teamIdToPFSNName: Record<string, string> = {
   'san-francisco-49ers': 'San Francisco 49ers',
   'seattle-seahawks': 'Seattle Seahawks',
 };
 
 // Function to scrape salary cap data from PFSN as fallback
-async function scrapePFNSalaryCapData(teamId: string): Promise<{
+async function scrapePFSNSalaryCapData(teamId: string): Promise<{
   capSpace: number;
   salaryCap: number;
   activeCapSpend: number;
   deadMoney: number;
 } | null> {
   try {
-    const pfnTeamName = teamIdToPFNName[teamId];
-    if (!pfnTeamName) {
+    const pfsnTeamName = teamIdToPFSNName[teamId];
+    if (!pfsnTeamName) {
       return null;
     }
 
@@ -99,7 +99,7 @@ async function scrapePFNSalaryCapData(teamId: string): Promise<{
     );
 
     if (!response.ok) {
-      throw new Error(`PFN fetch error: ${response.status}`);
+      throw new Error(`PFSN fetch error: ${response.status}`);
     }
 
     const html = await response.text();
@@ -107,11 +107,11 @@ async function scrapePFNSalaryCapData(teamId: string): Promise<{
     // Parse the HTML to find the team's row
     // Format: <tr data-team=San Francisco 49ers data-cap-space=$37,135,702 data-salary-cap=$315,417,966 data-active-cap=$256,418,523 data-dead-money=$21,863,741>
     const teamRowMatch = html.match(
-      new RegExp(`<tr data-team=${pfnTeamName}[^>]*data-cap-space=\\$([0-9,]+)[^>]*data-salary-cap=\\$([0-9,]+)[^>]*data-active-cap=\\$([0-9,]+)[^>]*data-dead-money=\\$([0-9,]+)`, 'i')
+      new RegExp(`<tr data-team=${pfsnTeamName}[^>]*data-cap-space=\\$([0-9,]+)[^>]*data-salary-cap=\\$([0-9,]+)[^>]*data-active-cap=\\$([0-9,]+)[^>]*data-dead-money=\\$([0-9,]+)`, 'i')
     );
 
     if (!teamRowMatch) {
-      console.error(`Could not find salary cap data for ${pfnTeamName} in PFN HTML`);
+      console.error(`Could not find salary cap data for ${pfsnTeamName} in PFSN HTML`);
       return null;
     }
 
@@ -128,7 +128,7 @@ async function scrapePFNSalaryCapData(teamId: string): Promise<{
       deadMoney,
     };
   } catch (error) {
-    console.error(`Error scraping PFN data for ${teamId}:`, error);
+    console.error(`Error scraping PFSN data for ${teamId}:`, error);
     return null;
   }
 }
@@ -214,22 +214,22 @@ export async function GET(
       useFallback = true;
     }
 
-    // If Sportskeeda fails, try PFN scraper for specific teams
-    if (useFallback && teamIdToPFNName[teamId]) {
-      console.log(`Using PFN fallback for ${teamId}`);
-      const pfnData = await scrapePFNSalaryCapData(teamId);
+    // If Sportskeeda fails, try PFSN scraper for specific teams
+    if (useFallback && teamIdToPFSNName[teamId]) {
+      console.log(`Using PFSN fallback for ${teamId}`);
+      const pfsnData = await scrapePFSNSalaryCapData(teamId);
 
-      if (pfnData) {
+      if (pfsnData) {
         return NextResponse.json({
           teamId,
           salaryCapData: {
-            teamSummary: pfnData,
-            players: [], // No player-level data from PFN
+            teamSummary: pfsnData,
+            players: [], // No player-level data from PFSN
           },
           totalPlayers: 0,
           lastUpdated: new Date().toISOString(),
           season: 2025,
-          source: 'pfn', // Indicate this is from PFSN
+          source: 'pfsn', // Indicate this is from PFSN
         });
       }
     }

@@ -16,7 +16,7 @@ const getCleanPlayerName = (playerName: string) => {
 };
 
 // Helper function to generate PFSN URL
-const getPFNUrl = (playerName: string) => {
+const getPFSNUrl = (playerName: string) => {
   const cleanName = getCleanPlayerName(playerName);
   return `https://www.profootballnetwork.com/players/${cleanName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
 };

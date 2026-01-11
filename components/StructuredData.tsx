@@ -7,7 +7,7 @@ export default function StructuredData() {
         "@id": "https://www.profootballnetwork.com/#organization",
         "name": "PFSN",
         "legalName": "Pro Football Network Inc.",
-        "alternateName": ["Pro Football Network", "Pro Football & Sports Network", "PFN", "PFSN365", "PFN365"],
+        "alternateName": ["Pro Football Network", "Pro Football & Sports Network", "PFSN", "PFSN365"],
         "url": "https://www.profootballnetwork.com/",
         "foundingDate": "2019",
         "address": {
@@ -32,7 +32,7 @@ export default function StructuredData() {
           "https://www.instagram.com/pfsn365/",
           "https://www.linkedin.com/company/pfsn365",
           "https://www.youtube.com/c/profootballnetwork",
-          "https://www.tiktok.com/@pfn365",
+          "https://www.tiktok.com/@pfsn365",
           "https://www.threads.com/@pfsn365",
           "https://bsky.app/profile/did:plc:ymwh7dihf5ra32e5ms5jjaar",
           "https://apple.news/TNZRJixlpTJCDE_GPUJK2Lw",

@@ -194,7 +194,7 @@ const GamesPageSidebar: React.FC<GamesPageSidebarProps> = ({ currentGame, isMobi
     );
   }
 
-  // Desktop version - PFN Power Rankings style
+  // Desktop version - PFSN Power Rankings style
   return (
     <div className="w-full h-full bg-black border-r border-gray-800 flex flex-col">
       {/* Header with logo */}

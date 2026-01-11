@@ -6,7 +6,7 @@ import { getApiPath } from '@/utils/api';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
 
 // Helper function to generate PFSN URL
-const getPFNUrl = (playerName: string) => {
+const getPFSNUrl = (playerName: string) => {
   return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
 };
 
@@ -315,7 +315,7 @@ export default function RosterTab({ team }: RosterTabProps) {
                                 </div>
                                 <div className="flex flex-col">
                                   <a
-                                    href={getPFNUrl(player.name)}
+                                    href={getPFSNUrl(player.name)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="font-medium hover:underline whitespace-nowrap cursor-pointer"

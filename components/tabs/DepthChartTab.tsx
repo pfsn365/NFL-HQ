@@ -6,7 +6,7 @@ import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 
 // Helper function to generate PFSN URL
-const getPFNUrl = (playerName: string) => {
+const getPFSNUrl = (playerName: string) => {
   return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
 };
 
@@ -73,7 +73,7 @@ const PositionTable = ({
                 <td className="p-3">
                   {starter ? (
                     <a
-                      href={getPFNUrl(starter.name)}
+                      href={getPFSNUrl(starter.name)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium hover:underline cursor-pointer"
@@ -88,7 +88,7 @@ const PositionTable = ({
                 <td className="p-3">
                   {second ? (
                     <a
-                      href={getPFNUrl(second.name)}
+                      href={getPFSNUrl(second.name)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium hover:underline cursor-pointer"
@@ -103,7 +103,7 @@ const PositionTable = ({
                 <td className="p-3">
                   {third ? (
                     <a
-                      href={getPFNUrl(third.name)}
+                      href={getPFSNUrl(third.name)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium hover:underline cursor-pointer"
@@ -118,7 +118,7 @@ const PositionTable = ({
                 <td className="p-3">
                   {fourth ? (
                     <a
-                      href={getPFNUrl(fourth.name)}
+                      href={getPFSNUrl(fourth.name)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium hover:underline cursor-pointer"

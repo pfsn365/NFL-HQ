@@ -6,7 +6,7 @@ import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 
 // Helper function to generate PFSN URL
-const getPFNUrl = (playerName: string) => {
+const getPFSNUrl = (playerName: string) => {
   return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
 };
 
@@ -279,7 +279,7 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
                       <td className="p-3 text-gray-700">{transaction.date}</td>
                       <td className="p-3">
                         <a 
-                          href={getPFNUrl(transaction.player)}
+                          href={getPFSNUrl(transaction.player)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-medium hover:underline cursor-pointer"

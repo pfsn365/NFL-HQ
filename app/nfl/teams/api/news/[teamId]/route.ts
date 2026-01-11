@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Team ID to PFSN team abbreviation mapping
-const teamIdToPFNMap: Record<string, string> = {
+const teamIdToPFSNMap: Record<string, string> = {
   'arizona-cardinals': 'ARI',
   'atlanta-falcons': 'ATL',
   'baltimore-ravens': 'BAL',
@@ -44,9 +44,9 @@ export async function GET(
     const { teamId } = await params;
 
     // Get PFSN team abbreviation
-    const pfnTeamAbbr = teamIdToPFNMap[teamId];
+    const pfsnTeamAbbr = teamIdToPFSNMap[teamId];
 
-    if (!pfnTeamAbbr) {
+    if (!pfsnTeamAbbr) {
       return NextResponse.json(
         { error: 'Team not found or not yet mapped' },
         { status: 404 }
@@ -54,7 +54,7 @@ export async function GET(
     }
 
     // Use the new PFSN API endpoint with dynamic team
-    const apiUrl = `https://gotham.profootballnetwork.com/taxonomy/nfl/news-feeds?pageStart=1&newsType=Fantasy&team=${pfnTeamAbbr}`;
+    const apiUrl = `https://gotham.profootballnetwork.com/taxonomy/nfl/news-feeds?pageStart=1&newsType=Fantasy&team=${pfsnTeamAbbr}`;
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -67,13 +67,13 @@ export async function GET(
     });
 
     if (!response.ok) {
-      throw new Error(`PFN API error: ${response.status} ${response.statusText}`);
+      throw new Error(`PFSN API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
 
     // Log the raw response for debugging
-    console.log(`PFN API Response for ${pfnTeamAbbr}:`, {
+    console.log(`PFSN API Response for ${pfsnTeamAbbr}:`, {
       status: data.status,
       feedsLength: data.feeds?.length || 0,
       sampleFeed: data.feeds?.[0]
@@ -82,9 +82,9 @@ export async function GET(
     // Extract articles from the feeds array
     const articles = data.feeds || [];
 
-    console.log(`Found ${articles.length} ${pfnTeamAbbr} articles from PFN API`);
+    console.log(`Found ${articles.length} ${pfsnTeamAbbr} articles from PFSN API`);
 
-    // Map the PFN API structure to our expected format
+    // Map the PFSN API structure to our expected format
     const mappedNews = articles.slice(0, 12).map((article: any) => ({
       title: article.title || 'Untitled',
       description: article.content || '',
@@ -99,7 +99,7 @@ export async function GET(
       articles: mappedNews,
       count: mappedNews.length,
       isCardinalsFocused: true, // This endpoint is team-specific
-      team: pfnTeamAbbr,
+      team: pfsnTeamAbbr,
       debug: {
         totalArticles: articles.length,
         status: data.status,

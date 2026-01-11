@@ -6,7 +6,7 @@ import { getApiPath } from '@/utils/api';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
 
 // Helper function to generate PFSN URL
-const getPFNUrl = (playerName: string | undefined | null) => {
+const getPFSNUrl = (playerName: string | undefined | null) => {
   if (!playerName || typeof playerName !== 'string') {
     return '#';
   }
@@ -769,7 +769,7 @@ export default function StatsTab({ team }: StatsTabProps) {
                     <td key={key} className="p-2 sm:p-3 whitespace-nowrap">
                       {(key === 'player' || key === 'name') && value && typeof value === 'string' ? (
                         <a
-                          href={getPFNUrl(value)}
+                          href={getPFSNUrl(value)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-medium hover:underline cursor-pointer"

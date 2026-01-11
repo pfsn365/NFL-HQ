@@ -64,7 +64,7 @@ interface TeamInjuryApiResponse {
 }
 
 // Helper function to generate PFSN URL
-const getPFNUrl = (playerName: string) => {
+const getPFSNUrl = (playerName: string) => {
   return `https://www.profootballnetwork.com/players/${playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}/`;
 };
 
@@ -382,7 +382,7 @@ export default function InjuryReportTab({ team }: InjuryReportTabProps) {
               <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
                 <div className="text-sm sm:text-base font-medium">
                   <a
-                    href={getPFNUrl(playerInjury.player.name)}
+                    href={getPFSNUrl(playerInjury.player.name)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline cursor-pointer"

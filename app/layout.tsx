@@ -75,8 +75,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'NFL HQ - Team Pages, Standings, Stats & News',
     description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news.',
-    creator: '@PFN365',
-    site: '@PFN365',
+    creator: '@PFSN365',
+    site: '@PFSN365',
     images: ['/nfl-hq/og-image.png'],
   },
   alternates: {

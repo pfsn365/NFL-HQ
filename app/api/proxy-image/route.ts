@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'URL parameter is required' }, { status: 400 });
     }
 
-    // Only allow PFN CDN URLs for security
+    // Only allow PFSN CDN URLs for security
     if (!url.includes('profootballnetwork.com')) {
-      return NextResponse.json({ error: 'Only PFN URLs are allowed' }, { status: 403 });
+      return NextResponse.json({ error: 'Only PFSN URLs are allowed' }, { status: 403 });
     }
 
     // Fetch the image from the external URL
