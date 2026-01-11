@@ -149,9 +149,18 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex">
-        <NFLTeamsSidebar />
-        <main className="flex-1 md:ml-64">
+      <div className="flex min-h-screen bg-gray-50">
+        {/* Desktop sidebar */}
+        <div className="hidden lg:block">
+          <div className="fixed top-0 left-0 w-64 h-screen z-10">
+            <NFLTeamsSidebar />
+          </div>
+        </div>
+        {/* Mobile sidebar */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
+          <NFLTeamsSidebar isMobile={true} />
+        </div>
+        <main className="flex-1 lg:ml-64 min-w-0 pt-[57px] lg:pt-0">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <SkeletonLoader className="h-8 w-48 mb-6" />
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -178,9 +187,18 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   // Error state
   if (error || !player) {
     return (
-      <div className="min-h-screen bg-gray-50 flex">
-        <NFLTeamsSidebar />
-        <main className="flex-1 md:ml-64">
+      <div className="flex min-h-screen bg-gray-50">
+        {/* Desktop sidebar */}
+        <div className="hidden lg:block">
+          <div className="fixed top-0 left-0 w-64 h-screen z-10">
+            <NFLTeamsSidebar />
+          </div>
+        </div>
+        {/* Mobile sidebar */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
+          <NFLTeamsSidebar isMobile={true} />
+        </div>
+        <main className="flex-1 lg:ml-64 min-w-0 pt-[57px] lg:pt-0">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <Link href="/players" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
               &larr; Back to Players
@@ -210,10 +228,19 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   const gradeColors = player.pfsnImpact ? getGradeColor(player.pfsnImpact.grade) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <NFLTeamsSidebar />
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        <div className="fixed top-0 left-0 w-64 h-screen z-10">
+          <NFLTeamsSidebar />
+        </div>
+      </div>
+      {/* Mobile sidebar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
+        <NFLTeamsSidebar isMobile={true} />
+      </div>
 
-      <main className="flex-1 md:ml-64">
+      <main className="flex-1 lg:ml-64 min-w-0 pt-[57px] lg:pt-0">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Link */}
           <Link href="/players" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
