@@ -235,8 +235,9 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
 
       if (regularSeasonComplete && postseasonGames.length > 0) {
         // Regular season is over and team has postseason games
-        // Show last 3 regular season games + all postseason games (up to 5 total)
-        const lastRegularGames = regularSeasonGames.slice(-3);
+        // Calculate how many regular season games we need to fill 5 slots
+        const regularGamesNeeded = Math.max(0, 5 - postseasonGames.length);
+        const lastRegularGames = regularSeasonGames.slice(-regularGamesNeeded);
         const combinedGames = [...lastRegularGames, ...postseasonGames];
         relevantGames = combinedGames.slice(-5);
       } else if (currentWeekIndex === -1) {
@@ -382,7 +383,9 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
 
       if (regularSeasonComplete && postseasonGames.length > 0) {
         // Regular season is over and team has postseason games
-        const lastRegularGames = regularSeasonGames.slice(-3);
+        // Calculate how many regular season games we need to fill 5 slots
+        const regularGamesNeeded = Math.max(0, 5 - postseasonGames.length);
+        const lastRegularGames = regularSeasonGames.slice(-regularGamesNeeded);
         const combinedGames = [...lastRegularGames, ...postseasonGames];
         relevantGames = combinedGames.slice(-5);
       } else if (currentWeekIndex === -1) {
@@ -460,7 +463,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
         {/* Column 1 - Schedule Widget */}
         <div>
           <div className="bg-white rounded-lg shadow p-6 h-[430px] flex flex-col">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">2025 Schedule</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">2025-26 Schedule</h2>
 
             <div className="space-y-3 flex-grow">
               {scheduleLoading ? (

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
-import { getAllTeams, TeamData } from '@/data/teams';
+import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
@@ -185,19 +185,35 @@ export default function PlayersDirectoryClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <NFLTeamsSidebar />
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        <div className="fixed top-0 left-0 w-64 h-screen z-10">
+          <NFLTeamsSidebar />
+        </div>
+      </div>
 
-      <main className="flex-1 md:ml-64">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">NFL Players</h1>
-            <p className="text-gray-600 mt-1">
+      {/* Mobile sidebar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
+        <NFLTeamsSidebar isMobile={true} />
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 lg:ml-64 min-w-0">
+        {/* Header */}
+        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+              NFL Players
+            </h1>
+            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
               Browse player profiles with bio information and PFSN Impact Grades
             </p>
           </div>
+        </div>
 
+        {/* Content */}
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
           {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -352,7 +368,7 @@ export default function PlayersDirectoryClient() {
                 <div className="mt-6 text-center">
                   <button
                     onClick={() => setDisplayLimit(prev => prev + 50)}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-6 py-2 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] transition-colors"
                   >
                     Load More Players
                   </button>
