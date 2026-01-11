@@ -87,6 +87,7 @@ interface ESPNStats {
   statistics: ESPNStat[];
   displayDraft: string | null;
   displayBirthPlace: string | null;
+  college: string | null;
 }
 
 interface ESPNGameLogEntry {
@@ -372,6 +373,7 @@ async function fetchESPNAthleteStats(athleteId: string): Promise<ESPNStats | nul
       })),
       displayDraft,
       displayBirthPlace: data.athlete?.displayBirthPlace || null,
+      college: data.athlete?.college?.name || null,
     };
   } catch (error) {
     console.error('Error fetching ESPN athlete stats:', error);
@@ -926,7 +928,7 @@ export async function GET(
       age: foundPlayer.age,
       height: foundPlayer.height,
       weight: foundPlayer.weight,
-      college: foundPlayer.college,
+      college: espnStats?.college || foundPlayer.college,
       experience: foundPlayer.experience,
       experienceLabel: foundPlayer.experience === 0 ? 'Rookie' : `${foundPlayer.experience} ${foundPlayer.experience === 1 ? 'Year' : 'Years'}`,
       draft: espnStats?.displayDraft || (foundPlayer.draft ? `${foundPlayer.draft.year}: Round ${foundPlayer.draft.round}, Pick ${foundPlayer.draft.pick}` : null),
