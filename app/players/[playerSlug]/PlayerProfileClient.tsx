@@ -545,7 +545,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
           </div>
         )}
 
-        {/* Game Log Section - ESPN Stats + Impact Grade */}
+        {/* Game Log Section - ESPN Stats */}
         {player.gameLog && player.gameLog.games.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -563,50 +563,30 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                         {label.label}
                       </th>
                     ))}
-                    {player.pfsnImpact && (
-                      <th className="text-center py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">GRADE</th>
-                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {player.gameLog.games.map((game, index) => {
-                    // Find matching impact grade for this week
-                    const weeklyImpact = player.pfsnImpact?.weeklyData.find(w => w.week === game.week);
-                    const weekGradeColors = weeklyImpact ? getGradeColor(weeklyImpact.grade) : null;
-
-                    return (
-                      <tr
-                        key={game.week}
-                        className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
-                      >
-                        <td className="py-3 px-2 font-medium text-gray-900 whitespace-nowrap">{game.week}</td>
-                        <td className="py-3 px-2 text-gray-700 whitespace-nowrap">
-                          <span className="text-gray-500">{game.homeAway}</span> {game.opponent}
+                  {player.gameLog.games.map((game, index) => (
+                    <tr
+                      key={game.week}
+                      className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                    >
+                      <td className="py-3 px-2 font-medium text-gray-900 whitespace-nowrap">{game.week}</td>
+                      <td className="py-3 px-2 text-gray-700 whitespace-nowrap">
+                        <span className="text-gray-500">{game.homeAway}</span> {game.opponent}
+                      </td>
+                      <td className="py-3 px-2 text-center whitespace-nowrap">
+                        <span className={`font-medium ${game.result.startsWith('W') ? 'text-green-600' : game.result.startsWith('L') ? 'text-red-600' : 'text-gray-600'}`}>
+                          {game.result}
+                        </span>
+                      </td>
+                      {player.gameLog!.statLabels.slice(0, 8).map((label) => (
+                        <td key={label.name} className="py-3 px-2 text-center text-gray-700 whitespace-nowrap">
+                          {game.stats[label.name] || '-'}
                         </td>
-                        <td className="py-3 px-2 text-center whitespace-nowrap">
-                          <span className={`font-medium ${game.result.startsWith('W') ? 'text-green-600' : game.result.startsWith('L') ? 'text-red-600' : 'text-gray-600'}`}>
-                            {game.result}
-                          </span>
-                        </td>
-                        {player.gameLog!.statLabels.slice(0, 8).map((label) => (
-                          <td key={label.name} className="py-3 px-2 text-center text-gray-700 whitespace-nowrap">
-                            {game.stats[label.name] || '-'}
-                          </td>
-                        ))}
-                        {player.pfsnImpact && (
-                          <td className="py-3 px-2 text-center whitespace-nowrap">
-                            {weeklyImpact ? (
-                              <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${weekGradeColors?.bg} ${weekGradeColors?.text}`}>
-                                {weeklyImpact.grade} ({weeklyImpact.score})
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
+                      ))}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
