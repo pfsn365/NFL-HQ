@@ -72,7 +72,7 @@ export default function PlayersDirectoryClient() {
   const [selectedTeam, setSelectedTeam] = useState('all');
   const [selectedPosition, setSelectedPosition] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(24);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   // Debounced search value
@@ -351,10 +351,9 @@ export default function PlayersDirectoryClient() {
                             onChange={e => setItemsPerPage(Number(e.target.value))}
                             className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-sm bg-white"
                           >
-                            <option value={12}>12</option>
-                            <option value={24}>24</option>
-                            <option value={48}>48</option>
-                            <option value={96}>96</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
                           </select>
                         </div>
                       </div>
