@@ -44,22 +44,33 @@ const GOOGLE_SHEETS_CONFIG: Record<string, { spreadsheetId: string; gid: string 
   },
 };
 
-// Column mappings for each position sheet
+// Column mappings for each position sheet (must match player API)
 const POSITION_COLUMN_MAPPINGS: Record<string, {
   playerCol: number;
   scoreCol: number;
+  rankCol: number; // Used to validate rows
   headerRows: number;
 }> = {
-  QB: { playerCol: 2, scoreCol: 4, headerRows: 1 },
-  SAF: { playerCol: 1, scoreCol: -2, headerRows: 10 },
-  CB: { playerCol: 1, scoreCol: -2, headerRows: 10 },
-  LB: { playerCol: 2, scoreCol: -2, headerRows: 10 },
-  EDGE: { playerCol: 1, scoreCol: -2, headerRows: 10 },
-  DT: { playerCol: 1, scoreCol: -2, headerRows: 10 },
-  OL: { playerCol: 3, scoreCol: -2, headerRows: 10 },
-  TE: { playerCol: 1, scoreCol: -2, headerRows: 10 },
-  WR: { playerCol: 1, scoreCol: -6, headerRows: 10 },
-  RB: { playerCol: 2, scoreCol: 0, headerRows: 10 },
+  // QB: Season, Rank, Player, Grade, Score, OVR. Rank
+  QB: { playerCol: 2, scoreCol: 4, rankCol: 1, headerRows: 1 },
+  // SAF: columns from end: -4=Ovr.Rank, -3=SeasonRank, -2=SAF+, -1=Grade
+  SAF: { playerCol: 1, scoreCol: -2, rankCol: -3, headerRows: 10 },
+  // CB: columns from end: -4=Ovr.Rank, -3=SeasonRank, -2=CB+, -1=Grade
+  CB: { playerCol: 1, scoreCol: -2, rankCol: -3, headerRows: 10 },
+  // LB: columns from end: -4=Ovr.Rank, -3=SeasonRank, -2=LB+, -1=Grade
+  LB: { playerCol: 2, scoreCol: -2, rankCol: -3, headerRows: 10 },
+  // EDGE: columns from end: -4=Ovr.Rank, -3=SeasonRank, -2=EDGE+, -1=Grade
+  EDGE: { playerCol: 1, scoreCol: -2, rankCol: -3, headerRows: 10 },
+  // DT: columns from end: -4=Ovr.Rank, -3=SeasonRank, -2=DT+, -1=Grade
+  DT: { playerCol: 1, scoreCol: -2, rankCol: -3, headerRows: 10 },
+  // OL: columns from end: -5=Ovr.Rank, -4=SeasonRank, -3=SeasonPosRank, -2=OL+, -1=Grade
+  OL: { playerCol: 3, scoreCol: -2, rankCol: -4, headerRows: 10 },
+  // TE: columns from end: -4=Ovr.Rank, -3=SeasonRank, -2=TE+, -1=Grade
+  TE: { playerCol: 1, scoreCol: -2, rankCol: -3, headerRows: 10 },
+  // WR: columns from end: -8=Ovr.Rank, -6=WR+, -5=Grade, -1=SeasonRank
+  WR: { playerCol: 1, scoreCol: -6, rankCol: -1, headerRows: 10 },
+  // RB: col 0=RB+, col 1=Grade, col 2=Player, from end: -3=OverallRank, -1=SeasonRank
+  RB: { playerCol: 2, scoreCol: 0, rankCol: -1, headerRows: 10 },
 };
 
 // Position to sheet mapping
@@ -144,7 +155,10 @@ async function fetchPositionGrades(position: string): Promise<ImpactGrade[]> {
       next: { revalidate: 86400 },
     });
 
-    if (!response.ok) return [];
+    if (!response.ok) {
+      console.error(`Failed to fetch ${position} grades: ${response.status}`);
+      return [];
+    }
 
     const csvText = await response.text();
     const lines = csvText.split('\n').filter(line => line.trim());
@@ -152,18 +166,25 @@ async function fetchPositionGrades(position: string): Promise<ImpactGrade[]> {
 
     for (let i = mapping.headerRows; i < lines.length; i++) {
       const values = parseCSVLine(lines[i]);
-      if (values.length < 5) continue;
+      if (values.length < 3) continue; // Relaxed from 5 to 3
 
       const getCol = (col: number) => col < 0 ? values[values.length + col] : values[col];
 
       const player = getCol(mapping.playerCol)?.trim() || '';
       const scoreStr = getCol(mapping.scoreCol)?.trim() || '0';
+      const rankStr = getCol(mapping.rankCol)?.trim() || '0';
+
+      // Parse score (remove % if present)
       const score = parseFloat(scoreStr.replace('%', '')) || 0;
+      const rank = parseInt(rankStr) || 0;
 
+      // Skip header rows and invalid data
       if (!player || player.toLowerCase() === 'player' || player.toLowerCase().includes('season')) continue;
-      if (score <= 0) continue;
 
-      grades.push({ player, score });
+      // Accept row if score > 0 OR rank > 0 (more lenient)
+      if (score <= 0 && rank <= 0) continue;
+
+      grades.push({ player, score: score > 0 ? score : 50 }); // Default to 50 if only rank exists
     }
 
     return grades;
