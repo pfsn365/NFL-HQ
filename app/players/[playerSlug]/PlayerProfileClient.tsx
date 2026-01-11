@@ -309,29 +309,24 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
       {/* Hero Section with Team Color */}
       <div style={{ backgroundColor: player.team.primaryColor }} className="text-white pt-[57px] lg:pt-0">
-        <div className="container mx-auto px-4 py-6 lg:py-8">
-          {/* Back Link */}
-          <Link href="/players" className="text-white/80 hover:text-white mb-4 inline-flex items-center gap-1 text-sm">
-            ← Back to Players
-          </Link>
-
-          <div className="flex flex-col lg:flex-row items-center justify-between mt-4">
+        <div className="container mx-auto px-4 py-8 lg:py-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between">
             {/* Player Info */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 mb-6 lg:mb-0">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-8 mb-6 lg:mb-0">
               {/* Headshot */}
-              <div className="w-24 h-24 lg:w-32 lg:h-32 bg-white rounded-full flex items-center justify-center shadow-lg p-1 flex-shrink-0">
+              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-full flex items-center justify-center shadow-lg p-1.5 flex-shrink-0">
                 {!imageError ? (
                   <Image
                     src={player.headshotUrl}
                     alt={player.name}
-                    width={120}
-                    height={120}
+                    width={160}
+                    height={160}
                     className="w-full h-full rounded-full object-cover"
                     onError={() => setImageError(true)}
                   />
                 ) : (
                   <div
-                    className="w-full h-full rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold"
+                    className="w-full h-full rounded-full flex items-center justify-center text-3xl lg:text-4xl font-bold"
                     style={{ backgroundColor: player.team.secondaryColor || '#e5e7eb', color: player.team.primaryColor }}
                   >
                     {getInitials(player.name)}
@@ -341,19 +336,19 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
               {/* Name and Details */}
               <div className="text-center sm:text-left">
-                <div className="flex items-center justify-center sm:justify-start gap-3 mb-1">
-                  <h1 className="text-2xl lg:text-4xl font-bold">{player.name}</h1>
-                  <span className="text-xl lg:text-3xl opacity-70">#{player.jerseyNumber}</span>
+                <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
+                  <h1 className="text-3xl lg:text-5xl font-bold">{player.name}</h1>
+                  <span className="text-2xl lg:text-4xl opacity-70">#{player.jerseyNumber}</span>
                 </div>
 
-                <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                <div className="flex items-center justify-center sm:justify-start gap-3 text-lg lg:text-xl">
                   <Link href={`/teams/${player.team.id}`} className="flex items-center gap-2 hover:opacity-80">
                     <Image
                       src={player.team.logo}
                       alt={player.team.name}
-                      width={20}
-                      height={20}
-                      className="w-5 h-5"
+                      width={28}
+                      height={28}
+                      className="w-7 h-7"
                     />
                     <span className="font-medium">{player.team.name}</span>
                   </Link>
@@ -361,18 +356,9 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                   <span className="opacity-90">{player.positionFull}</span>
                 </div>
 
-                {/* Quick Stats Row */}
-                <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-sm opacity-90">
-                  <span>{player.age} years old</span>
-                  <span>•</span>
-                  <span>{player.height}, {player.weight} lbs</span>
-                  <span>•</span>
-                  <span>{player.experienceLabel}</span>
-                </div>
-
                 {/* Status Badge */}
                 {player.status !== 'Active' && (
-                  <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                  <span className="inline-block mt-3 px-4 py-1.5 rounded-full text-sm font-medium bg-white/20 text-white">
                     {player.status}
                   </span>
                 )}
@@ -432,6 +418,22 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
             Player Information
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <dt className="text-xs text-gray-500 uppercase tracking-wide">Age</dt>
+              <dd className="font-medium text-gray-900">{player.age || '—'}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500 uppercase tracking-wide">Height</dt>
+              <dd className="font-medium text-gray-900">{player.height || '—'}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500 uppercase tracking-wide">Weight</dt>
+              <dd className="font-medium text-gray-900">{player.weight ? `${player.weight} lbs` : '—'}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500 uppercase tracking-wide">Experience</dt>
+              <dd className="font-medium text-gray-900">{player.experienceLabel || '—'}</dd>
+            </div>
             <div>
               <dt className="text-xs text-gray-500 uppercase tracking-wide">College</dt>
               <dd className="font-medium text-gray-900">{player.college || '—'}</dd>
