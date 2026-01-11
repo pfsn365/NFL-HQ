@@ -426,7 +426,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
         <div className="container mx-auto px-4 py-4 lg:py-5">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             {/* Player Info */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-8 mb-4 lg:mb-0">
+            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-8 mb-4 lg:mb-0">
               {/* Headshot */}
               <div className="w-36 h-36 lg:w-44 lg:h-44 rounded-full flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0 bg-white mt-2">
                 {!imageError ? (
@@ -481,7 +481,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
             {/* PFSN Impact Card */}
             <div className="bg-white text-gray-800 rounded-lg p-4 lg:p-5 w-full sm:w-auto min-w-[200px] shadow-lg flex flex-col">
-              <h3 className="text-sm font-semibold text-center text-gray-600">PFSN Impact Grade</h3>
+              <h3 className="text-base font-semibold text-center text-gray-600">PFSN Impact Grade</h3>
               {player.pfsnImpact ? (
                 <div className="flex flex-col flex-1">
                   <div className="flex items-center justify-center gap-4 flex-1 py-3">
