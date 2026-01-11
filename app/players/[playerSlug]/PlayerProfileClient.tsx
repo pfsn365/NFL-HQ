@@ -192,7 +192,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
       try {
         // Use the player slug for the RSS feed URL
         const rssUrl = `https://www.profootballnetwork.com/tag/${playerSlug}/feed/`;
-        const response = await fetch(`/api/proxy-rss?url=${encodeURIComponent(rssUrl)}`);
+        const response = await fetch(getApiPath(`api/proxy-rss?url=${encodeURIComponent(rssUrl)}`));
 
         if (!response.ok) return;
 
