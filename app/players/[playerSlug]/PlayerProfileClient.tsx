@@ -481,7 +481,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
             {/* PFSN Impact Card */}
             <div className="bg-white text-gray-800 rounded-lg p-4 lg:p-5 w-full sm:w-auto min-w-[200px] shadow-lg flex flex-col">
-              <h3 className="text-sm font-semibold text-center text-gray-600">PFSN IMPACT GRADE</h3>
+              <h3 className="text-sm font-semibold text-center text-gray-600">PFSN Impact Grade</h3>
               {player.pfsnImpact ? (
                 <div className="flex flex-col flex-1">
                   <div className="flex items-center justify-center gap-4 flex-1 py-3">
