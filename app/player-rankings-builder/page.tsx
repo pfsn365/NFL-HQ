@@ -14,8 +14,30 @@ const PlayerRankingsClient = dynamic(() => import('./PlayerRankingsClient'), {
 });
 
 export const metadata: Metadata = {
-  title: 'NFL Player Rankings Builder | NBA Hub',
-  description: 'Create and customize your own NBA player rankings. Rank the best players, download and share your rankings.',
+  title: 'NFL Player Rankings Builder - Create Your Own Player Rankings',
+  description: 'Create and customize your own NFL player rankings. Rank the best NFL players by position, download and share your rankings.',
+  keywords: [
+    'NFL Player Rankings',
+    'NFL Rankings Builder',
+    'NFL Player Tiers',
+    'Best NFL Players',
+    'NFL Fantasy Rankings',
+    'Custom NFL Rankings'
+  ],
+  openGraph: {
+    title: 'NFL Player Rankings Builder - Create Your Own Player Rankings',
+    description: 'Create and customize your own NFL player rankings. Rank the best players by position.',
+    type: 'website',
+    url: 'https://www.profootballnetwork.com/nfl-hq/player-rankings-builder',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NFL Player Rankings Builder - Create Your Own Player Rankings',
+    description: 'Create and customize your own NFL player rankings. Rank the best players by position.',
+  },
+  alternates: {
+    canonical: 'https://www.profootballnetwork.com/nfl-hq/player-rankings-builder',
+  },
 };
 
 export default function PlayerRankingsPage() {

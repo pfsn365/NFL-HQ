@@ -1,7 +1,28 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { useTickerContext } from '@/context/TickerContext';
+import { getApiPath } from '@/utils/api';
+
+interface TickerGame {
+  id: string;
+  awayTeam: {
+    abbr: string;
+    logo: string;
+    score?: number;
+    hasPossession?: boolean;
+  };
+  homeTeam: {
+    abbr: string;
+    logo: string;
+    score?: number;
+    hasPossession?: boolean;
+  };
+  statusDetail: string;
+  startDate: string;
+  isLive: boolean;
+  isFinal: boolean;
+}
 
 // Format game time in user's local timezone
 function formatLocalGameTime(isoDate: string): string {
@@ -23,7 +44,29 @@ function formatLocalGameTime(isoDate: string): string {
 }
 
 export default function NFLScoreTicker() {
-  const { games, loading } = useTickerContext();
+  const [games, setGames] = useState<TickerGame[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const fetchGames = useCallback(async () => {
+    try {
+      const response = await fetch(getApiPath('api/nfl/espn-scoreboard?ticker=true'));
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      setGames(data.games || []);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Error fetching live scores:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchGames();
+    const interval = setInterval(fetchGames, 30000);
+    return () => clearInterval(interval);
+  }, [fetchGames]);
 
   if (loading) {
     return (

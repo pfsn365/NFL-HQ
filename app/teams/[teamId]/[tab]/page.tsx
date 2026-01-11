@@ -74,6 +74,8 @@ export async function generateMetadata({ params }: PageProps) {
 
   const tabTitle = tabTitles[tab] || tab;
 
+  const canonicalUrl = `https://www.profootballnetwork.com/nfl-hq/teams/${teamId}/${tab}`;
+
   return {
     title: `${team.fullName} ${tabTitle} - NFL Team Page`,
     description: `${team.fullName} ${tabTitle.toLowerCase()}. ${team.generalManager} (GM), ${team.headCoach} (HC). ${team.record} record in ${team.division}.`,
@@ -86,10 +88,19 @@ export async function generateMetadata({ params }: PageProps) {
       team.division,
       tabTitle.toLowerCase()
     ].join(', '),
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `${team.fullName} ${tabTitle} - NFL Team Page`,
       description: `${team.fullName} ${tabTitle.toLowerCase()} information.`,
       images: [team.logoUrl],
+      url: canonicalUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${team.fullName} ${tabTitle} - NFL Team Page`,
+      description: `${team.fullName} ${tabTitle.toLowerCase()} information.`,
     },
   };
 }
