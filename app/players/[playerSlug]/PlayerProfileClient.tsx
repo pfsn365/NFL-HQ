@@ -422,7 +422,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
       />
 
       {/* Hero Section with Blue Background */}
-      <div style={{ backgroundColor: '#0050A0' }} className="text-white pt-[57px] lg:pt-4 lg:pb-4">
+      <div style={{ backgroundColor: '#0050A0' }} className="text-white pt-[57px] lg:pt-5 lg:pb-4">
         <div className="container mx-auto px-4 py-4 lg:py-5">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             {/* Player Info */}
@@ -480,23 +480,23 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
             </div>
 
             {/* PFSN Impact Card */}
-            <div className="bg-white text-gray-800 rounded-lg p-3 lg:p-4 w-full sm:w-auto min-w-[180px] shadow-lg">
-              <h3 className="text-xs font-semibold mb-2 text-center text-gray-600">PFSN IMPACT GRADE</h3>
+            <div className="bg-white text-gray-800 rounded-lg p-4 lg:p-5 w-full sm:w-auto min-w-[200px] shadow-lg">
+              <h3 className="text-sm font-semibold mb-3 text-center text-gray-600">PFSN IMPACT GRADE</h3>
               {player.pfsnImpact ? (
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-3">
+                  <div className="flex items-center justify-center gap-4">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${gradeColors?.bg} ${gradeColors?.text} border-2 ${gradeColors?.border}`}
+                      className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold ${gradeColors?.bg} ${gradeColors?.text} border-2 ${gradeColors?.border}`}
                     >
                       {player.pfsnImpact.grade}
                     </div>
                     <div className="text-left">
-                      <div className={`text-2xl font-bold ${getScoreColor(player.pfsnImpact.score)}`}>
+                      <div className={`text-3xl font-bold ${getScoreColor(player.pfsnImpact.score)}`}>
                         {player.pfsnImpact.score}
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-center mt-2 pt-2 border-t border-gray-100 text-xs">
+                  <div className="flex justify-center mt-3 pt-3 border-t border-gray-100 text-sm">
                     <div>
                       <span className="text-gray-500">Season Rank</span>
                       <span className="font-bold text-gray-900 ml-1">#{player.pfsnImpact.seasonRank}</span>
@@ -504,8 +504,8 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-1">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold text-gray-400 mb-1">
+                <div className="text-center py-2">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-2xl font-bold text-gray-400 mb-2">
                     —
                   </div>
                   <p className="text-gray-500 text-xs">Not available</p>
