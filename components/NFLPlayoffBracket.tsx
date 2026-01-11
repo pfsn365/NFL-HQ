@@ -47,11 +47,11 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   },
   'afc-wc-2': {
     id: 'afc-wc-2',
-    team1: { seed: 3, name: 'Jaguars', teamId: 'jacksonville-jaguars' },
-    team2: { seed: 6, name: 'Bills', teamId: 'buffalo-bills' },
+    team1: { seed: 3, name: 'Jaguars', teamId: 'jacksonville-jaguars', score: 24 },
+    team2: { seed: 6, name: 'Bills', teamId: 'buffalo-bills', score: 27 },
     round: 'Wild Card',
     date: 'Jan 11',
-    completed: false,
+    completed: true,
   },
   'afc-wc-3': {
     id: 'afc-wc-3',
