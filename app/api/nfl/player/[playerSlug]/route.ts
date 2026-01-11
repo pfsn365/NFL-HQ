@@ -44,6 +44,56 @@ interface PFSNResponse {
   positionMap: Record<string, string>;
 }
 
+interface ESPNStat {
+  name: string;
+  displayName: string;
+  shortDisplayName: string;
+  abbreviation: string;
+  value: number;
+  displayValue: string;
+}
+
+interface ESPNStats {
+  displayName: string;
+  statistics: ESPNStat[];
+}
+
+// ESPN Team ID mapping
+const espnTeamIdMap: Record<string, string> = {
+  'arizona-cardinals': '22',
+  'atlanta-falcons': '1',
+  'baltimore-ravens': '33',
+  'buffalo-bills': '2',
+  'carolina-panthers': '29',
+  'chicago-bears': '3',
+  'cincinnati-bengals': '4',
+  'cleveland-browns': '5',
+  'dallas-cowboys': '6',
+  'denver-broncos': '7',
+  'detroit-lions': '8',
+  'green-bay-packers': '9',
+  'houston-texans': '34',
+  'indianapolis-colts': '11',
+  'jacksonville-jaguars': '30',
+  'kansas-city-chiefs': '12',
+  'las-vegas-raiders': '13',
+  'los-angeles-chargers': '24',
+  'los-angeles-rams': '14',
+  'miami-dolphins': '15',
+  'minnesota-vikings': '16',
+  'new-england-patriots': '17',
+  'new-orleans-saints': '18',
+  'new-york-giants': '19',
+  'new-york-jets': '20',
+  'philadelphia-eagles': '21',
+  'pittsburgh-steelers': '23',
+  'san-francisco-49ers': '25',
+  'seattle-seahawks': '26',
+  'tampa-bay-buccaneers': '27',
+  'tennessee-titans': '10',
+  'washington-commanders': '28',
+};
+
 function normalizePlayerName(name: string): string {
   return name
     .toLowerCase()
@@ -176,6 +226,75 @@ async function fetchTeamRosterDirect(teamId: string): Promise<{ players: RosterP
     return { players, teamId };
   } catch (error) {
     console.error(`Error fetching roster for ${teamId}:`, error);
+    return null;
+  }
+}
+
+async function fetchESPNAthleteId(teamId: string, playerName: string): Promise<string | null> {
+  try {
+    const espnTeamId = espnTeamIdMap[teamId];
+    if (!espnTeamId) return null;
+
+    const response = await fetch(
+      `https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${espnTeamId}/roster`,
+      {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)' },
+        next: { revalidate: 86400 },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const normalizedSearchName = normalizePlayerName(playerName);
+
+    // Search through all position groups
+    for (const group of data.athletes || []) {
+      for (const athlete of group.items || []) {
+        const athleteName = athlete.fullName || athlete.displayName || '';
+        if (normalizePlayerName(athleteName) === normalizedSearchName) {
+          return athlete.id;
+        }
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching ESPN athlete ID:', error);
+    return null;
+  }
+}
+
+async function fetchESPNAthleteStats(athleteId: string): Promise<ESPNStats | null> {
+  try {
+    const response = await fetch(
+      `https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/${athleteId}`,
+      {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)' },
+        next: { revalidate: 3600 }, // Cache for 1 hour
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const statsSummary = data.athlete?.statsSummary;
+
+    if (!statsSummary || !statsSummary.statistics) return null;
+
+    return {
+      displayName: statsSummary.displayName || '',
+      statistics: statsSummary.statistics.map((stat: Record<string, unknown>) => ({
+        name: stat.name || '',
+        displayName: stat.displayName || '',
+        shortDisplayName: stat.shortDisplayName || '',
+        abbreviation: stat.abbreviation || '',
+        value: Number(stat.value) || 0,
+        displayValue: String(stat.displayValue || '0'),
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching ESPN athlete stats:', error);
     return null;
   }
 }
@@ -359,7 +478,14 @@ export async function GET(
     // Get team info
     const team = teams[foundTeamId];
 
-    // Fetch PFSN Impact data
+    // Fetch ESPN stats
+    let espnStats: ESPNStats | null = null;
+    const espnAthleteId = await fetchESPNAthleteId(foundTeamId, foundPlayer.name);
+    if (espnAthleteId) {
+      espnStats = await fetchESPNAthleteStats(espnAthleteId);
+    }
+
+    // Fetch PFSN Impact data (may fail if repos don't exist)
     const pfsnData = await fetchPFSNImpact();
 
     // Try to match player to PFSN data
