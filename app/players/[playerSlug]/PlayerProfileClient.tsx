@@ -57,6 +57,19 @@ interface PlayerProfile {
       displayValue: string;
     }>;
   } | null;
+  gameLog: {
+    season: string;
+    statLabels: Array<{ name: string; label: string }>;
+    games: Array<{
+      week: number;
+      date: string;
+      opponent: string;
+      opponentLogo: string;
+      homeAway: string;
+      result: string;
+      stats: Record<string, string>;
+    }>;
+  } | null;
 }
 
 interface Props {
@@ -491,62 +504,74 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
           </div>
         )}
 
-        {/* Game Log Section */}
-        {player.pfsnImpact && player.pfsnImpact.weeklyData.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+        {/* Game Log Section - ESPN Stats + Impact Grade */}
+        {player.gameLog && player.gameLog.games.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {player.pfsnImpact.season} Game Log
+              Game Log
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b-2 border-gray-200">
-                    <th className="text-left py-3 px-3 font-semibold text-gray-600 bg-gray-50">Week</th>
-                    <th className="text-left py-3 px-3 font-semibold text-gray-600 bg-gray-50">Opponent</th>
-                    <th className="text-center py-3 px-3 font-semibold text-gray-600 bg-gray-50">Score</th>
-                    <th className="text-center py-3 px-3 font-semibold text-gray-600 bg-gray-50">Grade</th>
+                    <th className="text-left py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">WK</th>
+                    <th className="text-left py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">OPP</th>
+                    <th className="text-center py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">RESULT</th>
+                    {player.gameLog.statLabels.slice(0, 8).map((label) => (
+                      <th key={label.name} className="text-center py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">
+                        {label.label}
+                      </th>
+                    ))}
+                    {player.pfsnImpact && (
+                      <th className="text-center py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">GRADE</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {player.pfsnImpact.weeklyData.map((week, index) => {
-                    const weekGradeColors = getGradeColor(week.grade);
+                  {player.gameLog.games.map((game, index) => {
+                    // Find matching impact grade for this week
+                    const weeklyImpact = player.pfsnImpact?.weeklyData.find(w => w.week === game.week);
+                    const weekGradeColors = weeklyImpact ? getGradeColor(weeklyImpact.grade) : null;
+
                     return (
                       <tr
-                        key={week.week}
+                        key={game.week}
                         className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
                       >
-                        <td className="py-3 px-3 font-medium text-gray-900">Week {week.week}</td>
-                        <td className="py-3 px-3 text-gray-700">{week.opponent || '—'}</td>
-                        <td className={`py-3 px-3 text-center font-bold ${getScoreColor(week.score)}`}>
-                          {week.score}
+                        <td className="py-3 px-2 font-medium text-gray-900 whitespace-nowrap">{game.week}</td>
+                        <td className="py-3 px-2 text-gray-700 whitespace-nowrap">
+                          <span className="text-gray-500">{game.homeAway}</span> {game.opponent}
                         </td>
-                        <td className="py-3 px-3 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${weekGradeColors.bg} ${weekGradeColors.text}`}>
-                            {week.grade}
+                        <td className="py-3 px-2 text-center whitespace-nowrap">
+                          <span className={`font-medium ${game.result.startsWith('W') ? 'text-green-600' : game.result.startsWith('L') ? 'text-red-600' : 'text-gray-600'}`}>
+                            {game.result}
                           </span>
                         </td>
+                        {player.gameLog!.statLabels.slice(0, 8).map((label) => (
+                          <td key={label.name} className="py-3 px-2 text-center text-gray-700 whitespace-nowrap">
+                            {game.stats[label.name] || '-'}
+                          </td>
+                        ))}
+                        {player.pfsnImpact && (
+                          <td className="py-3 px-2 text-center whitespace-nowrap">
+                            {weeklyImpact ? (
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${weekGradeColors?.bg} ${weekGradeColors?.text}`}>
+                                {weeklyImpact.grade} ({weeklyImpact.score})
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
-
-        {/* No Data Message */}
-        {!player.pfsnImpact && (
-          <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center mb-6">
-            <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-700 mb-1">No Stats Available</h3>
-            <p className="text-gray-500 text-sm">
-              PFSN Impact data and game logs are not available for this player.
-            </p>
           </div>
         )}
 

@@ -166,8 +166,13 @@ export default function PlayersDirectoryClient() {
           </div>
         </div>
 
+        {/* Raptive Header Ad */}
+        <div className="container mx-auto px-4 min-h-[150px]">
+          <div className="raptive-pfn-header"></div>
+        </div>
+
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

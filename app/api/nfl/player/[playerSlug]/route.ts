@@ -58,6 +58,22 @@ interface ESPNStats {
   statistics: ESPNStat[];
 }
 
+interface ESPNGameLogEntry {
+  week: number;
+  date: string;
+  opponent: string;
+  opponentLogo: string;
+  homeAway: string;
+  result: string;
+  stats: Record<string, string>;
+}
+
+interface ESPNGameLog {
+  season: string;
+  games: ESPNGameLogEntry[];
+  statLabels: Array<{ name: string; label: string }>;
+}
+
 // ESPN Team ID mapping
 const espnTeamIdMap: Record<string, string> = {
   'arizona-cardinals': '22',
@@ -299,6 +315,81 @@ async function fetchESPNAthleteStats(athleteId: string): Promise<ESPNStats | nul
   }
 }
 
+async function fetchESPNGameLog(athleteId: string): Promise<ESPNGameLog | null> {
+  try {
+    const response = await fetch(
+      `https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/${athleteId}/gamelog`,
+      {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)' },
+        next: { revalidate: 3600 },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+
+    // Get the season display name
+    const seasonType = data.seasonTypes?.[0];
+    if (!seasonType) return null;
+
+    const categories = seasonType.categories || [];
+    const events = seasonType.events || {};
+
+    // Find the main stats category (usually the first one with stats)
+    const mainCategory = categories.find((cat: Record<string, unknown>) =>
+      Array.isArray(cat.events) && cat.events.length > 0
+    );
+
+    if (!mainCategory) return null;
+
+    // Get stat labels from the category
+    const statLabels: Array<{ name: string; label: string }> = (mainCategory.labels || []).map(
+      (label: string, index: number) => ({
+        name: mainCategory.names?.[index] || label,
+        label: label,
+      })
+    );
+
+    // Parse game entries
+    const games: ESPNGameLogEntry[] = [];
+
+    for (const eventId of mainCategory.events || []) {
+      const event = events[eventId];
+      if (!event) continue;
+
+      const gameStats = mainCategory.totals?.[mainCategory.events.indexOf(eventId)] || [];
+      const statsMap: Record<string, string> = {};
+
+      statLabels.forEach((label, index) => {
+        statsMap[label.name] = gameStats[index] || '-';
+      });
+
+      games.push({
+        week: event.week || 0,
+        date: event.gameDate || '',
+        opponent: event.opponent?.displayName || event.opponent?.abbreviation || 'TBD',
+        opponentLogo: event.opponent?.logo || '',
+        homeAway: event.homeAway === 'home' ? 'vs' : '@',
+        result: event.gameResult || '-',
+        stats: statsMap,
+      });
+    }
+
+    // Sort by week
+    games.sort((a, b) => a.week - b.week);
+
+    return {
+      season: seasonType.displayName || '2025 Regular Season',
+      games,
+      statLabels,
+    };
+  } catch (error) {
+    console.error('Error fetching ESPN game log:', error);
+    return null;
+  }
+}
+
 // Google Sheets configuration for PFSN Impact Grades
 const GOOGLE_SHEETS_CONFIG = {
   QB: {
@@ -521,11 +612,18 @@ export async function GET(
     // Get team info
     const team = teams[foundTeamId];
 
-    // Fetch ESPN stats
+    // Fetch ESPN stats and game log
     let espnStats: ESPNStats | null = null;
+    let espnGameLog: ESPNGameLog | null = null;
     const espnAthleteId = await fetchESPNAthleteId(foundTeamId, foundPlayer.name);
     if (espnAthleteId) {
-      espnStats = await fetchESPNAthleteStats(espnAthleteId);
+      // Fetch stats and game log in parallel
+      const [statsResult, gameLogResult] = await Promise.all([
+        fetchESPNAthleteStats(espnAthleteId),
+        fetchESPNGameLog(espnAthleteId),
+      ]);
+      espnStats = statsResult;
+      espnGameLog = gameLogResult;
     }
 
     // Fetch PFSN Impact data (may fail if repos don't exist)
@@ -587,6 +685,21 @@ export async function GET(
           abbreviation: stat.abbreviation,
           value: stat.value,
           displayValue: stat.displayValue,
+        })),
+      } : null,
+
+      // Game Log
+      gameLog: espnGameLog ? {
+        season: espnGameLog.season,
+        statLabels: espnGameLog.statLabels,
+        games: espnGameLog.games.map(game => ({
+          week: game.week,
+          date: game.date,
+          opponent: game.opponent,
+          opponentLogo: game.opponentLogo,
+          homeAway: game.homeAway,
+          result: game.result,
+          stats: game.stats,
         })),
       } : null,
     };
