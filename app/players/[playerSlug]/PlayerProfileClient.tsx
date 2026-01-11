@@ -574,23 +574,6 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
           </div>
         </div>
 
-        {/* Season Stats Section - ESPN Stats */}
-        {player.seasonStats && player.seasonStats.stats.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {player.seasonStats.season}
-            </h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-              {player.seasonStats.stats.map((stat) => (
-                <div key={stat.name} className="bg-gray-50 rounded-lg p-3 text-center">
-                  <div className="text-lg font-bold text-gray-900">{stat.displayValue}</div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">{stat.shortLabel || stat.abbreviation}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Game Log Section - ESPN Stats */}
         {player.gameLog && player.gameLog.availableSeasons.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
@@ -650,6 +633,23 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                       </tr>
                     ))}
                   </tbody>
+                  {player.seasonStats && player.seasonStats.stats.length > 0 && (
+                    <tfoot>
+                      <tr className="border-t-2 border-gray-300 bg-gray-100 font-semibold">
+                        <td className="py-3 px-2 text-gray-900 whitespace-nowrap" colSpan={3}>
+                          SEASON TOTALS
+                        </td>
+                        {gameLogData.statLabels.slice(0, 8).map((label) => {
+                          const stat = player.seasonStats?.stats.find(s => s.name === label.name);
+                          return (
+                            <td key={label.name} className="py-3 px-2 text-center text-gray-900 whitespace-nowrap">
+                              {stat?.displayValue || '-'}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tfoot>
+                  )}
                 </table>
               </div>
             ) : (
