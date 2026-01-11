@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as cheerio from 'cheerio';
 
 interface Article {
   title: string;
@@ -7,77 +8,82 @@ interface Article {
   description: string;
   image?: string;
   featuredImage?: string;
-}
-
-function extractImageFromContent(content: string): string | undefined {
-  // Try to extract image from content:encoded or description
-  const imgMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
-  if (imgMatch) {
-    return imgMatch[1];
-  }
-
-  // Try media:content
-  const mediaMatch = content.match(/<media:content[^>]+url=["']([^"']+)["']/i);
-  if (mediaMatch) {
-    return mediaMatch[1];
-  }
-
-  return undefined;
+  author?: string;
+  category?: string;
+  readTime?: string;
 }
 
 function parseRSSItems(xmlText: string): Article[] {
+  const $ = cheerio.load(xmlText, { xmlMode: true });
   const articles: Article[] = [];
 
-  // Simple XML parsing for RSS items
-  const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-  let itemMatch;
+  $('item').each((_index, element) => {
+    const $item = $(element);
 
-  while ((itemMatch = itemRegex.exec(xmlText)) !== null) {
-    const itemContent = itemMatch[1];
+    const title = $item.find('title').text().trim();
+    const link = $item.find('link').text().trim();
+    const pubDate = $item.find('pubDate').text().trim();
+    const author = $item.find('dc\\:creator, creator').text().trim();
+    const category = $item.find('category').first().text().trim();
 
-    // Extract title
-    const titleMatch = itemContent.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/i) ||
-                       itemContent.match(/<title>(.*?)<\/title>/i);
-    const title = titleMatch ? titleMatch[1].trim() : '';
+    // Extract featured image from media:thumbnail (primary method)
+    let featuredImage = $item.find('media\\:thumbnail').attr('url') || '';
 
-    // Extract link
-    const linkMatch = itemContent.match(/<link>(.*?)<\/link>/i);
-    const link = linkMatch ? linkMatch[1].trim() : '';
-
-    // Extract pubDate
-    const pubDateMatch = itemContent.match(/<pubDate>(.*?)<\/pubDate>/i);
-    const pubDate = pubDateMatch ? pubDateMatch[1].trim() : '';
-
-    // Extract description
-    const descMatch = itemContent.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/i) ||
-                      itemContent.match(/<description>([\s\S]*?)<\/description>/i);
-    const description = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '').slice(0, 200) : '';
-
-    // Extract image from content:encoded or media:content
-    const contentMatch = itemContent.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/i);
-    const mediaMatch = itemContent.match(/<media:content[^>]+url=["']([^"']+)["']/i);
-    const enclosureMatch = itemContent.match(/<enclosure[^>]+url=["']([^"']+)["']/i);
-
-    let image: string | undefined;
-    if (mediaMatch) {
-      image = mediaMatch[1];
-    } else if (enclosureMatch) {
-      image = enclosureMatch[1];
-    } else if (contentMatch) {
-      image = extractImageFromContent(contentMatch[1]);
+    // Fallback: try media:content
+    if (!featuredImage) {
+      featuredImage = $item.find('media\\:content').attr('url') || '';
     }
+
+    // Fallback: try enclosure
+    if (!featuredImage) {
+      featuredImage = $item.find('enclosure').attr('url') || '';
+    }
+
+    // Fallback: try to extract from content:encoded HTML
+    if (!featuredImage) {
+      const contentEncoded = $item.find('content\\:encoded').text();
+      const imgMatch = contentEncoded.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (imgMatch) {
+        featuredImage = imgMatch[1];
+      }
+    }
+
+    // Fallback: try to extract from description HTML
+    if (!featuredImage) {
+      const descriptionHtml = $item.find('description').text();
+      const imgMatch = descriptionHtml.match(/src="([^"]+)"/);
+      if (imgMatch) {
+        featuredImage = imgMatch[1];
+      }
+    }
+
+    // Clean up description by removing HTML tags
+    const cleanDescription = $item.find('description').text()
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .trim()
+      .slice(0, 200);
+
+    // Estimate read time based on content length
+    const readTime = Math.max(1, Math.round(cleanDescription.length / 200)) + ' min read';
 
     if (title && link) {
       articles.push({
         title,
         link,
         pubDate,
-        description,
-        image,
-        featuredImage: image, // Also include as featuredImage for compatibility
+        description: cleanDescription,
+        image: featuredImage.trim(),
+        featuredImage: featuredImage.trim(),
+        author: author || 'PFSN',
+        category: category || 'NFL News',
+        readTime,
       });
     }
-  }
+  });
 
   return articles;
 }
