@@ -8,6 +8,7 @@ import StructuredData from '@/components/StructuredData';
 import { WebVitals } from '@/components/WebVitals';
 import VideoPlayerScript from '@/components/VideoPlayerScript';
 import NFLScoreTicker from '@/components/NFLScoreTicker';
+import { TickerProvider } from '@/context/TickerContext';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://profootballnetwork.com/nfl-hq'),
@@ -120,12 +121,14 @@ export default function RootLayout({
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
       <body className="antialiased raptive-pfn-disable-footer-close pb-24">
-        <NFLScoreTicker />
-        <CanonicalURL />
-        <StructuredData />
-        <WebVitals />
-        <VideoPlayerScript />
-        {children}
+        <TickerProvider>
+          <NFLScoreTicker />
+          <CanonicalURL />
+          <StructuredData />
+          <WebVitals />
+          <VideoPlayerScript />
+          {children}
+        </TickerProvider>
       </body>
     </html>
   );
