@@ -89,6 +89,7 @@ export interface ESPNCompetition {
   broadcasts?: ESPNBroadcast[];
   situation?: ESPNSituation;
   notes?: Array<{ headline: string }>; // e.g., "AFC Wild Card"
+  leaders?: ESPNLeaderCategory[]; // Game-level stat leaders
 }
 
 export interface ESPNEvent {
@@ -309,37 +310,57 @@ export function transformESPNGame(event: ESPNEvent): TransformedGame | null {
   const awayHasPossession = isLive && possessionTeamId === awayCompetitor.id;
   const homeHasPossession = isLive && possessionTeamId === homeCompetitor.id;
 
-  // Extract game leaders (get the best from either team)
+  // Extract game leaders - check competition.leaders first (game-level), then competitor.leaders (team-level)
   let hiPass: TransformedGame['hi_pass'];
   let hiRush: TransformedGame['hi_rush'];
   let hiRec: TransformedGame['hi_rec'];
 
-  for (const competitor of competition.competitors) {
-    if (competitor.leaders) {
-      for (const category of competitor.leaders) {
-        const topLeader = category.leaders?.[0];
-        if (!topLeader) continue;
+  // Helper to extract leader from category
+  const extractLeader = (category: ESPNLeaderCategory) => {
+    const topLeader = category.leaders?.[0];
+    if (!topLeader) return null;
+    return {
+      player_name: topLeader.athlete.displayName,
+      display_value: topLeader.displayValue,
+      value: topLeader.value
+    };
+  };
 
-        if (category.name === 'passingYards' && (!hiPass || topLeader.value > hiPass.value)) {
-          hiPass = {
-            player_name: topLeader.athlete.displayName,
-            display_value: topLeader.displayValue,
-            value: topLeader.value
-          };
-        }
-        if (category.name === 'rushingYards' && (!hiRush || topLeader.value > hiRush.value)) {
-          hiRush = {
-            player_name: topLeader.athlete.displayName,
-            display_value: topLeader.displayValue,
-            value: topLeader.value
-          };
-        }
-        if (category.name === 'receivingYards' && (!hiRec || topLeader.value > hiRec.value)) {
-          hiRec = {
-            player_name: topLeader.athlete.displayName,
-            display_value: topLeader.displayValue,
-            value: topLeader.value
-          };
+  // First check competition-level leaders (used for completed games)
+  if (competition.leaders) {
+    for (const category of competition.leaders) {
+      if (category.name === 'passingYards' || category.name === 'passingLeader') {
+        const leader = extractLeader(category);
+        if (leader && (!hiPass || leader.value > hiPass.value)) hiPass = leader;
+      }
+      if (category.name === 'rushingYards' || category.name === 'rushingLeader') {
+        const leader = extractLeader(category);
+        if (leader && (!hiRush || leader.value > hiRush.value)) hiRush = leader;
+      }
+      if (category.name === 'receivingYards' || category.name === 'receivingLeader') {
+        const leader = extractLeader(category);
+        if (leader && (!hiRec || leader.value > hiRec.value)) hiRec = leader;
+      }
+    }
+  }
+
+  // Fall back to competitor-level leaders if no game-level leaders found
+  if (!hiPass && !hiRush && !hiRec) {
+    for (const competitor of competition.competitors) {
+      if (competitor.leaders) {
+        for (const category of competitor.leaders) {
+          if (category.name === 'passingYards' || category.name === 'passingLeader') {
+            const leader = extractLeader(category);
+            if (leader && (!hiPass || leader.value > hiPass.value)) hiPass = leader;
+          }
+          if (category.name === 'rushingYards' || category.name === 'rushingLeader') {
+            const leader = extractLeader(category);
+            if (leader && (!hiRush || leader.value > hiRush.value)) hiRush = leader;
+          }
+          if (category.name === 'receivingYards' || category.name === 'receivingLeader') {
+            const leader = extractLeader(category);
+            if (leader && (!hiRec || leader.value > hiRec.value)) hiRec = leader;
+          }
         }
       }
     }
