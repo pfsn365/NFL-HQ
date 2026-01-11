@@ -333,19 +333,19 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
       {/* Hero Section with Team Color */}
       <div style={{ backgroundColor: player.team.primaryColor }} className="text-white pt-[57px] lg:pt-0">
-        <div className="container mx-auto px-4 py-8 lg:py-10">
+        <div className="container mx-auto px-4 py-5 lg:py-6">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             {/* Player Info */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-8 mb-6 lg:mb-0">
               {/* Headshot */}
-              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-full flex items-center justify-center shadow-lg p-1.5 flex-shrink-0">
+              <div className="w-28 h-28 lg:w-32 lg:h-32 bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0">
                 {!imageError ? (
                   <Image
                     src={player.headshotUrl}
                     alt={player.name}
                     width={160}
                     height={160}
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-full h-full object-cover object-top scale-125"
                     onError={() => setImageError(true)}
                   />
                 ) : (
@@ -406,10 +406,10 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-center mt-3 pt-3 border-t border-gray-100 text-xs">
+                  <div className="flex justify-center mt-3 pt-3 border-t border-gray-100 text-sm">
                     <div>
                       <span className="text-gray-500">Season Rank</span>
-                      <span className="font-semibold text-gray-900 ml-1">#{player.pfsnImpact.seasonRank}</span>
+                      <span className="font-bold text-gray-900 ml-1">#{player.pfsnImpact.seasonRank}</span>
                     </div>
                   </div>
                 </div>
