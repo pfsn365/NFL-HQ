@@ -19,8 +19,28 @@ interface TickerGame {
     hasPossession?: boolean;
   };
   statusDetail: string;
+  startDate: string;
   isLive: boolean;
   isFinal: boolean;
+}
+
+// Format game time in user's local timezone
+function formatLocalGameTime(isoDate: string): string {
+  const date = new Date(isoDate);
+
+  // Format date part (e.g., "1/11")
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  // Format time part in user's locale
+  const timeStr = date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZoneName: 'short'
+  });
+
+  return `${month}/${day} - ${timeStr}`;
 }
 
 export default function NFLScoreTicker() {
@@ -133,7 +153,7 @@ export default function NFLScoreTicker() {
                       ) : game.isFinal ? (
                         <span className="text-xs font-medium text-gray-300">Final</span>
                       ) : (
-                        <span className="text-xs text-gray-300">{game.statusDetail}</span>
+                        <span className="text-xs text-gray-300">{formatLocalGameTime(game.startDate)}</span>
                       )}
                     </div>
 

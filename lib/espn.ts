@@ -538,6 +538,7 @@ export interface TickerGame {
     hasPossession?: boolean;
   };
   statusDetail: string; // "Q3 8:42", "Final", "1:00 PM ET"
+  startDate: string; // ISO date string for client-side timezone formatting
   isLive: boolean;
   isFinal: boolean;
 }
@@ -572,6 +573,7 @@ export function transformToTickerGame(event: ESPNEvent): TickerGame | null {
       hasPossession: isLive && possessionTeamId === homeCompetitor.id,
     },
     statusDetail: competition.status.type.shortDetail,
+    startDate: event.date, // ISO date for client-side timezone formatting
     isLive,
     isFinal,
   };
