@@ -645,11 +645,23 @@ export default function PlayerRankingsClient() {
 
       // Player name and position
       ctx.fillStyle = '#000000';
-      const baseFontSize = selectedPlayers.length > 10 ? 16 : 20;
-      ctx.font = `600 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+      const baseFontSize = selectedPlayers.length > 25 ? 14 : (selectedPlayers.length > 10 ? 16 : 20);
 
+      // Calculate available width for name (container - padding - rank - gap - logo - logo padding)
+      const logoSize = 48;
+      const availableWidth = containerWidth - paddingX - rankWidth - 20 - logoSize - 20;
+
+      // Measure name and reduce font size if needed
+      let fontSize = baseFontSize;
       const playerName = rankedPlayer.player.name;
-      const nameY = containerCenterY + (baseFontSize * 0.35);
+      ctx.font = `600 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+
+      while (ctx.measureText(playerName).width > availableWidth && fontSize > 10) {
+        fontSize -= 1;
+        ctx.font = `600 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+      }
+
+      const nameY = containerCenterY + (fontSize * 0.35);
       ctx.fillText(playerName, xPos + paddingX + rankWidth + 20, nameY);
 
       // Team logo
@@ -683,7 +695,7 @@ export default function PlayerRankingsClient() {
     return canvas;
   };
 
-  const handleDownload = async (count: 10 | 25 | 50 | 100) => {
+  const handleDownload = async (count: 10 | 25 | 50) => {
     if (!logosLoaded) {
       alert('Logos are still loading. Please wait a moment and try again.');
       return;
@@ -1007,12 +1019,6 @@ export default function PlayerRankingsClient() {
                           className="w-full px-4 py-2 text-left hover:bg-gray-50 text-gray-700 transition-colors"
                         >
                           <span className="font-medium">Top 50 Players</span>
-                        </button>
-                        <button
-                          onClick={() => handleDownload(100)}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-50 text-gray-700 transition-colors"
-                        >
-                          <span className="font-medium">Top 100 Players</span>
                         </button>
                       </div>
                     </div>
