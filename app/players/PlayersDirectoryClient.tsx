@@ -272,20 +272,22 @@ export default function PlayersDirectoryClient() {
                         >
                           {/* Headshot */}
                           <div className="flex justify-center mb-3">
-                            {!imageErrors.has(player.slug) ? (
-                              <Image
-                                src={`https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${player.slug}.png`}
-                                alt={player.name}
-                                width={64}
-                                height={64}
-                                className="w-16 h-16 rounded-full object-cover bg-gray-200"
-                                onError={() => handleImageError(player.slug)}
-                              />
-                            ) : (
-                              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-semibold text-lg">
-                                {getInitials(player.name)}
-                              </div>
-                            )}
+                            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                              {!imageErrors.has(player.slug) ? (
+                                <Image
+                                  src={`https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${player.slug}.png`}
+                                  alt={player.name}
+                                  width={64}
+                                  height={64}
+                                  className="w-full h-full object-cover"
+                                  onError={() => handleImageError(player.slug)}
+                                />
+                              ) : (
+                                <span className="text-gray-500 font-semibold text-lg">
+                                  {getInitials(player.name)}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Name and Jersey */}
