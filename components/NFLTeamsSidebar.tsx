@@ -22,17 +22,20 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   // Helper to normalize pathname by removing trailing slashes for comparison
   const normalizePath = (path: string) => path.replace(/\/$/, '');
 
-  // Get the normalized current pathname
+  // Get the normalized current pathname (usePathname returns path without basePath)
   const normalizedPathname = normalizePath(pathname);
 
   // Check if current page matches a given URL
+  // URLs in nflTools include /nfl-hq prefix, but usePathname() returns without basePath
   const isActivePage = (url: string) => {
     const normalizedUrl = normalizePath(url);
-    return normalizedPathname === normalizedUrl;
+    // Strip /nfl-hq prefix from URL for comparison since pathname doesn't include it
+    const urlWithoutBase = normalizedUrl.replace(/^\/nfl-hq/, '');
+    return normalizedPathname === urlWithoutBase || normalizedPathname === normalizedUrl;
   };
 
-  // Check if we're on the home page
-  const isHomePage = normalizedPathname === '/nfl-hq' || normalizedPathname === '' || normalizedPathname === '/';
+  // Check if we're on the home page (pathname will be '' or '/' when at /nfl-hq/)
+  const isHomePage = normalizedPathname === '' || normalizedPathname === '/';
 
   // Function to generate team URL based on current tab
   const getTeamUrl = (teamId: string) => {
