@@ -15,6 +15,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTeamsExpanded, setIsTeamsExpanded] = useState(false);
   const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
+  const [isImpactRankingsExpanded, setIsImpactRankingsExpanded] = useState(false);
   const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(true);
   const allTeams = getAllTeams();
   const pathname = usePathname();
@@ -71,6 +72,21 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
     { title: 'NBA Mock Draft Simulator', url: 'https://www.profootballnetwork.com/nba-mock-draft-simulator' },
     { title: 'World Cup Simulator', url: 'https://www.profootballnetwork.com/fifa-world-cup-simulator/' },
     { title: 'MLB Playoff Predictor', url: 'https://www.profootballnetwork.com/mlb-playoff-predictor/' },
+  ];
+
+  const impactRankings = [
+    { title: 'Team Offense', url: 'https://www.profootballnetwork.com/nfl-offense-rankings-impact/' },
+    { title: 'Team Defense', url: 'https://www.profootballnetwork.com/nfl-defense-rankings-impact/' },
+    { title: 'QB', url: 'https://www.profootballnetwork.com/nfl-qb-rankings-impact/' },
+    { title: 'RB', url: 'https://www.profootballnetwork.com/nfl-rb-rankings-impact/' },
+    { title: 'WR', url: 'https://www.profootballnetwork.com/nfl-wr-rankings-impact/' },
+    { title: 'TE', url: 'https://www.profootballnetwork.com/nfl-te-rankings-impact/' },
+    { title: 'OL', url: 'https://www.profootballnetwork.com/nfl-player-ol-rankings-impact/' },
+    { title: 'DT', url: 'https://www.profootballnetwork.com/nfl-dt-rankings-impact/' },
+    { title: 'EDGE', url: 'https://www.profootballnetwork.com/nfl-edge-rankings-impact/' },
+    { title: 'LB', url: 'https://www.profootballnetwork.com/nfl-lb-rankings-impact/' },
+    { title: 'CB', url: 'https://www.profootballnetwork.com/nfl-cb-rankings-impact/' },
+    { title: 'SAF', url: 'https://www.profootballnetwork.com/nfl-saf-rankings-impact/' },
   ];
 
   // Mobile version
@@ -186,20 +202,55 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
               </div>
               {isNFLToolsExpanded && (
                 <div className="grid grid-cols-1 gap-1">
-                  {nflTools.map((tool) => {
+                  {nflTools.map((tool, index) => {
                     const isActive = !tool.external && isActivePage(tool.url);
 
                     return (
-                      <a
-                        key={tool.title}
-                        href={tool.url}
-                        {...(tool.external && { target: "_blank", rel: "noopener noreferrer" })}
-                        className={`block p-2 rounded text-sm transition-colors ${
-                          isActive ? 'bg-[#0050A0] text-white' : 'text-white hover:bg-gray-800'
-                        }`}
-                      >
-                        <div className="text-xs">{tool.title}</div>
-                      </a>
+                      <React.Fragment key={tool.title}>
+                        <a
+                          href={tool.url}
+                          {...(tool.external && { target: "_blank", rel: "noopener noreferrer" })}
+                          className={`block p-2 rounded text-sm transition-colors ${
+                            isActive ? 'bg-[#0050A0] text-white' : 'text-white hover:bg-gray-800'
+                          }`}
+                        >
+                          <div className="text-xs">{tool.title}</div>
+                        </a>
+                        {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
+                        {tool.title === 'NFL Free Agency Tracker' && (
+                          <div>
+                            <button
+                              onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
+                              className="w-full flex items-center justify-between p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
+                            >
+                              <div className="text-xs">PFSN Impact Rankings</div>
+                              <svg
+                                className={`w-3 h-3 transform transition-transform ${isImpactRankingsExpanded ? 'rotate-180' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            {isImpactRankingsExpanded && (
+                              <div className="pl-3 grid grid-cols-1 gap-1">
+                                {impactRankings.map((item) => (
+                                  <a
+                                    key={item.title}
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
+                                  >
+                                    <div className="text-xs">{item.title}</div>
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </div>
@@ -390,26 +441,71 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
             const isActive = !tool.external && isActivePage(tool.url);
 
             return (
-              <li key={tool.title}>
-                <a
-                  href={tool.url}
-                  {...(tool.external && { target: "_blank", rel: "noopener noreferrer" })}
-                  className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
-                    isActive
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
-                  }`}
-                >
-                  <span className="text-sm font-medium truncate flex items-center gap-2">
-                    {tool.title}
-                    {tool.external && (
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    )}
-                  </span>
-                </a>
-              </li>
+              <React.Fragment key={tool.title}>
+                <li>
+                  <a
+                    href={tool.url}
+                    {...(tool.external && { target: "_blank", rel: "noopener noreferrer" })}
+                    className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+                      isActive
+                        ? 'bg-[#0050A0] text-white'
+                        : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+                    }`}
+                  >
+                    <span className="text-sm font-medium truncate flex items-center gap-2">
+                      {tool.title}
+                      {tool.external && (
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      )}
+                    </span>
+                  </a>
+                </li>
+                {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
+                {tool.title === 'NFL Free Agency Tracker' && (
+                  <>
+                    <li>
+                      <button
+                        onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
+                        className="w-full relative flex items-center justify-between px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
+                      >
+                        <span className="text-sm font-medium truncate flex items-center gap-2">
+                          PFSN Impact Rankings
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </span>
+                        <svg
+                          className={`w-4 h-4 transform transition-transform ${isImpactRankingsExpanded ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </li>
+                    {isImpactRankingsExpanded && impactRankings.map((item) => (
+                      <li key={item.title}>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="relative flex items-center px-3 py-2 mx-1 ml-4 rounded-md transition-all duration-200 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                        >
+                          <span className="text-sm font-medium truncate flex items-center gap-2">
+                            {item.title}
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </>
+                )}
+              </React.Fragment>
             );
           })}
 
