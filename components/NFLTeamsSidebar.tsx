@@ -65,6 +65,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
 
   const otherTools = [
     { title: 'Fantasy Football Hub', url: 'https://www.profootballnetwork.com/fantasy/football/' },
+    { title: 'CFB Transfer Portal Tracker', url: 'https://www.profootballnetwork.com/cfb-hq/transfer-portal-tracker' },
     { title: 'CFB Playoff Predictor', url: 'https://www.profootballnetwork.com/cfb/playoff-predictor-cfb-cta/' },
     { title: 'NBA HQ', url: 'https://www.profootballnetwork.com/nba-hq/' },
     { title: 'NBA Mock Draft Simulator', url: 'https://www.profootballnetwork.com/nba-mock-draft-simulator' },
