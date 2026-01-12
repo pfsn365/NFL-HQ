@@ -22,6 +22,18 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   // Helper to normalize pathname by removing trailing slashes for comparison
   const normalizePath = (path: string) => path.replace(/\/$/, '');
 
+  // Get the normalized current pathname
+  const normalizedPathname = normalizePath(pathname);
+
+  // Check if current page matches a given URL
+  const isActivePage = (url: string) => {
+    const normalizedUrl = normalizePath(url);
+    return normalizedPathname === normalizedUrl;
+  };
+
+  // Check if we're on the home page
+  const isHomePage = normalizedPathname === '/nfl-hq' || normalizedPathname === '' || normalizedPathname === '/';
+
   // Function to generate team URL based on current tab
   const getTeamUrl = (teamId: string) => {
     if (currentTab === 'overview') {
@@ -126,7 +138,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                 <a
                   href="/nfl-hq/"
                   className={`block p-2 rounded text-sm transition-colors ${
-                    normalizePath(pathname) === '' || normalizePath(pathname) === '/'
+                    isHomePage
                       ? 'bg-[#0050A0] text-white'
                       : 'text-white hover:bg-gray-800'
                   }`}
@@ -136,7 +148,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                 <a
                   href="/nfl-hq/teams"
                   className={`block p-2 rounded text-sm transition-colors ${
-                    normalizePath(pathname) === '/teams'
+                    isActivePage('/nfl-hq/teams')
                       ? 'bg-[#0050A0] text-white'
                       : 'text-white hover:bg-gray-800'
                   }`}
@@ -170,9 +182,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
               {isNFLToolsExpanded && (
                 <div className="grid grid-cols-1 gap-1">
                   {nflTools.map((tool) => {
-                    const normalizedPathname = normalizePath(pathname);
-                    const normalizedUrl = normalizePath(tool.url);
-                    const isActive = !tool.external && normalizedPathname === normalizedUrl;
+                    const isActive = !tool.external && isActivePage(tool.url);
 
                     return (
                       <a
@@ -304,7 +314,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
             <a
               href="/nfl-hq/"
               className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
-                normalizePath(pathname) === '' || normalizePath(pathname) === '/'
+                isHomePage
                   ? 'bg-[#0050A0] text-white'
                   : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
               }`}
@@ -334,7 +344,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
             <a
               href="/nfl-hq/teams"
               className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
-                normalizePath(pathname) === '/teams'
+                isActivePage('/nfl-hq/teams')
                   ? 'bg-[#0050A0] text-white'
                   : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
               }`}
@@ -372,9 +382,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
             </div>
           </li>
           {nflTools.map((tool) => {
-            const normalizedPathname = normalizePath(pathname);
-            const normalizedUrl = normalizePath(tool.url);
-            const isActive = !tool.external && normalizedPathname === normalizedUrl;
+            const isActive = !tool.external && isActivePage(tool.url);
 
             return (
               <li key={tool.title}>
