@@ -15,25 +15,6 @@ const generatePlayerSlug = (playerName: string) => {
   return playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
 };
 
-// Helper function to generate team URL (using PFSN team pages)
-const getTeamUrl = (teamName: string) => {
-  const teamSlug = teamName.toLowerCase()
-    .replace(/arizona cardinals/g, 'arizona-cardinals')
-    .replace(/buffalo bills/g, 'buffalo-bills')
-    .replace(/tennessee titans/g, 'tennessee-titans')
-    .replace(/green bay packers/g, 'green-bay-packers')
-    .replace(/dallas cowboys/g, 'dallas-cowboys')
-    .replace(/new york jets/g, 'new-york-jets')
-    .replace(/carolina panthers/g, 'carolina-panthers')
-    .replace(/new york giants/g, 'new-york-giants')
-    .replace(/cleveland browns/g, 'cleveland-browns')
-    .replace(/houston texans/g, 'houston-texans')
-    .replace(/new england patriots/g, 'new-england-patriots')
-    .replace(/kansas city chiefs/g, 'kansas-city-chiefs')
-    .replace(/\s+/g, '-');
-  return `https://www.profootballnetwork.com/nfl-hq/teams/${teamSlug}/`;
-};
-
 interface Transaction {
   date: string;
   player: string;
@@ -221,21 +202,13 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
 
             {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-sm table-fixed">
-                <colgroup>
-                  <col className="w-20" />
-                  <col className="w-48" />
-                  <col className="w-16" />
-                  <col className="w-56" />
-                  <col className="w-auto" />
-                </colgroup>
+              <table className="w-full text-sm">
                 <thead>
                   <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                    <th className="text-left p-3 font-medium">DATE</th>
+                    <th className="text-left p-3 font-medium w-24">DATE</th>
                     <th className="text-left p-3 font-medium">PLAYER</th>
-                    <th className="text-left p-3 font-medium">POS</th>
-                    <th className="text-left p-3 font-medium">TYPE</th>
-                    <th className="text-left p-3 font-medium">DETAILS</th>
+                    <th className="text-left p-3 font-medium w-20 text-center">POS</th>
+                    <th className="text-left p-3 font-medium">TRANSACTION</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -252,83 +225,17 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
                           {transaction.player}
                         </Link>
                       </td>
-                      <td className="p-3 text-gray-700">{transaction.position}</td>
+                      <td className="p-3 text-gray-700 text-center">{transaction.position}</td>
                       <td className="p-3 text-gray-700">
-                        <div className="font-medium">
-                          {/* Make transaction type clear from Cardinals perspective */}
-                          {transaction.fromTeam === team.fullName && transaction.toTeam ?
-                            // Player leaving Cardinals
-                            transaction.transaction.includes('Practice squad addition') ? 'Practice Squad Departure' :
-                            transaction.transaction.includes('signed') ? 'Released/Signed Elsewhere' :
-                            transaction.transaction
-                            :
-                            // Player joining Cardinals or other transactions
-                            transaction.toTeam === team.fullName ?
-                              transaction.transaction.replace('Practice squad addition', 'Practice Squad Addition')
-                              : transaction.transaction
-                          }
-                        </div>
-                      </td>
-                      <td className="p-3 text-gray-700">
-                        <div>
-                          {transaction.fromTeam && transaction.toTeam && (
-                            <div className="text-sm">
-                              <span className="text-gray-600">from:</span>
-                              <a
-                                href={getTeamUrl(transaction.fromTeam)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:underline ml-1"
-                                style={{ color: team.primaryColor }}
-                              >
-                                {transaction.fromTeam}
-                              </a>
-                              <span className="text-gray-600 ml-3">to:</span>
-                              <a
-                                href={getTeamUrl(transaction.toTeam)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:underline ml-1"
-                                style={{ color: team.primaryColor }}
-                              >
-                                {transaction.toTeam}
-                              </a>
-                            </div>
-                          )}
-                          {transaction.fromTeam && !transaction.toTeam && (
-                            <div className="text-sm">
-                              <span className="text-gray-600">from:</span>
-                              <a
-                                href={getTeamUrl(transaction.fromTeam)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:underline ml-1"
-                                style={{ color: team.primaryColor }}
-                              >
-                                {transaction.fromTeam}
-                              </a>
-                            </div>
-                          )}
-                          {!transaction.fromTeam && transaction.toTeam && transaction.toTeam !== team.fullName && (
-                            <div className="text-sm">
-                              <span className="text-gray-600">to:</span>
-                              <a
-                                href={getTeamUrl(transaction.toTeam)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium hover:underline ml-1"
-                                style={{ color: team.primaryColor }}
-                              >
-                                {transaction.toTeam}
-                              </a>
-                            </div>
-                          )}
-                          {transaction.details && (
-                            <div className="text-sm text-gray-600 mt-1">
-                              {transaction.details}
-                            </div>
-                          )}
-                        </div>
+                        {transaction.fromTeam === team.fullName && transaction.toTeam ?
+                          transaction.transaction.includes('Practice squad addition') ? 'Practice Squad Departure' :
+                          transaction.transaction.includes('signed') ? 'Released/Signed Elsewhere' :
+                          transaction.transaction
+                          :
+                          transaction.toTeam === team.fullName ?
+                            transaction.transaction.replace('Practice squad addition', 'Practice Squad Addition')
+                            : transaction.transaction
+                        }
                       </td>
                     </tr>
                   ))}
