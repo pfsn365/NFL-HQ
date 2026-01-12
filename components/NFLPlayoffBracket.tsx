@@ -55,11 +55,11 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   },
   'afc-wc-3': {
     id: 'afc-wc-3',
-    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots' },
-    team2: { seed: 7, name: 'Chargers', teamId: 'los-angeles-chargers' },
+    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots', score: 16 },
+    team2: { seed: 7, name: 'Chargers', teamId: 'los-angeles-chargers', score: 3 },
     round: 'Wild Card',
     date: 'Jan 11',
-    completed: false,
+    completed: true,
   },
   // NFC Wild Card Round
   'nfc-wc-1': {
