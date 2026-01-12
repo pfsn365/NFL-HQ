@@ -279,7 +279,7 @@ export default function PlayersDirectoryClient() {
                                   alt={player.name}
                                   width={64}
                                   height={64}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-cover scale-125 translate-y-1"
                                   onError={() => handleImageError(player.slug)}
                                 />
                               ) : (
