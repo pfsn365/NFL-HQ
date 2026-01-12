@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
@@ -454,11 +453,9 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               {/* Headshot */}
               <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-full flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0 bg-white">
                 {!imageError ? (
-                  <Image
+                  <img
                     src={player.headshotUrl}
                     alt={player.name}
-                    width={160}
-                    height={160}
                     className="w-full h-full object-cover object-[center_15%] scale-[1.4]"
                     onError={() => setImageError(true)}
                   />
@@ -481,11 +478,9 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
                 <div className="flex items-center justify-center sm:justify-start gap-2 text-base lg:text-lg">
                   <Link href={`/teams/${player.team.id}`} className="flex items-center gap-2 hover:opacity-80">
-                    <Image
+                    <img
                       src={player.team.logo}
                       alt={player.team.name}
-                      width={24}
-                      height={24}
                       className="w-6 h-6"
                     />
                     <span className="font-medium">{player.team.name}</span>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -274,11 +273,9 @@ export default function PlayersDirectoryClient() {
                           <div className="flex justify-center mb-3">
                             <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                               {!imageErrors.has(player.slug) ? (
-                                <Image
+                                <img
                                   src={`https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${player.slug}.png`}
                                   alt={player.name}
-                                  width={64}
-                                  height={64}
                                   className="w-full h-full object-cover scale-125 translate-y-1"
                                   onError={() => handleImageError(player.slug)}
                                 />
@@ -305,11 +302,9 @@ export default function PlayersDirectoryClient() {
 
                           {/* Team */}
                           <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-gray-200">
-                            <Image
+                            <img
                               src={player.teamLogo}
                               alt={player.teamName}
-                              width={20}
-                              height={20}
                               className="w-5 h-5"
                             />
                             <span className="text-sm text-gray-600">{player.teamAbbr}</span>
