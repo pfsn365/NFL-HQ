@@ -42,7 +42,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: { seed: 4, name: 'Steelers', teamId: 'pittsburgh-steelers', score: 6 },
     team2: { seed: 5, name: 'Texans', teamId: 'houston-texans', score: 30 },
     round: 'Wild Card',
-    date: 'Jan 12',
+    date: 'Mon, Jan 12',
     completed: true,
   },
   'afc-wc-2': {
@@ -50,7 +50,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: { seed: 3, name: 'Jaguars', teamId: 'jacksonville-jaguars', score: 24 },
     team2: { seed: 6, name: 'Bills', teamId: 'buffalo-bills', score: 27 },
     round: 'Wild Card',
-    date: 'Jan 11',
+    date: 'Sun, Jan 11',
     completed: true,
   },
   'afc-wc-3': {
@@ -58,7 +58,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots', score: 16 },
     team2: { seed: 7, name: 'Chargers', teamId: 'los-angeles-chargers', score: 3 },
     round: 'Wild Card',
-    date: 'Jan 11',
+    date: 'Sun, Jan 11',
     completed: true,
   },
   // NFC Wild Card Round
@@ -67,7 +67,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: { seed: 4, name: 'Panthers', teamId: 'carolina-panthers', score: 31 },
     team2: { seed: 5, name: 'Rams', teamId: 'los-angeles-rams', score: 34 },
     round: 'Wild Card',
-    date: 'Jan 10',
+    date: 'Sat, Jan 10',
     completed: true,
   },
   'nfc-wc-2': {
@@ -75,7 +75,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: { seed: 3, name: 'Eagles', teamId: 'philadelphia-eagles', score: 19 },
     team2: { seed: 6, name: '49ers', teamId: 'san-francisco-49ers', score: 23 },
     round: 'Wild Card',
-    date: 'Jan 11',
+    date: 'Sun, Jan 11',
     completed: true,
   },
   'nfc-wc-3': {
@@ -83,7 +83,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: { seed: 2, name: 'Bears', teamId: 'chicago-bears', score: 31 },
     team2: { seed: 7, name: 'Packers', teamId: 'green-bay-packers', score: 27 },
     round: 'Wild Card',
-    date: 'Jan 10',
+    date: 'Sat, Jan 10',
     completed: true,
   },
   // AFC Divisional Round
@@ -143,7 +143,7 @@ const initialPlayoffData: { [key: string]: Matchup } = {
     team1: null,
     team2: null,
     round: 'Super Bowl LX',
-    date: 'Feb 8',
+    date: 'Sun, Feb 8',
     completed: false,
   },
 };
@@ -537,7 +537,7 @@ export default function NFLPlayoffBracket() {
         <div className="lg:hidden space-y-6">
           {/* Wild Card Round */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Wild Card Round - Jan 11-13</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Wild Card Round - Jan 10-12</h4>
             <div className="space-y-3">
               <div>
                 <div className="text-xs text-gray-600 mb-1 font-medium">AFC Wild Card</div>
