@@ -1005,7 +1005,7 @@ export default function PlayerRankingsClient() {
 
                   {/* Actions Menu Dropdown */}
                   {showActionsMenu && !isDownloading && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="py-2">
                         {/* Save */}
                         <button

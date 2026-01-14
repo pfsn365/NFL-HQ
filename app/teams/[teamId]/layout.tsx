@@ -35,7 +35,7 @@ export default function TeamLayout({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64 min-w-0">
+      <div className="flex-1 lg:ml-64 min-w-0 pt-12 lg:pt-0">
         {/* Tab Content - TeamPage component handles its own hero */}
         {children}
       </div>
