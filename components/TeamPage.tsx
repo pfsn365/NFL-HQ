@@ -488,10 +488,8 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
         <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
 
         {/* Raptive Header Ad - Below Tabs */}
-        <div className="w-full bg-white border-b border-gray-200">
-          <div className="container mx-auto px-4 py-4">
-            <div className="raptive-pfn-header-90"></div>
-          </div>
+        <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
+          <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
         <LayoutStabilizer minHeight={400} className="w-full max-w-none px-4 py-6 pb-24">

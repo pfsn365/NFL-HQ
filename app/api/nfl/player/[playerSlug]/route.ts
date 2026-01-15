@@ -71,7 +71,7 @@ interface ESPNStats {
 }
 
 interface ESPNGameLogEntry {
-  week: number;
+  week: number | string;
   date: string;
   opponent: string;
   opponentLogo: string;
@@ -287,24 +287,12 @@ async function fetchESPNGameLog(athleteId: string, season?: number): Promise<ESP
 
     const data = await response.json();
 
-    // Get the season display name
-    const seasonType = data.seasonTypes?.[0];
-    if (!seasonType) return null;
-
-    const categories = seasonType.categories || [];
-    // Events are at the top level of data, not inside seasonType
+    // Events are at the top level of data
     const events = data.events || {};
 
-    // Find the main stats category (usually the first one with stats)
-    const mainCategory = categories.find((cat: Record<string, unknown>) =>
-      Array.isArray(cat.events) && cat.events.length > 0
-    );
-
-    if (!mainCategory) return null;
-
-    // Get stat labels - use top-level labels/names if available, otherwise from category
-    const labels = data.labels || mainCategory.labels || [];
-    const names = data.names || mainCategory.names || [];
+    // Get stat labels from top-level (consistent across all season types)
+    const labels = data.labels || [];
+    const names = data.names || [];
     const statLabels: Array<{ name: string; label: string }> = labels.map(
       (label: string, index: number) => ({
         name: names[index] || label,
@@ -312,47 +300,120 @@ async function fetchESPNGameLog(athleteId: string, season?: number): Promise<ESP
       })
     );
 
-    // Parse game entries - mainCategory.events is array of {eventId, stats} objects
-    const games: ESPNGameLogEntry[] = [];
+    // Combine games from ALL season types (regular season + postseason)
+    const allGames: ESPNGameLogEntry[] = [];
+    const allTotals: number[] = [];
+    let seasonDisplayName = '';
 
-    for (const eventData of mainCategory.events || []) {
-      // eventData is {eventId: string, stats: string[]}
-      const eventId = eventData.eventId || eventData;
-      const event = events[eventId];
-      if (!event) continue;
+    // Process all season types (regular season type=2, postseason type=3)
+    for (const seasonType of data.seasonTypes || []) {
+      // Track the display name (prefer regular season name)
+      if (!seasonDisplayName || seasonType.type === 2) {
+        seasonDisplayName = seasonType.displayName || seasonDisplayName;
+      }
 
-      // Stats are in eventData.stats, not in mainCategory.totals
-      const gameStats = eventData.stats || [];
-      const statsMap: Record<string, string> = {};
+      const categories = seasonType.categories || [];
 
-      statLabels.forEach((label, index) => {
-        statsMap[label.name] = gameStats[index] || '-';
-      });
+      // Find the main stats category (usually the first one with stats)
+      const mainCategory = categories.find((cat: Record<string, unknown>) =>
+        Array.isArray(cat.events) && cat.events.length > 0
+      );
 
-      games.push({
-        week: event.week || 0,
-        date: event.gameDate || '',
-        opponent: event.opponent?.displayName || event.opponent?.abbreviation || 'TBD',
-        opponentLogo: event.opponent?.logo || '',
-        homeAway: event.atVs === 'vs' ? 'vs' : '@',
-        result: event.gameResult || '-',
-        stats: statsMap,
-      });
+      if (!mainCategory) continue;
+
+      // If we don't have stat labels yet, get them from the category
+      if (statLabels.length === 0) {
+        const catLabels = mainCategory.labels || [];
+        const catNames = mainCategory.names || [];
+        catLabels.forEach((label: string, index: number) => {
+          statLabels.push({
+            name: catNames[index] || label,
+            label: label,
+          });
+        });
+      }
+
+      // Parse game entries
+      for (const eventData of mainCategory.events || []) {
+        const eventId = eventData.eventId || eventData;
+        const event = events[eventId];
+        if (!event) continue;
+
+        const gameStats = eventData.stats || [];
+        const statsMap: Record<string, string> = {};
+
+        statLabels.forEach((label, index) => {
+          statsMap[label.name] = gameStats[index] || '-';
+        });
+
+        // For postseason games, prefix week with "P" (e.g., Wild Card = P1, Divisional = P2, etc.)
+        const weekDisplay = seasonType.type === 3 ? `P${event.week || 0}` : (event.week || 0);
+
+        allGames.push({
+          week: typeof weekDisplay === 'string' ? parseInt(weekDisplay.replace('P', '')) + 100 : weekDisplay, // Sort postseason after regular
+          date: event.gameDate || '',
+          opponent: event.opponent?.displayName || event.opponent?.abbreviation || 'TBD',
+          opponentLogo: event.opponent?.logo || '',
+          homeAway: event.atVs === 'vs' ? 'vs' : '@',
+          result: event.gameResult || '-',
+          stats: statsMap,
+        });
+      }
+
+      // Accumulate totals from each season type
+      const categoryTotals = mainCategory.totals || [];
+      if (categoryTotals.length > 0) {
+        if (allTotals.length === 0) {
+          // Initialize with first season type totals
+          categoryTotals.forEach((val: string) => {
+            allTotals.push(parseFloat(val) || 0);
+          });
+        } else {
+          // Add subsequent season type totals
+          categoryTotals.forEach((val: string, index: number) => {
+            const numVal = parseFloat(val) || 0;
+            if (index < allTotals.length) {
+              allTotals[index] += numVal;
+            }
+          });
+        }
+      }
     }
 
-    // Sort by week
-    games.sort((a, b) => a.week - b.week);
+    if (allGames.length === 0) return null;
 
-    // Parse season totals from the category
-    const totalsArray = mainCategory.totals || [];
+    // Sort games by week (regular season weeks 1-18, then postseason 101+)
+    allGames.sort((a, b) => {
+      const weekA = typeof a.week === 'number' ? a.week : 0;
+      const weekB = typeof b.week === 'number' ? b.week : 0;
+      return weekA - weekB;
+    });
+
+    // Convert week numbers back to display format
+    for (const game of allGames) {
+      if (typeof game.week === 'number' && game.week > 100) {
+        // Postseason game - show as WC, DIV, CONF, SB
+        const postWeek = game.week - 100;
+        const postWeekNames: Record<number, string> = { 1: 'WC', 2: 'DIV', 3: 'CONF', 4: 'SB' };
+        game.week = postWeekNames[postWeek] || `P${postWeek}`;
+      }
+    }
+
+    // Format combined totals
     const seasonTotals: Record<string, string> = {};
     statLabels.forEach((label, index) => {
-      seasonTotals[label.name] = totalsArray[index] || '-';
+      const total = allTotals[index];
+      // Format averages to 1 decimal place, integers as whole numbers
+      if (label.name.toLowerCase().includes('avg') || label.name.toLowerCase().includes('pct')) {
+        seasonTotals[label.name] = total !== undefined ? total.toFixed(1) : '-';
+      } else {
+        seasonTotals[label.name] = total !== undefined ? Math.round(total).toString() : '-';
+      }
     });
 
     return {
-      season: seasonType.displayName || '2025 Regular Season',
-      games,
+      season: seasonDisplayName || `${season || 2025} Season`,
+      games: allGames,
       statLabels,
       seasonTotals,
     };

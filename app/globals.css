@@ -5,12 +5,6 @@ iframe[id^="google_ads_iframe"] {
 }
 
 /* Raptive Header Ad Restriction */
-.raptive-pfn-header {
-  height: 92px;
-  max-height: 92px;
-  overflow: hidden;
-}
-
 .raptive-pfn-header-90 {
   height: 90px;
   max-height: 90px;

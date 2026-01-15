@@ -224,8 +224,8 @@ export default function HomePageContent() {
         </div>
 
         {/* Raptive Header Ad */}
-        <div className="container mx-auto px-4 min-h-[150px]">
-          <div className="raptive-pfn-header"></div>
+        <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
+          <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
         {/* NFL Playoff Bracket */}
