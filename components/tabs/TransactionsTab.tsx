@@ -39,53 +39,64 @@ interface TransactionsTabProps {
 }
 
 export default function TransactionsTab({ team }: TransactionsTabProps) {
+  const [selectedSeason, setSelectedSeason] = useState<string>('2025');
   const [selectedMonth, setSelectedMonth] = useState<string>('All Season');
 
   // SWR fetch - replaces useState/useCallback/useEffect boilerplate
   const { data, error, isLoading, mutate } = useSWR<TransactionsResponse>(
-    getApiPath(`nfl/teams/api/transactions/${team.id}`),
+    getApiPath(`nfl/teams/api/transactions/${team.id}?season=${selectedSeason}`),
     fetcher,
     defaultSWROptions
   );
 
+  // Available seasons
+  const availableSeasons = ['2025', '2024', '2023', '2022'];
+
   const transactionsData = data?.transactions || [];
 
   // Helper to get month key from date string (MM/DD format)
-  // For NFL 2025 season: Sep-Dec are 2025, Jan-Feb are 2026
+  // For NFL season: Sep-Dec are in season year, Jan-Mar are in following year
   const getMonthKey = (dateStr: string): string => {
     const month = dateStr.substring(0, 2);
+    const seasonYear = parseInt(selectedSeason);
+    const nextYear = seasonYear + 1;
+
     switch (month) {
-      case '01': return 'Jan 2026';
-      case '02': return 'Feb 2026';
-      case '03': return 'Mar 2026';
-      case '04': return 'Apr 2025';
-      case '05': return 'May 2025';
-      case '06': return 'Jun 2025';
-      case '07': return 'Jul 2025';
-      case '08': return 'Aug 2025';
-      case '09': return 'Sep 2025';
-      case '10': return 'Oct 2025';
-      case '11': return 'Nov 2025';
-      case '12': return 'Dec 2025';
+      case '01': return `Jan ${nextYear}`;
+      case '02': return `Feb ${nextYear}`;
+      case '03': return `Mar ${nextYear}`;
+      case '04': return `Apr ${seasonYear}`;
+      case '05': return `May ${seasonYear}`;
+      case '06': return `Jun ${seasonYear}`;
+      case '07': return `Jul ${seasonYear}`;
+      case '08': return `Aug ${seasonYear}`;
+      case '09': return `Sep ${seasonYear}`;
+      case '10': return `Oct ${seasonYear}`;
+      case '11': return `Nov ${seasonYear}`;
+      case '12': return `Dec ${seasonYear}`;
       default: return 'Other';
     }
   };
 
-  // Month sort order for NFL season (newest first: Jan 2026 -> Sep 2025)
-  const monthSortOrder: Record<string, number> = {
-    'Feb 2026': 1,
-    'Jan 2026': 2,
-    'Dec 2025': 3,
-    'Nov 2025': 4,
-    'Oct 2025': 5,
-    'Sep 2025': 6,
-    'Aug 2025': 7,
-    'Jul 2025': 8,
-    'Jun 2025': 9,
-    'May 2025': 10,
-    'Apr 2025': 11,
-    'Mar 2026': 12,
-  };
+  // Month sort order for NFL season (newest first: Feb next year -> Mar season year)
+  const getMonthSortOrder = useMemo(() => {
+    const seasonYear = parseInt(selectedSeason);
+    const nextYear = seasonYear + 1;
+    return {
+      [`Feb ${nextYear}`]: 1,
+      [`Jan ${nextYear}`]: 2,
+      [`Dec ${seasonYear}`]: 3,
+      [`Nov ${seasonYear}`]: 4,
+      [`Oct ${seasonYear}`]: 5,
+      [`Sep ${seasonYear}`]: 6,
+      [`Aug ${seasonYear}`]: 7,
+      [`Jul ${seasonYear}`]: 8,
+      [`Jun ${seasonYear}`]: 9,
+      [`May ${seasonYear}`]: 10,
+      [`Apr ${seasonYear}`]: 11,
+      [`Mar ${nextYear}`]: 12,
+    };
+  }, [selectedSeason]);
 
   // Generate month filter options from actual data
   const months = useMemo(() => {
@@ -94,17 +105,17 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
     // Sort months with newest first
     const sortedMonths = uniqueMonths
       .filter(m => m !== 'Other')
-      .sort((a, b) => (monthSortOrder[a] || 99) - (monthSortOrder[b] || 99));
+      .sort((a, b) => (getMonthSortOrder[a] || 99) - (getMonthSortOrder[b] || 99));
 
     return ['All Season', ...sortedMonths];
-  }, [transactionsData]);
+  }, [transactionsData, selectedSeason, getMonthSortOrder]);
 
   const filteredData = useMemo(() => {
     return transactionsData.filter(transaction => {
       if (selectedMonth === 'All Season') return true;
       return getMonthKey(transaction.date) === selectedMonth;
     });
-  }, [transactionsData, selectedMonth]);
+  }, [transactionsData, selectedMonth, selectedSeason]);
 
   // Group transactions by month for display
   const groupedData = useMemo(() => {
@@ -128,14 +139,14 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
     });
 
     return groups;
-  }, [filteredData]);
+  }, [filteredData, selectedSeason]);
 
   // Get sorted month keys for rendering (newest first)
   const sortedMonthKeys = useMemo(() => {
     return Object.keys(groupedData)
       .filter(m => m !== 'Other')
-      .sort((a, b) => (monthSortOrder[a] || 99) - (monthSortOrder[b] || 99));
-  }, [groupedData]);
+      .sort((a, b) => (getMonthSortOrder[a] || 99) - (getMonthSortOrder[b] || 99));
+  }, [groupedData, getMonthSortOrder]);
 
   // Tab header component - reused across loading/error/data states
   const TabHeader = ({ showFilter = false }: { showFilter?: boolean }) => (
@@ -144,19 +155,39 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Transactions</h2>
         <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '290px' }}></div>
       </div>
-      <div className="flex flex-col sm:flex-row gap-3 lg:min-w-48">
+      <div className="flex flex-row gap-3">
+        {/* Season Dropdown */}
+        {showFilter ? (
+          <select
+            value={selectedSeason}
+            onChange={(e) => {
+              setSelectedSeason(e.target.value);
+              setSelectedMonth('All Season');
+            }}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400"
+          >
+            {availableSeasons.map(season => (
+              <option key={season} value={season}>{season}</option>
+            ))}
+          </select>
+        ) : (
+          <select disabled className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-sm">
+            <option>2025</option>
+          </select>
+        )}
+        {/* Month Filter Dropdown */}
         {showFilter ? (
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="flex-1 p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400"
+            className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400 min-w-[120px]"
           >
             {months.map(month => (
               <option key={month} value={month}>{month}</option>
             ))}
           </select>
         ) : (
-          <select disabled className="flex-1 p-2 border border-gray-300 rounded-lg bg-gray-100 text-sm">
+          <select disabled className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-sm min-w-[120px]">
             <option>Loading...</option>
           </select>
         )}

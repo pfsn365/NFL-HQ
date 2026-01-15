@@ -151,6 +151,8 @@ export async function GET(
 ) {
   try {
     const { teamId } = await params;
+    const searchParams = request.nextUrl.searchParams;
+    const season = searchParams.get('season') || '2025';
 
     // Get team name for filtering
     const teamName = teamIdMap[teamId];
@@ -164,7 +166,7 @@ export async function GET(
 
     // Step 1: First call to get available months
     const initialResponse = await fetch(
-      'https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/2025',
+      `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
@@ -196,7 +198,7 @@ export async function GET(
       if (monthCodes) {
         // Fetch with all months
         const fullResponse = await fetch(
-          `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/2025?months=${monthCodes}`,
+          `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}?months=${monthCodes}`,
           {
             headers: {
               'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
@@ -280,7 +282,7 @@ export async function GET(
       transactions: transformedTransactions,
       totalTransactions: transformedTransactions.length,
       lastUpdated: new Date().toISOString(),
-      season: 2025
+      season: parseInt(season)
     });
 
   } catch (error) {
