@@ -49,8 +49,13 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
     defaultSWROptions
   );
 
-  // Available seasons
-  const availableSeasons = ['2025', '2024', '2023', '2022'];
+  // Available seasons (value is the starting year, label shows full season span)
+  const availableSeasons = [
+    { value: '2025', label: '2025-26' },
+    { value: '2024', label: '2024-25' },
+    { value: '2023', label: '2023-24' },
+    { value: '2022', label: '2022-23' },
+  ];
 
   const transactionsData = data?.transactions || [];
 
@@ -167,12 +172,12 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
             className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400"
           >
             {availableSeasons.map(season => (
-              <option key={season} value={season}>{season}</option>
+              <option key={season.value} value={season.value}>{season.label}</option>
             ))}
           </select>
         ) : (
           <select disabled className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-sm">
-            <option>2025</option>
+            <option>2025-26</option>
           </select>
         )}
         {/* Month Filter Dropdown */}
