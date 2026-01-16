@@ -251,7 +251,7 @@ export default function SalaryCapTrackerClient() {
                         onClick={() => handleSort('salaryCap')}
                       >
                         <div className="flex items-center gap-1 sm:gap-2">
-                          <span className="hidden sm:inline">2025 </span>SALARY CAP
+                          <span className="hidden sm:inline">2026 </span>SALARY CAP
                           <SortIndicator column="salaryCap" />
                         </div>
                       </th>
@@ -305,7 +305,7 @@ export default function SalaryCapTrackerClient() {
                         >
                           <td className="px-2 sm:px-4 py-3 sm:py-4">
                             <a
-                              href={`/teams/${team.teamId}/salary-cap`}
+                              href={`/nfl-hq/teams/${team.teamId}/salary-cap`}
                               className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
                             >
                               {teamInfo && (
