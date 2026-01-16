@@ -117,7 +117,17 @@ function getPositionImpactUrl(position: string): string {
 }
 
 function transformFreeAgentData(rawData: RawFreeAgentData[]): FreeAgent[] {
-  return rawData.map((agent, index) => {
+  // Deduplicate by name + position + team to prevent duplicate entries
+  // while allowing players with same name but different positions/teams
+  const seenKeys = new Set<string>();
+  const uniqueData = rawData.filter(agent => {
+    const key = `${agent.Name?.trim().toLowerCase()}-${agent.Position?.trim().toLowerCase()}-${agent['2025 Team']?.trim().toLowerCase()}`;
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
+
+  return uniqueData.map((agent, index) => {
     const teamId = mapTeamNameToId(agent['2025 Team']);
 
     // Parse position rank - handle formats like "WR1", "CB2", "EDGE1"
@@ -164,6 +174,7 @@ export default function FreeAgencyTrackerClient() {
   const [selectedPosition, setSelectedPosition] = useState('all');
   const [selectedFaType, setSelectedFaType] = useState('all');
   const [selectedSignedStatus, setSelectedSignedStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Sorting States
   const [sortKey, setSortKey] = useState<SortKey>('rank');
@@ -213,10 +224,19 @@ export default function FreeAgencyTrackerClient() {
     fetchFreeAgents();
   }, [hasLoaded]);
 
-  // Extract unique positions for filter
+  // Extract unique positions for filter with custom order
   const availablePositions = useMemo(() => {
+    const positionOrder = ['QB', 'RB', 'FB', 'WR', 'TE', 'OT', 'OG', 'OC', 'OL', 'DT', 'EDGE', 'LB', 'CB', 'S', 'K', 'P', 'LS'];
     const positions = new Set(allFreeAgents.map(a => a.position).filter(Boolean));
-    return Array.from(positions).sort();
+    return Array.from(positions).sort((a, b) => {
+      const indexA = positionOrder.indexOf(a);
+      const indexB = positionOrder.indexOf(b);
+      // If position not in order list, put it at the end
+      if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
   }, [allFreeAgents]);
 
   // Extract unique FA types for filter
@@ -231,6 +251,7 @@ export default function FreeAgencyTrackerClient() {
       const matchesTeam = selectedTeam === 'all' || agent.teamId === selectedTeam;
       const matchesPosition = selectedPosition === 'all' || agent.position === selectedPosition;
       const matchesFaType = selectedFaType === 'all' || agent.faType === selectedFaType;
+      const matchesSearch = searchQuery.trim() === '' || agent.name.toLowerCase().includes(searchQuery.toLowerCase());
 
       let matchesSignedStatus = true;
       if (selectedSignedStatus === 'unsigned') {
@@ -239,9 +260,9 @@ export default function FreeAgencyTrackerClient() {
         matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '');
       }
 
-      return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus;
+      return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus && matchesSearch;
     });
-  }, [allFreeAgents, selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus]);
+  }, [allFreeAgents, selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
 
   // Sorting Logic
   const sortedFreeAgents = useMemo(() => {
@@ -273,7 +294,7 @@ export default function FreeAgencyTrackerClient() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus]);
+  }, [selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
 
   // Sort Handler
   const handleSort = (key: SortKey) => {
@@ -369,7 +390,7 @@ export default function FreeAgencyTrackerClient() {
             <>
               {/* Filters */}
               <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   {/* Team Filter */}
                   <div>
                     <label htmlFor="fa-team-filter" className="block text-sm font-semibold text-gray-700 mb-2">Team</label>
@@ -431,6 +452,29 @@ export default function FreeAgencyTrackerClient() {
                       <option value="unsigned">Unsigned</option>
                       <option value="signed">Signed</option>
                     </select>
+                  </div>
+
+                  {/* Player Search */}
+                  <div>
+                    <label htmlFor="fa-search" className="block text-sm font-semibold text-gray-700 mb-2">Search</label>
+                    <div className="relative">
+                      <input
+                        id="fa-search"
+                        type="text"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        placeholder="Search players..."
+                        className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm"
+                      />
+                      <svg
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
