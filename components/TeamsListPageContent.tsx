@@ -163,15 +163,9 @@ export default function TeamsListPageContent() {
           </div>
           <div className="text-right flex-shrink-0 hidden lg:block">
             {isLoading ? (
-              <>
-                <div className="h-5 w-16 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-12 bg-gray-200 rounded animate-pulse mt-1"></div>
-              </>
+              <div className="h-5 w-16 bg-gray-200 rounded animate-pulse"></div>
             ) : (
-              <>
-                <p className="text-sm font-semibold text-gray-900">{record}</p>
-                <p className="text-xs text-gray-600 mt-1">{divisionRank}</p>
-              </>
+              <p className="text-sm font-semibold text-gray-900">{record}</p>
             )}
           </div>
         </div>
