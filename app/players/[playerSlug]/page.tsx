@@ -78,7 +78,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (jerseyNumber) {
     title += ` #${jerseyNumber}`;
   }
-  title += ' | NFL HQ';
 
   return {
     title,

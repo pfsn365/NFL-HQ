@@ -511,8 +511,11 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero Section with Blue Background */}
-      <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-3 lg:pb-3">
+      {/* Hero Section with Team Primary Color */}
+      <div
+        className="text-white pt-[57px] lg:pt-3 lg:pb-3"
+        style={{ backgroundColor: player.team?.primaryColor || '#0050A0' }}
+      >
         <div className="container mx-auto px-4 py-3 lg:py-3">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             {/* Player Info */}
