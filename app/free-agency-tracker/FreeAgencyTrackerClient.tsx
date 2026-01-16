@@ -578,7 +578,7 @@ export default function FreeAgencyTrackerClient() {
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
                                 {teamInfo ? (
-                                  <Link href={`/teams/${teamInfo.id}`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                                  <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
                                     <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
                                     <span className="font-medium text-[#0050A0]">{teamInfo.abbreviation}</span>
                                   </Link>
