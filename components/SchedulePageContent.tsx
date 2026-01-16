@@ -473,7 +473,7 @@ function SchedulePageInner() {
               <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('daily')}
-                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer ${
                     viewMode === 'daily'
                       ? 'bg-white text-[#0050A0] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
@@ -483,7 +483,7 @@ function SchedulePageInner() {
                 </button>
                 <button
                   onClick={() => setViewMode('weekly')}
-                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer ${
                     viewMode === 'weekly'
                       ? 'bg-white text-[#0050A0] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
@@ -493,7 +493,7 @@ function SchedulePageInner() {
                 </button>
                 <button
                   onClick={() => setViewMode('monthly')}
-                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer ${
                     viewMode === 'monthly'
                       ? 'bg-white text-[#0050A0] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
@@ -510,7 +510,7 @@ function SchedulePageInner() {
                     window.location.href = `/nfl-hq/teams/${e.target.value}/schedule`;
                   }
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-gray-900 bg-white"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-gray-900 bg-white cursor-pointer"
                 defaultValue=""
               >
                 <option value="" disabled>View Team Schedule</option>
@@ -531,7 +531,7 @@ function SchedulePageInner() {
               <div className="flex items-center gap-2 justify-center">
                 <button
                   onClick={goToPreviousDay}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
                   aria-label="Previous day"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -550,7 +550,7 @@ function SchedulePageInner() {
 
                 <button
                   onClick={goToNextDay}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
                   aria-label="Next day"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -587,7 +587,7 @@ function SchedulePageInner() {
               <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <button
                   onClick={goToPreviousWeek}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px]"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px] cursor-pointer"
                   aria-label="Previous week"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -609,7 +609,7 @@ function SchedulePageInner() {
 
                 <button
                   onClick={goToNextWeek}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px]"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px] cursor-pointer"
                   aria-label="Next week"
                 >
                   <span className="hidden md:inline text-sm font-medium text-gray-700">Next</span>
@@ -627,7 +627,7 @@ function SchedulePageInner() {
               <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <button
                   onClick={goToPreviousMonth}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px]"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px] cursor-pointer"
                   aria-label="Previous month"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -644,7 +644,7 @@ function SchedulePageInner() {
 
                 <button
                   onClick={goToNextMonth}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px]"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors flex-shrink-0 min-h-[44px] cursor-pointer"
                   aria-label="Next month"
                 >
                   <span className="hidden md:inline text-sm font-medium text-gray-700">Next</span>
@@ -666,7 +666,7 @@ function SchedulePageInner() {
               <p className="text-red-600">{error}</p>
               <button
                 onClick={() => setSelectedDate(selectedDate)}
-                className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
               >
                 Retry
               </button>

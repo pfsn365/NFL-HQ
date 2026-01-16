@@ -169,7 +169,7 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
               setSelectedSeason(e.target.value);
               setSelectedMonth('All Season');
             }}
-            className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400"
+            className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400 cursor-pointer"
           >
             {availableSeasons.map(season => (
               <option key={season.value} value={season.value}>{season.label}</option>
@@ -185,7 +185,7 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400 min-w-[120px]"
+            className="p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:border-gray-400 min-w-[120px] cursor-pointer"
           >
             {months.map(month => (
               <option key={month} value={month}>{month}</option>

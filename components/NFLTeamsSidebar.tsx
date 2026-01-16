@@ -226,7 +226,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                           <div>
                             <button
                               onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
-                              className="w-full flex items-center justify-between p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
+                              className="w-full flex items-center justify-between p-2 rounded text-sm transition-colors text-white hover:bg-gray-800 cursor-pointer"
                             >
                               <div className="text-xs">PFSN Impact Rankings</div>
                               <svg
@@ -483,7 +483,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                     <li>
                       <button
                         onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
-                        className="w-full relative flex items-center justify-between px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
+                        className="w-full relative flex items-center justify-between px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white cursor-pointer"
                       >
                         <span className="text-sm font-medium truncate">
                           PFSN Impact Rankings

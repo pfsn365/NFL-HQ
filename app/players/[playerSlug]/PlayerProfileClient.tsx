@@ -671,7 +671,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               <select
                 value={selectedGameLogSeason || ''}
                 onChange={(e) => setSelectedGameLogSeason(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
               >
                 {player.gameLog.availableSeasons.map((year) => (
                   <option key={year} value={year}>{year}-{String(year + 1).slice(-2)}</option>
@@ -776,7 +776,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               <select
                 value={selectedSeason}
                 onChange={(e) => setSelectedSeason(e.target.value === 'career' ? 'career' : parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
               >
                 <option value="career">Career Totals</option>
                 {player.careerStats.availableSeasons.map((year) => (
@@ -886,7 +886,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                     e.preventDefault();
                     setVisibleArticles(prev => Math.min(prev + 3, articles.length));
                   }}
-                  className="text-white px-8 py-4 rounded-lg font-medium transition-colors hover:opacity-90 text-base min-h-[48px] bg-[#0050A0]"
+                  className="text-white px-8 py-4 rounded-lg font-medium transition-colors hover:opacity-90 text-base min-h-[48px] bg-[#0050A0] cursor-pointer"
                 >
                   Show More Articles
                 </button>

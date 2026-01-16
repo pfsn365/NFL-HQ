@@ -231,10 +231,10 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div>
-          <select 
-            value={selectedYear} 
+          <select
+            value={selectedYear}
             onChange={(e) => setSelectedYear(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
           >
             <option value="All">Year: All</option>
             {years.map(year => (
@@ -244,10 +244,10 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
         </div>
 
         <div>
-          <select 
-            value={selectedRound} 
+          <select
+            value={selectedRound}
             onChange={(e) => setSelectedRound(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
           >
             <option value="All">Round: All</option>
             {rounds.map(round => (
@@ -257,10 +257,10 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
         </div>
 
         <div>
-          <select 
-            value={selectedPosition} 
+          <select
+            value={selectedPosition}
             onChange={(e) => setSelectedPosition(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
           >
             <option value="All">Position: All</option>
             {positions.map(position => (

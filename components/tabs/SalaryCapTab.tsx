@@ -219,7 +219,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
             <h3 className="text-lg font-semibold text-gray-800">2026 Active Roster Cap</h3>
             <button
               onClick={() => setShowPotentialSavings(!showPotentialSavings)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors border ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors border cursor-pointer ${
                 showPotentialSavings
                   ? 'text-white border-transparent'
                   : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50'
