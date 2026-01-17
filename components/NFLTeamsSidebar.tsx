@@ -47,6 +47,8 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   };
 
   const nflTools = [
+    // UNCOMMENT AFTER CONFERENCE CHAMPIONSHIPS TO LAUNCH SUPER BOWL HUB
+    // { title: 'Super Bowl Hub', url: '/nfl-hq/super-bowl-hub', external: false, icon: '/nfl-hq/super-bowl-lx-logo.png' },
     { title: 'NFL Free Agency Tracker', url: '/nfl-hq/free-agency-tracker', external: false },
     { title: 'NFL Schedule', url: '/nfl-hq/schedule', external: false },
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
@@ -209,6 +211,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                 <div className="grid grid-cols-1 gap-1">
                   {nflTools.map((tool, index) => {
                     const isActive = !tool.external && isActivePage(tool.url);
+                    const toolWithIcon = tool as typeof tool & { icon?: string };
 
                     return (
                       <React.Fragment key={tool.title}>
@@ -219,7 +222,12 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                             isActive ? 'bg-[#0050A0] text-white' : 'text-white hover:bg-gray-800'
                           }`}
                         >
-                          <div className="text-xs">{tool.title}</div>
+                          <div className="text-xs flex items-center gap-2">
+                            <span>{tool.title}</span>
+                            {toolWithIcon.icon && (
+                              <img src={toolWithIcon.icon} alt="" className="w-6 h-6 object-contain flex-shrink-0" />
+                            )}
+                          </div>
                         </a>
                         {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
                         {tool.title === 'NFL Free Agency Tracker' && (
@@ -454,6 +462,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
           </li>
           {nflTools.map((tool) => {
             const isActive = !tool.external && isActivePage(tool.url);
+            const toolWithIcon = tool as typeof tool & { icon?: string };
 
             return (
               <React.Fragment key={tool.title}>
@@ -469,6 +478,9 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                   >
                     <span className="text-sm font-medium truncate flex items-center gap-2">
                       {tool.title}
+                      {toolWithIcon.icon && (
+                        <img src={toolWithIcon.icon} alt="" className="w-7 h-7 object-contain flex-shrink-0" />
+                      )}
                       {tool.external && (
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
