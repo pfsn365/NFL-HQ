@@ -97,11 +97,11 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   },
   'afc-div-2': {
     id: 'afc-div-2',
-    team1: null,
-    team2: null,
+    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots', score: 28, isWinner: true },
+    team2: { seed: 5, name: 'Texans', teamId: 'houston-texans', score: 16 },
     round: 'Divisional',
     date: 'Sun, Jan 18',
-    completed: false,
+    completed: true,
   },
   // NFC Divisional Round
   'nfc-div-1': {
