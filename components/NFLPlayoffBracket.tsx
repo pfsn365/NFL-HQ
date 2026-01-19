@@ -114,11 +114,11 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   },
   'nfc-div-2': {
     id: 'nfc-div-2',
-    team1: null,
-    team2: null,
+    team1: { seed: 2, name: 'Bears', teamId: 'chicago-bears', score: 17 },
+    team2: { seed: 5, name: 'Rams', teamId: 'los-angeles-rams', score: 20, isWinner: true },
     round: 'Divisional',
     date: 'Sun, Jan 18',
-    completed: false,
+    completed: true,
   },
   // Conference Championships
   'afc-conf': {
