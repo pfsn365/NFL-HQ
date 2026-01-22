@@ -38,6 +38,9 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   // Check if we're on the home page (pathname will be '' or '/' when at /nfl-hq/)
   const isHomePage = normalizedPathname === '' || normalizedPathname === '/';
 
+  // Check if we're on the Super Bowl LX page
+  const isSuperBowlLXPage = normalizedPathname === '/super-bowl-lx';
+
   // Function to generate team URL based on current tab
   const getTeamUrl = (teamId: string) => {
     if (currentTab === 'overview') {
@@ -155,7 +158,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
 
         {isExpanded && (
           <div className="bg-black border-t border-gray-800">
-            {/* Home and Browse All Teams */}
+            {/* Home, Super Bowl LX, and Browse All Teams */}
             <div className="px-4 py-2 border-b border-gray-800">
               <div className="grid grid-cols-1 gap-1">
                 <a
@@ -167,6 +170,23 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                   }`}
                 >
                   <div className="text-xs">Home</div>
+                </a>
+                <a
+                  href="/nfl-hq/super-bowl-lx"
+                  className={`block p-2 rounded text-sm transition-colors ${
+                    isSuperBowlLXPage
+                      ? 'bg-[#0050A0] text-white'
+                      : 'text-white hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="text-xs flex items-center gap-1">
+                    <img
+                      src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                      alt="Super Bowl LX"
+                      className="h-3 w-3 object-contain"
+                    />
+                    Super Bowl LX
+                  </div>
                 </a>
                 <a
                   href="/nfl-hq/teams"
@@ -414,6 +434,27 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                   />
                 </svg>
                 <span className="text-sm font-medium">Home</span>
+              </div>
+            </a>
+          </li>
+
+          {/* Super Bowl LX Button */}
+          <li>
+            <a
+              href="/nfl-hq/super-bowl-lx"
+              className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+                isSuperBowlLXPage
+                  ? 'bg-[#0050A0] text-white'
+                  : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2 w-full">
+                <img
+                  src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                  alt="Super Bowl LX"
+                  className="h-4 w-4 object-contain"
+                />
+                <span className="text-sm font-medium">Super Bowl LX</span>
               </div>
             </a>
           </li>
