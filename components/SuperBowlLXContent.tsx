@@ -51,20 +51,22 @@ export default function SuperBowlLXContent() {
           </div>
 
           {/* Team Logos */}
-          <div className="flex items-center justify-center gap-6 sm:gap-10 lg:gap-16 mb-6">
-            <img
-              src="/nfl-hq/new-england-patriots.png"
-              alt="New England Patriots"
-              className="w-32 h-32 sm:w-44 sm:h-44 lg:w-56 lg:h-56 object-contain"
-            />
-            <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-700">
-              vs.
-            </span>
-            <img
-              src="/nfl-hq/seattle-seahawks-sb.png"
-              alt="Seattle Seahawks"
-              className="w-32 h-32 sm:w-44 sm:h-44 lg:w-56 lg:h-56 object-contain"
-            />
+          <div className="bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl p-6 mb-6 shadow-lg">
+            <div className="flex items-center justify-center gap-6 sm:gap-10 lg:gap-16">
+              <img
+                src="/nfl-hq/new-england-patriots.png"
+                alt="New England Patriots"
+                className="w-32 h-32 sm:w-44 sm:h-44 lg:w-56 lg:h-56 object-contain"
+              />
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+                vs.
+              </span>
+              <img
+                src="/nfl-hq/seattle-seahawks-sb.png"
+                alt="Seattle Seahawks"
+                className="w-32 h-32 sm:w-44 sm:h-44 lg:w-56 lg:h-56 object-contain"
+              />
+            </div>
           </div>
 
           {/* Three Column Layout: Broadcast Info | Stats | Game Info */}
