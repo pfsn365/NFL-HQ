@@ -123,25 +123,25 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   // Conference Championships
   'afc-conf': {
     id: 'afc-conf',
-    team1: null,
-    team2: null,
+    team1: { seed: 1, name: 'Broncos', teamId: 'denver-broncos', score: 7 },
+    team2: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots', score: 10, isWinner: true },
     round: 'AFC Championship',
     date: 'Sun, Jan 25',
-    completed: false,
+    completed: true,
   },
   'nfc-conf': {
     id: 'nfc-conf',
-    team1: null,
-    team2: null,
+    team1: { seed: 1, name: 'Seahawks', teamId: 'seattle-seahawks', score: 31, isWinner: true },
+    team2: { seed: 5, name: 'Rams', teamId: 'los-angeles-rams', score: 27 },
     round: 'NFC Championship',
     date: 'Sun, Jan 25',
-    completed: false,
+    completed: true,
   },
   // Super Bowl
   'superbowl': {
     id: 'superbowl',
-    team1: null,
-    team2: null,
+    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots' },
+    team2: { seed: 1, name: 'Seahawks', teamId: 'seattle-seahawks' },
     round: 'Super Bowl LX',
     date: 'Sun, Feb 8',
     completed: false,
