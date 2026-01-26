@@ -228,13 +228,39 @@ export default function HomePageContent() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
+        {/* Super Bowl LX Banner */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+          <Link
+            href="/super-bowl-lx"
+            className="block bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl border border-gray-200 shadow-lg p-4 hover:shadow-xl transition-shadow"
+          >
+            <div className="flex items-center justify-center gap-8 sm:gap-12 lg:gap-16">
+              <img
+                src="/nfl-hq/new-england-patriots.png"
+                alt="New England Patriots"
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 object-contain"
+              />
+              <img
+                src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                alt="Super Bowl LX"
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
+              />
+              <img
+                src="/nfl-hq/seattle-seahawks-sb.png"
+                alt="Seattle Seahawks"
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 object-contain"
+              />
+            </div>
+          </Link>
+        </div>
+
         {/* NFL Playoff Bracket */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-8">
           <NFLPlayoffBracket />
         </div>
 
-        {/* Upcoming Games Section */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Upcoming Games Section - Hidden */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 hidden">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Upcoming Games</h2>
