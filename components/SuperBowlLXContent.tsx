@@ -1,10 +1,90 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import { getApiPath } from '@/utils/api';
+
+interface Article {
+  title: string;
+  description: string;
+  link: string;
+  pubDate: string;
+  author?: string;
+  category?: string;
+  featuredImage?: string;
+}
 
 export default function SuperBowlLXContent() {
   const [activeMatchup, setActiveMatchup] = useState<'seahawks-offense' | 'patriots-offense'>('seahawks-offense');
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(true);
+  const [articlesError, setArticlesError] = useState<string | null>(null);
+  const [visibleArticles, setVisibleArticles] = useState(3);
+
+  useEffect(() => {
+    fetchSuperBowlArticles();
+  }, []);
+
+  const fetchSuperBowlArticles = async () => {
+    try {
+      setArticlesLoading(true);
+      setArticlesError(null);
+
+      const rssUrl = encodeURIComponent('https://www.profootballnetwork.com/tag/super-bowl-60/feed/');
+      const response = await fetch(getApiPath(`api/proxy-rss?url=${rssUrl}`));
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch articles');
+      }
+
+      const data = await response.json();
+
+      if (data.articles && data.articles.length > 0) {
+        setArticles(data.articles);
+      } else {
+        throw new Error('No articles found');
+      }
+    } catch (err) {
+      console.error('Error fetching Super Bowl articles:', err);
+      setArticlesError('Failed to load articles. Please try again later.');
+    } finally {
+      setArticlesLoading(false);
+    }
+  };
+
+  const getRelativeTime = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) {
+      return `${diffMins}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else if (diffDays < 7) {
+      return `${diffDays}d ago`;
+    } else {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    }
+  };
+
+  const truncateDescription = (text: string, maxLength: number = 150) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
+  const loadMoreArticles = () => {
+    setVisibleArticles(prev => prev + 3);
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -609,6 +689,104 @@ export default function SuperBowlLXContent() {
                   </div>
                 </div>
               </div>
+
+          {/* Latest Super Bowl Articles Section */}
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Super Bowl Articles</h2>
+
+            {articlesLoading && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(3)].map((_, idx) => (
+                  <div key={idx} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="h-48 bg-gray-200 animate-pulse" />
+                    <div className="p-4">
+                      <div className="h-5 bg-gray-200 rounded w-3/4 mb-3 animate-pulse" />
+                      <div className="h-4 bg-gray-200 rounded w-full mb-2 animate-pulse" />
+                      <div className="h-4 bg-gray-200 rounded w-5/6 mb-3 animate-pulse" />
+                      <div className="h-3 bg-gray-200 rounded w-1/4 animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {articlesError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <p className="text-red-700 mb-4">{articlesError}</p>
+                <button
+                  onClick={fetchSuperBowlArticles}
+                  className="px-4 py-2 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {!articlesLoading && !articlesError && articles.length === 0 && (
+              <div className="bg-gray-50 rounded-lg p-8 text-center">
+                <p className="text-gray-600">No Super Bowl articles available at this time.</p>
+              </div>
+            )}
+
+            {!articlesLoading && !articlesError && articles.length > 0 && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {articles.slice(0, visibleArticles).map((article, idx) => (
+                    <a
+                      key={idx}
+                      href={article.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group"
+                    >
+                      {article.featuredImage ? (
+                        <div className="h-48 overflow-hidden">
+                          <img
+                            src={article.featuredImage}
+                            alt={article.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-48 bg-gradient-to-br from-[#0050A0] to-[#003d7a] flex items-center justify-center">
+                          <img
+                            src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                            alt="Super Bowl LX"
+                            className="w-24 h-24 object-contain opacity-50"
+                          />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#0050A0] transition-colors">
+                          {article.title}
+                        </h3>
+                        {article.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {truncateDescription(article.description)}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">{getRelativeTime(article.pubDate)}</span>
+                          <span className="font-medium text-[#0050A0]">Read More →</span>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+
+                {visibleArticles < articles.length && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={loadMoreArticles}
+                      className="px-6 py-3 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] transition-colors font-medium"
+                    >
+                      Show More
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </main>
     </div>
