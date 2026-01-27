@@ -83,12 +83,12 @@ export default function HeadToHeadTab() {
   return (
     <div className="space-y-6">
       {/* Head-to-Head Record Summary */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] text-white px-6 py-4">
+      <div className="rounded-lg overflow-hidden border border-gray-200">
+        <div className="bg-[#0050A0] text-white px-6 py-4">
           <h2 className="text-xl font-bold text-center">Patriots vs Seahawks: All-Time Series</h2>
         </div>
 
-        <div className="p-6">
+        <div className="p-6 bg-white">
           {/* Main Record Display */}
           <div className="flex items-center justify-center gap-8 mb-8">
             <div className="text-center">
@@ -146,22 +146,22 @@ export default function HeadToHeadTab() {
       </div>
 
       {/* Franchise Comparison */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-gray-100 px-6 py-3 border-b">
-          <h3 className="font-bold text-gray-800">Franchise Comparison</h3>
+      <div className="rounded-lg overflow-hidden border border-gray-200">
+        <div className="bg-[#0050A0] text-white px-6 py-4">
+          <h3 className="font-bold text-lg">Franchise Comparison</h3>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto bg-white">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Stat</th>
-                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-600">
+              <tr className="bg-gray-100">
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Stat</th>
+                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700">
                   <div className="flex items-center justify-center gap-2">
                     <img src="/nfl-hq/new-england-patriots.png" alt="Patriots" className="w-6 h-6" />
                     Patriots
                   </div>
                 </th>
-                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-600">
+                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700">
                   <div className="flex items-center justify-center gap-2">
                     <img src="/nfl-hq/seattle-seahawks-sb.png" alt="Seahawks" className="w-6 h-6" />
                     Seahawks
@@ -221,18 +221,18 @@ export default function HeadToHeadTab() {
       </div>
 
       {/* Game History */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-gray-100 px-6 py-3 border-b">
-          <h3 className="font-bold text-gray-800">Game History</h3>
+      <div className="rounded-lg overflow-hidden border border-gray-200">
+        <div className="bg-[#0050A0] text-white px-6 py-4">
+          <h3 className="font-bold text-lg">Game History</h3>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto bg-white">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Date</th>
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Matchup</th>
-                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-600">Score</th>
-                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-600">Result</th>
+              <tr className="bg-gray-100">
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Date</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Matchup</th>
+                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700">Score</th>
+                <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700">Result</th>
               </tr>
             </thead>
             <tbody>
@@ -276,10 +276,10 @@ export default function HeadToHeadTab() {
         </div>
 
         {headToHeadGames.length > 5 && (
-          <div className="p-4 text-center border-t">
+          <div className="p-4 text-center border-t bg-white">
             <button
               onClick={() => setShowAllGames(!showAllGames)}
-              className="px-4 py-2 text-[#0050A0] hover:text-[#003d7a] font-medium transition-colors cursor-pointer"
+              className="px-6 py-2 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] font-medium transition-colors cursor-pointer"
             >
               {showAllGames ? 'Show Less' : `Show All ${headToHeadGames.length} Games`}
             </button>
