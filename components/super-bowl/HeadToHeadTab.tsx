@@ -125,23 +125,6 @@ export default function HeadToHeadTab() {
               </div>
             </div>
           </div>
-
-          {/* Super Bowl XLIX Highlight */}
-          <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#FFD700]/10 border border-[#D4AF37] rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-            <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2">
-              <span className="text-[#D4AF37] font-bold">★</span>
-              <span className="font-bold text-gray-800 text-sm sm:text-base">Super Bowl XLIX (February 1, 2015)</span>
-              <span className="text-[#D4AF37] font-bold">★</span>
-            </div>
-            <div className="text-center text-gray-700 text-sm sm:text-base">
-              <span className="font-semibold">New England Patriots 28</span>
-              <span className="mx-1 sm:mx-2">-</span>
-              <span className="font-semibold">Seattle Seahawks 24</span>
-            </div>
-            <div className="text-center text-xs sm:text-sm text-gray-600 mt-1">
-              Malcolm Butler's goal-line interception sealed the Patriots' 4th championship
-            </div>
-          </div>
         </div>
       </div>
 
