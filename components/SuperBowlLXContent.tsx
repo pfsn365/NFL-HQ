@@ -1,8 +1,63 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import HistoryTab from '@/components/super-bowl/HistoryTab';
+import HeadToHeadTab from '@/components/super-bowl/HeadToHeadTab';
+import InjuryReportTab from '@/components/super-bowl/InjuryReportTab';
+import StatsComparisonTab from '@/components/super-bowl/StatsComparisonTab';
+import RostersDepthChartsTab from '@/components/super-bowl/RostersDepthChartsTab';
 import { getApiPath } from '@/utils/api';
+
+// Countdown Timer Component
+function CountdownTimer({ targetDate }: { targetDate: string }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const difference = new Date(targetDate).getTime() - new Date().getTime();
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  return (
+    <div className="mt-2 text-center">
+      <div className="text-white text-sm sm:text-base font-semibold uppercase tracking-wider mb-2">Kickoff In</div>
+      <div className="flex gap-2 sm:gap-3 justify-center">
+        <div className="bg-black/30 backdrop-blur-sm rounded w-14 sm:w-16 lg:w-18 py-2 sm:py-3">
+          <div className="text-white font-bold text-xl sm:text-2xl lg:text-3xl tabular-nums">{timeLeft.days}</div>
+          <div className="text-white/70 text-[10px] sm:text-xs uppercase">Days</div>
+        </div>
+        <div className="bg-black/30 backdrop-blur-sm rounded w-14 sm:w-16 lg:w-18 py-2 sm:py-3">
+          <div className="text-white font-bold text-xl sm:text-2xl lg:text-3xl tabular-nums">{timeLeft.hours}</div>
+          <div className="text-white/70 text-[10px] sm:text-xs uppercase">Hrs</div>
+        </div>
+        <div className="bg-black/30 backdrop-blur-sm rounded w-14 sm:w-16 lg:w-18 py-2 sm:py-3">
+          <div className="text-white font-bold text-xl sm:text-2xl lg:text-3xl tabular-nums">{timeLeft.minutes}</div>
+          <div className="text-white/70 text-[10px] sm:text-xs uppercase">Min</div>
+        </div>
+        <div className="bg-black/30 backdrop-blur-sm rounded w-14 sm:w-16 lg:w-18 py-2 sm:py-3">
+          <div className="text-white font-bold text-xl sm:text-2xl lg:text-3xl tabular-nums">{timeLeft.seconds}</div>
+          <div className="text-white/70 text-[10px] sm:text-xs uppercase">Sec</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type MainTab = 'overview' | 'rosters' | 'injuries' | 'stats' | 'head-to-head' | 'history';
 
 interface Article {
   title: string;
@@ -15,11 +70,28 @@ interface Article {
 }
 
 export default function SuperBowlLXContent() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<MainTab>(() => {
+    const validTabs: MainTab[] = ['overview', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
+    if (tabParam && validTabs.includes(tabParam as MainTab)) return tabParam as MainTab;
+    return 'overview';
+  });
   const [activeMatchup, setActiveMatchup] = useState<'seahawks-offense' | 'patriots-offense'>('seahawks-offense');
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(true);
   const [articlesError, setArticlesError] = useState<string | null>(null);
   const [visibleArticles, setVisibleArticles] = useState(3);
+
+  // Sync tab state with URL param
+  useEffect(() => {
+    const validTabs: MainTab[] = ['overview', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
+    if (tabParam && validTabs.includes(tabParam as MainTab)) {
+      setActiveTab(tabParam as MainTab);
+    } else if (!tabParam) {
+      setActiveTab('overview');
+    }
+  }, [tabParam]);
 
   useEffect(() => {
     fetchSuperBowlArticles();
@@ -123,31 +195,87 @@ export default function SuperBowlLXContent() {
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="container mx-auto px-4 xl:px-8">
+            <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide">
+              {[
+                { id: 'overview', label: 'Overview' },
+                { id: 'rosters', label: 'Rosters & Depth Charts' },
+                { id: 'injuries', label: 'Injury Report' },
+                { id: 'stats', label: 'Stats Comparison' },
+                { id: 'head-to-head', label: 'Head-to-Head' },
+                { id: 'history', label: 'Super Bowl History' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as MainTab)}
+                  className={`py-4 px-2 sm:px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-colors cursor-pointer ${
+                    activeTab === tab.id
+                      ? 'border-[#0050A0] text-[#0050A0]'
+                      : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Raptive Header Ad - Below Tabs */}
+        <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
+          <div className="raptive-pfn-header-90 w-full h-full"></div>
+        </div>
+
         {/* Content */}
         <div className="container mx-auto px-4 xl:px-8 py-8">
-          {/* Header Ad */}
-          <div className="flex justify-center mb-6">
-            <div className="raptive-pfn-header-90"></div>
-          </div>
+          {activeTab === 'history' && <HistoryTab />}
+          {activeTab === 'rosters' && <RostersDepthChartsTab />}
+          {activeTab === 'injuries' && <InjuryReportTab />}
+          {activeTab === 'stats' && <StatsComparisonTab />}
+          {activeTab === 'head-to-head' && <HeadToHeadTab />}
+          {activeTab === 'overview' && (
+            <>
 
-          {/* Team Logos */}
-          <div className="bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl p-6 mb-6 shadow-lg">
-            <div className="flex items-center justify-center gap-6 sm:gap-10 lg:gap-16">
-              <img
-                src="/nfl-hq/new-england-patriots.png"
-                alt="New England Patriots"
-                className="w-32 h-32 sm:w-44 sm:h-44 lg:w-56 lg:h-56 object-contain"
-              />
-              <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                vs.
-              </span>
-              <img
-                src="/nfl-hq/seattle-seahawks-sb.png"
-                alt="Seattle Seahawks"
-                className="w-32 h-32 sm:w-44 sm:h-44 lg:w-56 lg:h-56 object-contain"
-              />
-            </div>
-          </div>
+              {/* Hero Section with Gradient */}
+              <div className="bg-gradient-to-r from-[#C60C30] via-[#002244] via-50% to-[#69BE28] rounded-xl p-6 mb-6 shadow-lg">
+                {/* Team Logos and Super Bowl Logo */}
+                <div className="flex items-center justify-center gap-4 sm:gap-8 lg:gap-12">
+                  {/* Patriots Side */}
+                  <div className="flex flex-col items-center">
+                    <img
+                      src="/nfl-hq/new-england-patriots.png"
+                      alt="New England Patriots"
+                      className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
+                    />
+                    {/* Record Badge */}
+                    <div className="mt-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1">
+                      <span className="text-white font-bold text-lg sm:text-xl">14-3</span>
+                      <span className="text-white/80 text-sm ml-2">#2 AFC</span>
+                    </div>
+                  </div>
+
+                  {/* Countdown Timer Center */}
+                  <div className="flex flex-col items-center justify-center">
+                    <CountdownTimer targetDate="2026-02-08T18:30:00-05:00" />
+                  </div>
+
+                  {/* Seahawks Side */}
+                  <div className="flex flex-col items-center">
+                    <img
+                      src="/nfl-hq/seattle-seahawks-sb.png"
+                      alt="Seattle Seahawks"
+                      className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
+                    />
+                    {/* Record Badge */}
+                    <div className="mt-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1">
+                      <span className="text-white font-bold text-lg sm:text-xl">14-3</span>
+                      <span className="text-white/80 text-sm ml-2">#1 NFC</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
           {/* Three Column Layout: Broadcast Info | Stats | Game Info */}
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-start">
@@ -196,47 +324,48 @@ export default function SuperBowlLXContent() {
               </div>
             </div>
 
-            {/* Stats Table - Center */}
-            <div className="flex-1 w-full rounded-lg overflow-hidden">
+            {/* Stats Table - Center with Team Color Accents */}
+            <div className="flex-1 w-full rounded-lg overflow-hidden border border-gray-200">
+                {/* Header Row */}
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">14-3</div>
-                  <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">2025 Record</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">14-3</div>
+                  <div className="flex-1 p-3 text-center font-bold text-white bg-[#002244] border-b-4 border-[#C60C30]">Patriots</div>
+                  <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Category</div>
+                  <div className="flex-1 p-3 text-center font-bold text-white bg-[#002244] border-b-4 border-[#69BE28]">Seahawks</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">44.2%</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] font-semibold bg-[#002244]/5">44.2%</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">PFSN Projected Win Rate</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">55.8%</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] font-semibold bg-[#69BE28]/10">55.8%</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">7th</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-white">7th</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Power Ranking</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">1st</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-white">1st</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">2nd (86.6 B)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-[#002244]/5">2nd (86.6 B)</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Offense</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">9th (79.8 C+)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-[#69BE28]/10">9th (79.8 C+)</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">Maye 2nd (91.1 A-)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-white">Maye 2nd (91.1 A-)</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Quarterback</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">Darnold 13th (78.7 C+)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-white">Darnold 13th (78.7 C+)</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">12th (74.5 C)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-[#002244]/5">12th (74.5 C)</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Offensive Line</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">17th (72.0 C)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-[#69BE28]/10">17th (72.0 C)</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">12th (78.2 C+)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-white">12th (78.2 C+)</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Defense</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-white">3rd (88.4 B+)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-white">3rd (88.4 B+)</div>
                 </div>
                 <div className="flex">
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">20th (73.9 C-)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-[#002244]/5">20th (73.9 C-)</div>
                   <div className="flex-1 p-3 text-center font-semibold text-white bg-[#0050A0] max-w-[180px] lg:max-w-[250px] min-[1600px]:max-w-[300px]">Special Teams</div>
-                  <div className="flex-1 p-3 text-center text-gray-900 bg-gray-100">2nd (90.9 A-)</div>
+                  <div className="flex-1 p-3 text-center text-[#002244] bg-[#69BE28]/10">2nd (90.9 A-)</div>
                 </div>
             </div>
 
@@ -287,7 +416,7 @@ export default function SuperBowlLXContent() {
             {/* Patriots Coaches Box - Left side on 1400px+ */}
             <div className="hidden min-[1400px]:block w-[375px] flex-shrink-0">
               <div className="rounded-lg overflow-hidden border border-gray-200 sticky top-4">
-                <div className="bg-[#0050A0] text-white px-4 py-3">
+                <div className="bg-[#002244] text-white px-4 py-3 border-b-4 border-[#C60C30]">
                   <h3 className="font-semibold text-center">Patriots Coaches</h3>
                 </div>
                 <div className="bg-white p-4 space-y-3">
@@ -317,7 +446,7 @@ export default function SuperBowlLXContent() {
                   <div className="flex">
                   <button
                     onClick={() => setActiveMatchup('seahawks-offense')}
-                    className={`flex-1 py-3 px-4 font-semibold text-sm rounded-tl-lg transition-colors ${
+                    className={`flex-1 py-3 px-4 font-semibold text-sm rounded-tl-lg transition-colors cursor-pointer ${
                       activeMatchup === 'seahawks-offense'
                         ? 'bg-[#0050A0] text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -327,7 +456,7 @@ export default function SuperBowlLXContent() {
                   </button>
                   <button
                     onClick={() => setActiveMatchup('patriots-offense')}
-                    className={`flex-1 py-3 px-4 font-semibold text-sm rounded-tr-lg transition-colors ${
+                    className={`flex-1 py-3 px-4 font-semibold text-sm rounded-tr-lg transition-colors cursor-pointer ${
                       activeMatchup === 'patriots-offense'
                         ? 'bg-[#0050A0] text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -525,7 +654,7 @@ export default function SuperBowlLXContent() {
             {/* Seahawks Coaches Box - Right side on 1400px+ */}
             <div className="hidden min-[1400px]:block w-[375px] flex-shrink-0">
               <div className="rounded-lg overflow-hidden border border-gray-200 sticky top-4">
-                <div className="bg-[#0050A0] text-white px-4 py-3">
+                <div className="bg-[#002244] text-white px-4 py-3 border-b-4 border-[#69BE28]">
                   <h3 className="font-semibold text-center">Seahawks Coaches</h3>
                 </div>
                 <div className="bg-white p-4 space-y-3">
@@ -554,7 +683,7 @@ export default function SuperBowlLXContent() {
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 min-[1400px]:hidden">
                 {/* Patriots Coaches Box */}
                 <div className="rounded-lg overflow-hidden border border-gray-200">
-                  <div className="bg-[#0050A0] text-white px-4 py-3">
+                  <div className="bg-[#002244] text-white px-4 py-3 border-b-4 border-[#C60C30]">
                     <h3 className="font-semibold text-center">Patriots Coaches</h3>
                   </div>
                   <div className="bg-white p-4 space-y-3">
@@ -578,7 +707,7 @@ export default function SuperBowlLXContent() {
                 </div>
                 {/* Seahawks Coaches Box */}
                 <div className="rounded-lg overflow-hidden border border-gray-200">
-                  <div className="bg-[#0050A0] text-white px-4 py-3">
+                  <div className="bg-[#002244] text-white px-4 py-3 border-b-4 border-[#69BE28]">
                     <h3 className="font-semibold text-center">Seahawks Coaches</h3>
                   </div>
                   <div className="bg-white p-4 space-y-3">
@@ -787,6 +916,8 @@ export default function SuperBowlLXContent() {
               </>
             )}
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>

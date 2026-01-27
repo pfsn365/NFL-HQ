@@ -17,6 +17,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
   const [isImpactRankingsExpanded, setIsImpactRankingsExpanded] = useState(false);
   const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(true);
+  const [isSuperBowlLXExpanded, setIsSuperBowlLXExpanded] = useState(false);
   const allTeams = getAllTeams();
   const pathname = usePathname();
 
@@ -50,8 +51,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
   };
 
   const nflTools = [
-    // UNCOMMENT AFTER CONFERENCE CHAMPIONSHIPS TO LAUNCH SUPER BOWL HUB
-    // { title: 'Super Bowl Hub', url: '/nfl-hq/super-bowl-hub', external: false, icon: '/nfl-hq/super-bowl-lx-logo.png' },
     { title: 'NFL Free Agency Tracker', url: '/nfl-hq/free-agency-tracker', external: false },
     { title: 'NFL Schedule', url: '/nfl-hq/schedule', external: false },
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
@@ -171,23 +170,58 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                 >
                   <div className="text-xs">Home</div>
                 </a>
-                <a
-                  href="/nfl-hq/super-bowl-lx"
-                  className={`block p-2 rounded text-sm transition-colors ${
-                    isSuperBowlLXPage
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-white hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="text-xs flex items-center gap-1">
-                    <img
-                      src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                      alt="Super Bowl LX"
-                      className="h-3 w-3 object-contain"
-                    />
-                    Super Bowl LX
+                <div>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
+                    className={`block p-2 rounded text-sm transition-colors cursor-pointer ${
+                      isSuperBowlLXPage
+                        ? 'bg-[#0050A0] text-white'
+                        : 'text-white hover:bg-gray-800'
+                    }`}
+                  >
+                    <div className="text-xs flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <img
+                          src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                          alt="Super Bowl LX"
+                          className="h-5 w-5 object-contain"
+                        />
+                        Super Bowl LX
+                      </div>
+                      <svg
+                        className={`w-3 h-3 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
                   </div>
-                </a>
+                  {isSuperBowlLXExpanded && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {[
+                        { id: 'overview', label: 'Overview' },
+                        { id: 'rosters', label: 'Rosters & Depth Charts' },
+                        { id: 'injuries', label: 'Injury Report' },
+                        { id: 'stats', label: 'Stats Comparison' },
+                        { id: 'head-to-head', label: 'Head-to-Head' },
+                        { id: 'history', label: 'Super Bowl History' },
+                      ].map((tab) => (
+                        <a
+                          key={tab.id}
+                          href={`/nfl-hq/super-bowl-lx?tab=${tab.id}`}
+                          className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
+                        >
+                          <div className="text-xs">{tab.label}</div>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <a
                   href="/nfl-hq/teams"
                   className={`block p-2 rounded text-sm transition-colors ${
@@ -438,25 +472,58 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
             </a>
           </li>
 
-          {/* Super Bowl LX Button */}
+          {/* Super Bowl LX Button with Dropdown */}
           <li>
-            <a
-              href="/nfl-hq/super-bowl-lx"
-              className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
+              className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 cursor-pointer ${
                 isSuperBowlLXPage
                   ? 'bg-[#0050A0] text-white'
                   : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
               }`}
             >
-              <div className="flex items-center gap-2 w-full">
-                <img
-                  src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                  alt="Super Bowl LX"
-                  className="h-4 w-4 object-contain"
-                />
-                <span className="text-sm font-medium">Super Bowl LX</span>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                    alt="Super Bowl LX"
+                    className="h-6 w-6 object-contain"
+                  />
+                  <span className="text-sm font-medium">Super Bowl LX</span>
+                </div>
+                <svg
+                  className={`w-4 h-4 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
-            </a>
+            </div>
+            {isSuperBowlLXExpanded && (
+              <div className="mt-1">
+                {[
+                  { id: 'overview', label: 'Overview' },
+                  { id: 'rosters', label: 'Rosters & Depth Charts' },
+                  { id: 'injuries', label: 'Injury Report' },
+                  { id: 'stats', label: 'Stats Comparison' },
+                  { id: 'head-to-head', label: 'Head-to-Head' },
+                  { id: 'history', label: 'Super Bowl History' },
+                ].map((tab) => (
+                  <a
+                    key={tab.id}
+                    href={`/nfl-hq/super-bowl-lx?tab=${tab.id}`}
+                    className="relative flex items-center px-3 py-2 mx-1 ml-4 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
+                  >
+                    <span className="text-sm font-medium truncate">{tab.label}</span>
+                  </a>
+                ))}
+              </div>
+            )}
           </li>
 
           {/* Browse All Teams Button */}

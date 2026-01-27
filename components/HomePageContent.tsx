@@ -37,6 +37,25 @@ export default function HomePageContent() {
   // Team records map for upcoming games
   const [teamRecords, setTeamRecords] = useState<Record<string, string>>({});
 
+  // Super Bowl countdown
+  const SUPER_BOWL_DATE = new Date('2026-02-08T23:30:00Z'); // 6:30 PM ET
+  const [countdown, setCountdown] = useState<{ days: number; hours: number; minutes: number } | null>(null);
+
+  useEffect(() => {
+    const getCountdown = () => {
+      const now = new Date();
+      const diff = SUPER_BOWL_DATE.getTime() - now.getTime();
+      if (diff <= 0) return null;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return { days, hours, minutes };
+    };
+    setCountdown(getCountdown());
+    const timer = setInterval(() => setCountdown(getCountdown()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Fetch live standings
   useEffect(() => {
     async function fetchTopStandings() {
@@ -232,23 +251,58 @@ export default function HomePageContent() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6">
           <Link
             href="/super-bowl-lx"
-            className="block bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl border border-gray-200 shadow-lg p-4 hover:shadow-xl transition-shadow"
+            className="group block bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl border-2 border-[#D4AF37] shadow-lg p-4 sm:p-6 hover:shadow-2xl hover:shadow-[#D4AF37]/20 hover:scale-[1.02] hover:border-[#FFD700] transition-all duration-300 cursor-pointer relative overflow-hidden"
           >
-            <div className="flex items-center justify-center gap-8 sm:gap-12 lg:gap-16">
+            {/* Shimmer effect on hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+            <div className="relative flex items-center justify-between w-full px-2 sm:px-6 lg:px-12">
+              {/* Patriots logo - left */}
               <img
                 src="/nfl-hq/new-england-patriots.png"
                 alt="New England Patriots"
-                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 object-contain"
+                className="w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 object-contain group-hover:scale-110 transition-transform duration-300"
               />
-              <img
-                src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                alt="Super Bowl LX"
-                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
-              />
+
+              {/* Center content - SB logo, countdown, CTA */}
+              <div className="flex flex-col items-center">
+                <img
+                  src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                  alt="Super Bowl LX"
+                  className="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 object-contain"
+                />
+                {countdown && (
+                  <div className="mt-2 flex items-center gap-1 sm:gap-2 text-white">
+                    <div className="text-center">
+                      <div className="text-lg sm:text-xl lg:text-2xl font-bold">{countdown.days}</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider opacity-75">Days</div>
+                    </div>
+                    <span className="text-lg sm:text-xl font-bold opacity-50">:</span>
+                    <div className="text-center">
+                      <div className="text-lg sm:text-xl lg:text-2xl font-bold">{countdown.hours}</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider opacity-75">Hrs</div>
+                    </div>
+                    <span className="text-lg sm:text-xl font-bold opacity-50">:</span>
+                    <div className="text-center">
+                      <div className="text-lg sm:text-xl lg:text-2xl font-bold">{countdown.minutes}</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider opacity-75">Min</div>
+                    </div>
+                  </div>
+                )}
+                {/* CTA text */}
+                <div className="mt-2 flex items-center gap-2 text-[#D4AF37] group-hover:text-[#FFD700] transition-colors">
+                  <span className="text-sm sm:text-base font-semibold">View Super Bowl LX Coverage</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Seahawks logo - right */}
               <img
                 src="/nfl-hq/seattle-seahawks-sb.png"
                 alt="Seattle Seahawks"
-                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 object-contain"
+                className="w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 object-contain group-hover:scale-110 transition-transform duration-300"
               />
             </div>
           </Link>

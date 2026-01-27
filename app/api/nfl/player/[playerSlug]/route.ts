@@ -373,13 +373,14 @@ async function fetchESPNGameLog(athleteId: string, season?: number): Promise<ESP
       if (categoryTotals.length > 0) {
         if (allTotals.length === 0) {
           // Initialize with first season type totals
+          // Remove commas from numbers before parsing (ESPN returns "4,394" format)
           categoryTotals.forEach((val: string) => {
-            allTotals.push(parseFloat(val) || 0);
+            allTotals.push(parseFloat(String(val).replace(/,/g, '')) || 0);
           });
         } else {
           // Add subsequent season type totals
           categoryTotals.forEach((val: string, index: number) => {
-            const numVal = parseFloat(val) || 0;
+            const numVal = parseFloat(String(val).replace(/,/g, '')) || 0;
             if (index < allTotals.length) {
               allTotals[index] += numVal;
             }

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { superBowlHistory, superBowlRecords, getTeamSuperBowlHistory, getSuperBowlWinsByTeam, SuperBowlGame } from '@/data/superBowlHistory';
 import { getAllTeams } from '@/data/teams';
 
-type SortField = 'number' | 'winner' | 'score' | 'mvp';
+type SortField = 'number' | 'date' | 'winner' | 'score' | 'loser' | 'mvp' | 'venue';
 type SortOrder = 'asc' | 'desc';
 
 export default function HistoryTab() {
@@ -48,14 +48,23 @@ export default function HistoryTab() {
         case 'number':
           comparison = a.arabicNumber - b.arabicNumber;
           break;
+        case 'date':
+          comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+          break;
         case 'winner':
           comparison = a.winner.localeCompare(b.winner);
           break;
         case 'score':
           comparison = (a.winnerScore - a.loserScore) - (b.winnerScore - b.loserScore);
           break;
+        case 'loser':
+          comparison = a.loser.localeCompare(b.loser);
+          break;
         case 'mvp':
           comparison = a.mvp.player.localeCompare(b.mvp.player);
+          break;
+        case 'venue':
+          comparison = a.venue.localeCompare(b.venue);
           break;
       }
       return sortOrder === 'asc' ? comparison : -comparison;
@@ -74,7 +83,7 @@ export default function HistoryTab() {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <span className="text-gray-400 ml-1">↕</span>;
+    if (sortField !== field) return null;
     return <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>;
   };
 
@@ -160,7 +169,12 @@ export default function HistoryTab() {
                   >
                     SB <SortIcon field="number" />
                   </th>
-                  <th className="py-3 px-4 text-left">Date</th>
+                  <th
+                    className="py-3 px-4 text-left cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('date')}
+                  >
+                    Date <SortIcon field="date" />
+                  </th>
                   <th
                     className="py-3 px-4 text-left cursor-pointer hover:bg-gray-50"
                     onClick={() => handleSort('winner')}
@@ -173,14 +187,24 @@ export default function HistoryTab() {
                   >
                     Score <SortIcon field="score" />
                   </th>
-                  <th className="py-3 px-4 text-left">Loser</th>
+                  <th
+                    className="py-3 px-4 text-left cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('loser')}
+                  >
+                    Loser <SortIcon field="loser" />
+                  </th>
                   <th
                     className="py-3 px-4 text-left cursor-pointer hover:bg-gray-50"
                     onClick={() => handleSort('mvp')}
                   >
                     MVP <SortIcon field="mvp" />
                   </th>
-                  <th className="py-3 px-4 text-left hidden lg:table-cell">Venue</th>
+                  <th
+                    className="py-3 px-4 text-left cursor-pointer hover:bg-gray-50 hidden lg:table-cell"
+                    onClick={() => handleSort('venue')}
+                  >
+                    Venue <SortIcon field="venue" />
+                  </th>
                 </tr>
               </thead>
               <tbody>
