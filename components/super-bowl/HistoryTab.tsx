@@ -157,19 +157,64 @@ export default function HistoryTab() {
               </div>
             </div>
 
-            {/* Results Table */}
-            <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
-              <table className="w-full min-w-[600px]">
+            {/* Mobile Card Layout */}
+            <div className="sm:hidden space-y-3">
+              {filteredHistory.map((sb) => {
+                const winnerLogo = getTeamLogo(sb.winnerTeamId);
+                const loserLogo = getTeamLogo(sb.loserTeamId);
+
+                return (
+                  <div key={sb.number} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="bg-[#0050A0] text-white px-3 py-2 flex items-center justify-between">
+                      <span className="font-bold text-sm">Super Bowl {sb.number}</span>
+                      <span className="text-xs opacity-80">{sb.date}</span>
+                    </div>
+                    <div className="p-3">
+                      {/* Winner */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {winnerLogo && <img src={winnerLogo} alt="" className="w-6 h-6 object-contain" />}
+                          <Link href={`/nfl-hq/teams/${sb.winnerTeamId}`} className="font-semibold text-sm hover:text-[#0050A0] hover:underline cursor-pointer">
+                            {sb.winner}
+                          </Link>
+                        </div>
+                        <span className="font-bold text-[#0050A0] tabular-nums">{sb.winnerScore}</span>
+                      </div>
+                      {/* Loser */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          {loserLogo && <img src={loserLogo} alt="" className="w-6 h-6 object-contain" />}
+                          <Link href={`/nfl-hq/teams/${sb.loserTeamId}`} className="text-sm text-gray-700 hover:text-[#0050A0] hover:underline cursor-pointer">
+                            {sb.loser}
+                          </Link>
+                        </div>
+                        <span className="text-gray-600 tabular-nums">{sb.loserScore}</span>
+                      </div>
+                      {/* MVP & Venue */}
+                      <div className="border-t border-gray-100 pt-2 flex items-center justify-between text-xs text-gray-600">
+                        <div>
+                          <span className="font-medium text-gray-700">MVP:</span> {sb.mvp.player} <span className="text-gray-500">({sb.mvp.position})</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="overflow-x-auto hidden sm:block">
+              <table className="w-full">
                 <thead>
                   <tr className="bg-gray-100">
                     <th
-                      className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200"
+                      className="py-3 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200"
                       onClick={() => handleSort('number')}
                     >
                       SB <SortIcon field="number" />
                     </th>
                     <th
-                      className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200"
+                      className="py-3 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200"
                       onClick={() => handleSort('date')}
                     >
                       Date <SortIcon field="date" />
@@ -229,7 +274,7 @@ export default function HistoryTab() {
                           </div>
                         </td>
                         <td className="py-3 px-4 text-center tabular-nums">
-                          <span className="font-bold text-green-600">{sb.winnerScore}</span>
+                          <span className="font-bold text-[#0050A0]">{sb.winnerScore}</span>
                           <span className="text-gray-600 mx-1">-</span>
                           <span className="text-gray-600">{sb.loserScore}</span>
                         </td>

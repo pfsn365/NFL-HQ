@@ -248,12 +248,12 @@ export default function SuperBowlLXContent() {
                     <img
                       src="/nfl-hq/new-england-patriots.png"
                       alt="New England Patriots"
-                      className="w-20 h-20 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
+                      className="w-16 h-16 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
                     />
                     {/* Record Badge */}
-                    <div className="mt-1 sm:mt-2 bg-white/20 backdrop-blur-sm rounded-full px-2 sm:px-4 py-0.5 sm:py-1">
-                      <span className="text-white font-bold text-sm sm:text-xl">14-3</span>
-                      <span className="text-white text-xs sm:text-sm ml-1 sm:ml-2">#2 AFC</span>
+                    <div className="mt-1 sm:mt-2 bg-white/20 backdrop-blur-sm rounded-full px-1.5 sm:px-4 py-0.5 sm:py-1">
+                      <span className="text-white font-bold text-[10px] sm:text-xl">14-3</span>
+                      <span className="text-white text-[8px] sm:text-sm ml-0.5 sm:ml-2">#2 AFC</span>
                     </div>
                   </div>
 
@@ -267,12 +267,12 @@ export default function SuperBowlLXContent() {
                     <img
                       src="/nfl-hq/seattle-seahawks-sb.png"
                       alt="Seattle Seahawks"
-                      className="w-20 h-20 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
+                      className="w-16 h-16 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
                     />
                     {/* Record Badge */}
-                    <div className="mt-1 sm:mt-2 bg-white/20 backdrop-blur-sm rounded-full px-2 sm:px-4 py-0.5 sm:py-1">
-                      <span className="text-white font-bold text-sm sm:text-xl">14-3</span>
-                      <span className="text-white text-xs sm:text-sm ml-1 sm:ml-2">#1 NFC</span>
+                    <div className="mt-1 sm:mt-2 bg-white/20 backdrop-blur-sm rounded-full px-1.5 sm:px-4 py-0.5 sm:py-1">
+                      <span className="text-white font-bold text-[10px] sm:text-xl">14-3</span>
+                      <span className="text-white text-[8px] sm:text-sm ml-0.5 sm:ml-2">#1 NFC</span>
                     </div>
                   </div>
                 </div>
