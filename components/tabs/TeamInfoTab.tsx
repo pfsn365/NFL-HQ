@@ -1,17 +1,83 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { TeamData } from '@/data/teams';
-import { getTeamInfo } from '@/data/teamInfo';
-import { getHallOfFamers } from '@/data/hallOfFame';
+import { TeamInfoData } from '@/data/teamInfo';
+import { HallOfFamer } from '@/data/hallOfFame';
 import { getContrastTextColor } from '@/utils/colorHelpers';
 
 interface TeamInfoTabProps {
   team: TeamData;
 }
 
+// Default empty data to show while loading
+const defaultTeamInfo: TeamInfoData = {
+  founded: '',
+  stadium: '',
+  capacity: '',
+  location: '',
+  owner: '',
+  conference: '',
+  division: '',
+  superbowlWins: 0,
+  superbowlAppearances: [],
+  conferenceChampionships: 0,
+  divisionTitles: 0,
+  playoffAppearances: 0,
+  retiredNumbers: [],
+  stadiumHistory: [],
+  achievements: []
+};
+
 export default function TeamInfoTab({ team }: TeamInfoTabProps) {
-  const teamInfo = getTeamInfo(team.id);
-  const hallOfFamers = getHallOfFamers(team.id);
+  const [teamInfo, setTeamInfo] = useState<TeamInfoData>(defaultTeamInfo);
+  const [hallOfFamers, setHallOfFamers] = useState<HallOfFamer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchTeamInfo() {
+      try {
+        const response = await fetch(`/api/nfl/team-info/${team.id}`);
+        if (!response.ok) throw new Error('Failed to fetch');
+
+        const data = await response.json();
+
+        if (!cancelled) {
+          setTeamInfo(data.teamInfo);
+          setHallOfFamers(data.hallOfFamers);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching team info:', error);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    fetchTeamInfo();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [team.id]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow p-4 sm:p-6">

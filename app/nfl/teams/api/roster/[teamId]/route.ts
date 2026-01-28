@@ -139,7 +139,7 @@ async function fetchESPNCollegeNames(teamId: string): Promise<Map<string, string
 // Cache for impact grades
 let impactGradesCache: Map<string, number> | null = null;
 let cacheTimestamp = 0;
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours (reduced from 24hr to free memory faster)
 
 function normalizePlayerName(name: string): string {
   return name

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getAllRosters } from '@/app/api/nfl/rosters/route';
 
 // Google Sheets configuration for PFSN Impact Grades
@@ -37,7 +37,7 @@ interface ImpactGrade {
 // Cache for impact grades
 let impactGradesCache: Map<string, number> | null = null;
 let cacheTimestamp = 0;
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours (reduced from 24hr to free memory faster)
 
 function normalizePlayerName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(jr|sr|ii|iii|iv)$/g, '');
@@ -140,72 +140,188 @@ async function getAllImpactGrades(): Promise<Map<string, number>> {
   return gradesMap;
 }
 
-export async function GET() {
-  try {
-    // Fetch rosters and impact grades in parallel
-    const [rostersMap, impactGrades] = await Promise.all([
-      getAllRosters(),
-      getAllImpactGrades(),
-    ]);
+// Cache for processed players list (separate from impact grades cache)
+let processedPlayersCache: Array<{
+  id: string;
+  name: string;
+  position: string;
+  team: string;
+  teamId: string;
+  age: number;
+  impactGrade: number;
+}> | null = null;
+let playersCacheTimestamp = 0;
+const PLAYERS_CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours (reduced from implicit 24hr)
 
-    // Convert rosters to flat player list with impact grades
-    const allPlayers: Array<{
-      id: string;
-      name: string;
-      position: string;
-      team: string;
-      teamId: string;
-      age: number;
-      impactGrade: number;
-    }> = [];
+async function getProcessedPlayers() {
+  // Return cached data if still valid
+  if (processedPlayersCache && Date.now() - playersCacheTimestamp < PLAYERS_CACHE_DURATION) {
+    return processedPlayersCache;
+  }
 
-    rostersMap.forEach((roster, teamId) => {
-      for (const player of roster.players) {
-        // Only include active roster players (not practice squad)
-        if (!player.isActive || player.isPracticeSquad) continue;
+  // Fetch rosters and impact grades in parallel
+  const [rostersMap, impactGrades] = await Promise.all([
+    getAllRosters(),
+    getAllImpactGrades(),
+  ]);
 
-        // Get impact grade
-        const nameVariations = generateNameVariations(player.name);
-        let impactGrade = 0;
-        for (const variant of nameVariations) {
-          const score = impactGrades.get(variant);
-          if (score && score > 0) {
-            impactGrade = score;
-            break;
-          }
+  // Convert rosters to flat player list with impact grades
+  const allPlayers: Array<{
+    id: string;
+    name: string;
+    position: string;
+    team: string;
+    teamId: string;
+    age: number;
+    impactGrade: number;
+  }> = [];
+
+  rostersMap.forEach((roster, teamId) => {
+    for (const player of roster.players) {
+      // Only include active roster players (not practice squad)
+      if (!player.isActive || player.isPracticeSquad) continue;
+
+      // Get impact grade
+      const nameVariations = generateNameVariations(player.name);
+      let impactGrade = 0;
+      for (const variant of nameVariations) {
+        const score = impactGrades.get(variant);
+        if (score && score > 0) {
+          impactGrade = score;
+          break;
         }
-
-        allPlayers.push({
-          id: player.slug || player.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          name: player.name,
-          position: player.position,
-          team: roster.teamName,
-          teamId: teamId,
-          age: player.age || 0,
-          impactGrade
-        });
       }
-    });
 
-    // Sort by impact grade (highest first), then by name for ties
-    allPlayers.sort((a, b) => {
-      if (b.impactGrade !== a.impactGrade) {
-        return b.impactGrade - a.impactGrade;
-      }
-      return a.name.localeCompare(b.name);
-    });
+      allPlayers.push({
+        id: player.slug || player.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name: player.name,
+        position: player.position,
+        team: roster.teamName,
+        teamId: teamId,
+        age: player.age || 0,
+        impactGrade
+      });
+    }
+  });
+
+  // Sort by impact grade (highest first), then by name for ties
+  allPlayers.sort((a, b) => {
+    if (b.impactGrade !== a.impactGrade) {
+      return b.impactGrade - a.impactGrade;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  // Update cache
+  processedPlayersCache = allPlayers;
+  playersCacheTimestamp = Date.now();
+
+  return allPlayers;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+
+    // Check if pagination is explicitly requested
+    const usePagination = searchParams.has('page') || searchParams.has('limit') || searchParams.get('paginate') === 'true';
+
+    // Pagination params (only used if pagination is enabled)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '50')));
+
+    // Filter params
+    const search = searchParams.get('search')?.toLowerCase() || '';
+    const teamFilter = searchParams.get('team') || 'all';
+    const positionFilter = searchParams.get('position') || 'all';
+    const minGrade = parseInt(searchParams.get('minGrade') || '0');
+
+    // Special param to get top100 only
+    const top100Only = searchParams.get('top100') === 'true';
+
+    // Get all processed players (cached)
+    const allPlayers = await getProcessedPlayers();
+
+    // Apply filters
+    let filteredPlayers = allPlayers;
+
+    if (search) {
+      filteredPlayers = filteredPlayers.filter(player =>
+        player.name.toLowerCase().includes(search) ||
+        player.team.toLowerCase().includes(search) ||
+        player.position.toLowerCase().includes(search)
+      );
+    }
+
+    if (teamFilter !== 'all') {
+      filteredPlayers = filteredPlayers.filter(player => player.teamId === teamFilter);
+    }
+
+    if (positionFilter !== 'all') {
+      filteredPlayers = filteredPlayers.filter(player =>
+        player.position.toUpperCase() === positionFilter.toUpperCase() ||
+        player.position.toUpperCase().startsWith(positionFilter.toUpperCase())
+      );
+    }
+
+    if (minGrade > 0) {
+      filteredPlayers = filteredPlayers.filter(player => player.impactGrade >= minGrade);
+    }
 
     // Get top 100 by impact grade
     const top100 = allPlayers.filter(p => p.impactGrade > 0).slice(0, 100);
 
+    // If only top100 requested, return just that
+    if (top100Only) {
+      return NextResponse.json({
+        players: top100,
+        totalPlayers: top100.length,
+        lastUpdated: new Date().toISOString()
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
+        },
+      });
+    }
+
+    // If pagination is NOT requested, return all players (backwards compatible)
+    if (!usePagination) {
+      return NextResponse.json({
+        players: filteredPlayers,
+        top100: top100,
+        totalPlayers: filteredPlayers.length,
+        lastUpdated: new Date().toISOString()
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
+        },
+      });
+    }
+
+    // Pagination is requested - return paginated results
+    const totalPlayers = filteredPlayers.length;
+    const totalPages = Math.ceil(totalPlayers / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    // Get page of players
+    const paginatedPlayers = filteredPlayers.slice(startIndex, endIndex);
+
     return NextResponse.json({
-      players: allPlayers,
-      top100: top100,
-      totalPlayers: allPlayers.length,
+      players: paginatedPlayers,
+      top100: page === 1 ? top100 : undefined,
+      pagination: {
+        page,
+        limit,
+        totalPlayers,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
       lastUpdated: new Date().toISOString()
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=3600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800',
       },
     });
 

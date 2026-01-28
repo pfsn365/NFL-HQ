@@ -160,7 +160,7 @@ interface ESPNRosterCache {
   timestamp: number;
 }
 const espnRosterCache = new Map<string, ESPNRosterCache>();
-const ESPN_ROSTER_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const ESPN_ROSTER_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours (reduced from 24hr to free memory faster)
 
 async function fetchESPNAthleteId(teamId: string, playerName: string): Promise<string | null> {
   try {

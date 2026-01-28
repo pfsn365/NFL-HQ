@@ -103,7 +103,10 @@ function transformToTickerGame(event: ESPNEvent): TickerGame | null {
 let cachedGames: TickerGame[] = [];
 let cachedLastUpdated: Date | null = null;
 let hasFetchedOnce = false;
+
+// Reference counting for poll interval management
 let pollInterval: NodeJS.Timeout | null = null;
+let subscriberCount = 0;
 
 const TickerContext = createContext<TickerContextType>({
   games: [],
@@ -166,18 +169,29 @@ export function TickerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Increment subscriber count
+    subscriberCount++;
+
     // Only fetch if we haven't fetched before (globally)
     if (!hasFetchedOnce) {
       fetchGames();
     }
 
-    // Set up polling interval (only once globally)
+    // Set up polling interval (only once globally when first subscriber mounts)
     if (!pollInterval) {
       pollInterval = setInterval(fetchGames, 30000);
     }
 
-    // Don't clear interval on unmount - keep polling globally
-    return () => {};
+    // Cleanup: decrement subscriber count and clear interval when last subscriber unmounts
+    return () => {
+      subscriberCount--;
+
+      // Only clear interval when no more subscribers
+      if (subscriberCount === 0 && pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+      }
+    };
   }, [fetchGames]);
 
   return (

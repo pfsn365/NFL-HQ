@@ -60,7 +60,7 @@ interface TeamRoster {
 // In-memory cache for rosters
 let rostersCache: Map<string, TeamRoster> | null = null;
 let cacheTimestamp = 0;
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours (reduced from 24hr to free memory faster)
 
 // Team ID to Sportskeeda slug mapping
 const teamSlugMap: Record<string, string> = {
