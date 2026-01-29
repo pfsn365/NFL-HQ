@@ -8,6 +8,7 @@ import HeadToHeadTab from '@/components/super-bowl/HeadToHeadTab';
 import InjuryReportTab from '@/components/super-bowl/InjuryReportTab';
 import StatsComparisonTab from '@/components/super-bowl/StatsComparisonTab';
 import RostersDepthChartsTab from '@/components/super-bowl/RostersDepthChartsTab';
+import PathToSuperBowlTab from '@/components/super-bowl/PathToSuperBowlTab';
 import { getApiPath } from '@/utils/api';
 
 // Countdown Timer Component
@@ -57,7 +58,7 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
   );
 }
 
-type MainTab = 'overview' | 'rosters' | 'injuries' | 'stats' | 'head-to-head' | 'history';
+type MainTab = 'overview' | 'path' | 'rosters' | 'injuries' | 'stats' | 'head-to-head' | 'history';
 
 interface Article {
   title: string;
@@ -73,7 +74,7 @@ export default function SuperBowlLXContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<MainTab>(() => {
-    const validTabs: MainTab[] = ['overview', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
+    const validTabs: MainTab[] = ['overview', 'path', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
     if (tabParam && validTabs.includes(tabParam as MainTab)) return tabParam as MainTab;
     return 'overview';
   });
@@ -85,7 +86,7 @@ export default function SuperBowlLXContent() {
 
   // Sync tab state with URL param
   useEffect(() => {
-    const validTabs: MainTab[] = ['overview', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
+    const validTabs: MainTab[] = ['overview', 'path', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
     if (tabParam && validTabs.includes(tabParam as MainTab)) {
       setActiveTab(tabParam as MainTab);
     } else if (!tabParam) {
@@ -201,6 +202,7 @@ export default function SuperBowlLXContent() {
             <nav className="flex space-x-1 sm:space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
               {[
                 { id: 'overview', label: 'Overview', mobileLabel: 'Overview' },
+                { id: 'path', label: 'Path to Super Bowl', mobileLabel: 'Path' },
                 { id: 'rosters', label: 'Rosters & Depth Charts', mobileLabel: 'Rosters' },
                 { id: 'injuries', label: 'Injury Report', mobileLabel: 'Injuries' },
                 { id: 'stats', label: 'Stats Comparison', mobileLabel: 'Stats' },
@@ -232,6 +234,7 @@ export default function SuperBowlLXContent() {
         {/* Content */}
         <div className="container mx-auto px-4 xl:px-8 py-8">
           {activeTab === 'history' && <HistoryTab />}
+          {activeTab === 'path' && <PathToSuperBowlTab />}
           {activeTab === 'rosters' && <RostersDepthChartsTab />}
           {activeTab === 'injuries' && <InjuryReportTab />}
           {activeTab === 'stats' && <StatsComparisonTab />}

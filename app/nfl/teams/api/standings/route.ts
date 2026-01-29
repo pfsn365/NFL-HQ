@@ -463,29 +463,29 @@ export async function GET() {
       divisions[team.division].push(team);
     });
 
-    // Hardcoded 2025 NFL Playoff Seeding (based on official results)
+    // 2025-26 NFL Playoff Seeding (based on official results)
     const getPlayoffSeeds = (standings: TeamStanding[]): { afc: ConferencePlayoffs; nfc: ConferencePlayoffs } => {
       const findTeam = (teamId: string) => standings.find(t => t.teamId === teamId);
 
-      // AFC Playoff Seeds
+      // AFC Playoff Seeds (2025-26 season)
       const afcSeeds: PlayoffSeed[] = [
-        { seed: 1, team: findTeam('kansas-city-chiefs')!, seedType: 'division-winner' as const },
-        { seed: 2, team: findTeam('buffalo-bills')!, seedType: 'division-winner' as const },
-        { seed: 3, team: findTeam('baltimore-ravens')!, seedType: 'division-winner' as const },
-        { seed: 4, team: findTeam('houston-texans')!, seedType: 'division-winner' as const },
-        { seed: 5, team: findTeam('los-angeles-chargers')!, seedType: 'wild-card' as const },
-        { seed: 6, team: findTeam('pittsburgh-steelers')!, seedType: 'wild-card' as const },
-        { seed: 7, team: findTeam('denver-broncos')!, seedType: 'wild-card' as const },
+        { seed: 1, team: findTeam('denver-broncos')!, seedType: 'division-winner' as const },
+        { seed: 2, team: findTeam('new-england-patriots')!, seedType: 'division-winner' as const },
+        { seed: 3, team: findTeam('jacksonville-jaguars')!, seedType: 'division-winner' as const },
+        { seed: 4, team: findTeam('pittsburgh-steelers')!, seedType: 'division-winner' as const },
+        { seed: 5, team: findTeam('houston-texans')!, seedType: 'wild-card' as const },
+        { seed: 6, team: findTeam('buffalo-bills')!, seedType: 'wild-card' as const },
+        { seed: 7, team: findTeam('los-angeles-chargers')!, seedType: 'wild-card' as const },
       ].filter(s => s.team); // Filter out any undefined teams
 
-      // NFC Playoff Seeds
+      // NFC Playoff Seeds (2025-26 season)
       const nfcSeeds: PlayoffSeed[] = [
-        { seed: 1, team: findTeam('detroit-lions')!, seedType: 'division-winner' as const },
-        { seed: 2, team: findTeam('philadelphia-eagles')!, seedType: 'division-winner' as const },
-        { seed: 3, team: findTeam('tampa-bay-buccaneers')!, seedType: 'division-winner' as const },
-        { seed: 4, team: findTeam('los-angeles-rams')!, seedType: 'division-winner' as const },
-        { seed: 5, team: findTeam('minnesota-vikings')!, seedType: 'wild-card' as const },
-        { seed: 6, team: findTeam('washington-commanders')!, seedType: 'wild-card' as const },
+        { seed: 1, team: findTeam('seattle-seahawks')!, seedType: 'division-winner' as const },
+        { seed: 2, team: findTeam('chicago-bears')!, seedType: 'division-winner' as const },
+        { seed: 3, team: findTeam('philadelphia-eagles')!, seedType: 'division-winner' as const },
+        { seed: 4, team: findTeam('carolina-panthers')!, seedType: 'division-winner' as const },
+        { seed: 5, team: findTeam('los-angeles-rams')!, seedType: 'wild-card' as const },
+        { seed: 6, team: findTeam('san-francisco-49ers')!, seedType: 'wild-card' as const },
         { seed: 7, team: findTeam('green-bay-packers')!, seedType: 'wild-card' as const },
       ].filter(s => s.team);
 
