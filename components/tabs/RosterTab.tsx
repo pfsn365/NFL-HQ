@@ -129,7 +129,7 @@ export default function RosterTab({ team }: RosterTabProps) {
   const TabHeader = () => (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Roster</h2>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Roster</h1>
         <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '230px' }}></div>
       </div>
       <div className="text-sm text-gray-600">

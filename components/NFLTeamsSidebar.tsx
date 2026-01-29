@@ -205,6 +205,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                     <div className="ml-4 mt-1 space-y-1">
                       {[
                         { id: 'overview', label: 'Overview' },
+                        { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
                         { id: 'rosters', label: 'Rosters & Depth Charts' },
                         { id: 'injuries', label: 'Injury Report' },
                         { id: 'stats', label: 'Stats Comparison' },
@@ -508,6 +509,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
               <div className="mt-1">
                 {[
                   { id: 'overview', label: 'Overview' },
+                  { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
                   { id: 'rosters', label: 'Rosters & Depth Charts' },
                   { id: 'injuries', label: 'Injury Report' },
                   { id: 'stats', label: 'Stats Comparison' },

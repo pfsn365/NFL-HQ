@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { TeamData, getAllTeams } from '@/data/teams';
 import { useSEO } from '@/hooks/useSEO';
-import { useINPMonitoring, useOptimizedTabChange } from '@/hooks/useINPOptimization';
+import { useINPMonitoring } from '@/hooks/useINPOptimization';
 import PerformanceMonitor from '@/components/PerformanceMonitor';
 import CriticalCSS from '@/components/CriticalCSS';
 import {
@@ -74,7 +73,7 @@ function TeamHeroSection({ team, liveRecord, liveDivisionRank, teamStats }: Team
               />
             </div>
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold">{team.fullName}</h1>
+              <p className="text-3xl lg:text-4xl font-bold">{team.fullName}</p>
               <p className="text-lg lg:text-xl opacity-90 min-w-[300px]">
                 {liveDivisionRank && liveRecord ? (
                   `${liveDivisionRank} in ${team.division} • ${liveRecord}`
@@ -228,8 +227,6 @@ const getDivisionTeams = (currentTeam: TeamData): TeamData[] => {
 };
 
 function TeamPageContent({ team, initialTab }: TeamPageProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(initialTab || 'overview');
   const [standings, setStandings] = useState<TeamStanding | null>(null);
   const [, setLiveRecord] = useState<TeamRecord | null>(null);
@@ -243,8 +240,6 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
   // Performance monitoring
   useINPMonitoring();
 
-  // Optimized tab change handler
-  const optimizedTabChange = useOptimizedTabChange(setActiveTab);
 
   // Analytics tracking
   useEffect(() => {
@@ -353,16 +348,6 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
     fetchScheduleAndCalculateStandings();
   }, [team.id, team]);
 
-  useEffect(() => {
-    if (initialTab) {
-      setActiveTab(initialTab);
-    } else {
-      const tabFromUrl = searchParams.get('tab');
-      if (tabFromUrl) {
-        setActiveTab(tabFromUrl);
-      }
-    }
-  }, [searchParams, initialTab]);
 
   // Fetch team stats from new API with localStorage caching
   useEffect(() => {
@@ -416,15 +401,14 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
     // Track tab change for analytics
     trackTabChange(tab, team.id);
 
-    // Use optimized tab change with requestAnimationFrame batching
-    optimizedTabChange(tab);
+    // Update state directly (like CFB HQ pattern)
+    setActiveTab(tab);
 
-    // Navigate to path-based URL
-    if (tab === 'overview') {
-      router.replace(`/teams/${team.id}`, { scroll: false });
-    } else {
-      router.replace(`/teams/${team.id}/${tab}`, { scroll: false });
-    }
+    // Update URL without triggering Next.js navigation (smoother transition)
+    const newPath = tab === 'overview'
+      ? `/nfl-hq/teams/${team.id}/`
+      : `/nfl-hq/teams/${team.id}/${tab}/`;
+    window.history.replaceState(null, '', newPath);
   };
 
   const renderActiveTab = () => {
@@ -476,14 +460,12 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
 
       {/* Main content - No sidebar here, layout.tsx handles it */}
       <main id="main-content" className="w-full min-w-0 bg-gray-50">
-        <LayoutStabilizer minHeight={200}>
-          <TeamHeroSection
-            team={team}
-            liveRecord={standings?.recordString}
-            liveDivisionRank={standings?.divisionRank}
-            teamStats={teamStats}
-          />
-        </LayoutStabilizer>
+        <TeamHeroSection
+          team={team}
+          liveRecord={standings?.recordString}
+          liveDivisionRank={standings?.divisionRank}
+          teamStats={teamStats}
+        />
 
         <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
 

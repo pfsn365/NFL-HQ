@@ -183,7 +183,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
     return (
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
         <div className="text-center py-12">
@@ -198,7 +198,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
     return (
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
         <div className="text-center py-12">
@@ -224,7 +224,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
   return (
     <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
       <div className="mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h2>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h1>
         <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
       </div>
 

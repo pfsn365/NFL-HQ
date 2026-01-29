@@ -157,7 +157,7 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
   const TabHeader = ({ showFilter = false }: { showFilter?: boolean }) => (
     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
       <div className="flex-grow">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Transactions</h2>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Transactions</h1>
         <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '290px' }}></div>
       </div>
       <div className="flex flex-row gap-3">

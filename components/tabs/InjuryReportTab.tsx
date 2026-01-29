@@ -341,7 +341,7 @@ export default function InjuryReportTab({ team }: InjuryReportTabProps) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Injury Report</h2>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Injury Report</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
         <div className="animate-pulse space-y-4">
@@ -357,7 +357,7 @@ export default function InjuryReportTab({ team }: InjuryReportTabProps) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Injury Report</h2>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Injury Report</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
         <div className="text-center py-8">
@@ -409,7 +409,7 @@ export default function InjuryReportTab({ team }: InjuryReportTabProps) {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Injury Report</h2>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Injury Report</h1>
         <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         {lastUpdated && (
           <div className="text-xs text-gray-600 mt-2">

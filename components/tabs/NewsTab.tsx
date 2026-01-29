@@ -81,9 +81,9 @@ export default function NewsTab({ team }: NewsTabProps) {
     <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             {isTeamFocused ? `${team.fullName} News` : 'Latest NFL News'}
-          </h2>
+          </h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '250px' }}></div>
           {!isTeamFocused && (
             <p className="text-sm text-gray-600 mt-2">

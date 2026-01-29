@@ -83,7 +83,7 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
     <div className="bg-white rounded-lg shadow p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Team Information</h2>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Team Information</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '320px' }}></div>
         </div>
       </div>

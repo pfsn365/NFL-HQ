@@ -487,6 +487,12 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
 
   return (
     <div className="space-y-6">
+      {/* Page Title */}
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Overview</h1>
+        <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
+      </div>
+
       {/* Row 1 - Three columns with key widgets */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Column 1 - Schedule Widget */}
