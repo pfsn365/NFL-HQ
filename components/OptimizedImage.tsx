@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface OptimizedImageProps {
   src: string;
@@ -33,6 +33,14 @@ export default function OptimizedImage({
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Check if image is already cached/complete on mount
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
+      setIsLoading(false);
+    }
+  }, [src]);
 
   const handleLoad = useCallback(() => {
     setIsLoading(false);
@@ -69,6 +77,7 @@ export default function OptimizedImage({
       }}
     >
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         width={fill ? undefined : width}

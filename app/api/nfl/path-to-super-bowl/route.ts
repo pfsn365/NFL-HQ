@@ -356,7 +356,8 @@ let cachedStandingsData: {
 let cacheTimestamp: number = 0;
 const CACHE_DURATION = 3600000; // 1 hour
 
-// Fetch all standings data ONCE (records, playoff teams, and SOS)
+// Fetch all standings data from SportsKeeda draft order JSON (single API call)
+// This JSON contains: Record, Win %, SOS, and team slugs for all 32 teams
 async function fetchStandingsData(): Promise<{
   records: Record<string, { wins: number; losses: number }>;
   playoffTeams: string[];
@@ -370,44 +371,43 @@ async function fetchStandingsData(): Promise<{
   }
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/nfl-hq/nfl/teams/api/standings/?season=2025`, {
-      headers: { 'Accept': 'application/json' },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+    const response = await fetch('https://statics.sportskeeda.com/assets/sheets/tools/draft-order/draft_order.json', {
+      next: { revalidate: 7200 }, // Cache for 2 hours
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch standings:', response.status);
+      console.error('Failed to fetch data from SportsKeeda');
       return cachedStandingsData || { records: {}, playoffTeams: [], sosData: {} };
     }
 
     const data = await response.json();
     const records: Record<string, { wins: number; losses: number }> = {};
-    const playoffTeams: string[] = [];
-    const sosValues: { teamId: string; sos: number }[] = [];
+    const sosValues: { teamId: string; sos: number; winPct: number }[] = [];
 
-    // Extract records and SOS from standings
-    if (data.standings) {
-      for (const team of data.standings) {
-        records[team.teamId] = {
-          wins: team.record?.wins || 0,
-          losses: team.record?.losses || 0,
-        };
-        sosValues.push({ teamId: team.teamId, sos: team.strengthOfSchedule || 0 });
-      }
-    }
+    // Skip header row (index 0) and process team data
+    // Columns: [0]=Pick, [6]=Record, [7]=Win%, [8]=SOS, [11]=OT Slug (original team)
+    data.slice(1).forEach((row: string[]) => {
+      const teamSlug = row[11]; // originalTeamSlug at index 11
+      const recordStr = row[6]; // Record like "3-14" or "7-9-1"
+      const winPct = parseFloat(row[7]); // Win percentage
+      const sos = parseFloat(row[8]); // Strength of schedule
 
-    // Extract playoff teams
-    if (data.playoffPicture) {
-      for (const conf of ['afc', 'nfc']) {
-        const seeds = data.playoffPicture[conf]?.seeds || [];
-        for (const seed of seeds) {
-          if (seed.team?.teamId) {
-            playoffTeams.push(seed.team.teamId);
+      if (teamSlug && recordStr) {
+        // Parse record (handles ties like "7-9-1")
+        const parts = recordStr.split('-').map(p => parseInt(p, 10));
+        const wins = parts[0] || 0;
+        const losses = parts[1] || 0;
+
+        // Only add if we haven't seen this team yet (avoid duplicates from trades)
+        if (!records[teamSlug]) {
+          records[teamSlug] = { wins, losses };
+          if (!isNaN(sos)) {
+            sosValues.push({ teamId: teamSlug, sos, winPct: winPct || 0 });
           }
         }
       }
-    }
+    });
 
     // Calculate SOS ranks (higher = harder schedule)
     sosValues.sort((a, b) => b.sos - a.sos);
@@ -416,13 +416,36 @@ async function fetchStandingsData(): Promise<{
       sosData[item.teamId] = { sos: item.sos, sosRank: index + 1 };
     });
 
+    // Calculate playoff teams (top 7 from each conference by win %)
+    const afcTeams: { teamId: string; winPct: number }[] = [];
+    const nfcTeams: { teamId: string; winPct: number }[] = [];
+
+    for (const item of sosValues) {
+      const meta = teamMetadata[item.teamId];
+      if (!meta) continue;
+
+      if (meta.conference === 'AFC') {
+        afcTeams.push({ teamId: item.teamId, winPct: item.winPct });
+      } else {
+        nfcTeams.push({ teamId: item.teamId, winPct: item.winPct });
+      }
+    }
+
+    afcTeams.sort((a, b) => b.winPct - a.winPct);
+    nfcTeams.sort((a, b) => b.winPct - a.winPct);
+
+    const playoffTeams = [
+      ...afcTeams.slice(0, 7).map(t => t.teamId),
+      ...nfcTeams.slice(0, 7).map(t => t.teamId),
+    ];
+
     // Update cache
     cachedStandingsData = { records, playoffTeams, sosData };
     cacheTimestamp = now;
 
     return cachedStandingsData;
   } catch (error) {
-    console.error('Error fetching standings:', error);
+    console.error('Error fetching standings data:', error);
     return cachedStandingsData || { records: {}, playoffTeams: [], sosData: {} };
   }
 }
