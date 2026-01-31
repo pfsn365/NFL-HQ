@@ -27,6 +27,7 @@ import ScheduleTab from '@/components/tabs/ScheduleTab';
 import StatsTab from '@/components/tabs/StatsTab';
 import NewsTab from '@/components/tabs/NewsTab';
 import InjuryReportTab from '@/components/tabs/InjuryReportTab';
+import TeamNeedsTab from '@/components/tabs/TeamNeedsTab';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface TeamPageProps {
@@ -427,6 +428,8 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
         );
       case 'team-info':
         return wrapWithErrorBoundary(<TeamInfoTab team={team} />, 'Team Info');
+      case 'team-needs':
+        return wrapWithErrorBoundary(<TeamNeedsTab team={team} />, 'Team Needs');
       case 'draft-picks':
         return wrapWithErrorBoundary(<DraftPicksTab team={team} />, 'Draft Picks');
       case 'transactions':

@@ -1,7 +1,7 @@
 'use client';
 
 import { useINPMonitoring } from '../hooks/useINPOptimization';
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { TeamData } from '@/data/teams';
 
 interface NavigationTabsProps {
@@ -18,15 +18,53 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
   const navRef = useRef<HTMLElement>(null);
   const activeLinkRef = useRef<HTMLAnchorElement>(null);
 
+  // Track scroll state for fade indicators
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Check scroll position and update indicators
+  const updateScrollIndicators = useCallback(() => {
+    if (navRef.current) {
+      const nav = navRef.current;
+      const scrollLeft = nav.scrollLeft;
+      const scrollWidth = nav.scrollWidth;
+      const clientWidth = nav.clientWidth;
+
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  }, []);
+
+  // Initialize and update scroll indicators
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    // Initial check
+    updateScrollIndicators();
+
+    // Listen for scroll events
+    nav.addEventListener('scroll', updateScrollIndicators, { passive: true });
+
+    // Listen for resize events
+    window.addEventListener('resize', updateScrollIndicators, { passive: true });
+
+    return () => {
+      nav.removeEventListener('scroll', updateScrollIndicators);
+      window.removeEventListener('resize', updateScrollIndicators);
+    };
+  }, [updateScrollIndicators]);
+
   // Memoize tabs to prevent unnecessary re-renders
   const tabs = useMemo(() => [
     { id: 'overview', label: 'Overview' },
     { id: 'news', label: 'News' },
     { id: 'schedule', label: 'Schedule' },
     { id: 'roster', label: 'Roster' },
+    { id: 'depth-chart', label: 'Depth Chart' },
     { id: 'injury-report', label: 'Injury Report' },
     { id: 'stats', label: 'Stats' },
-    { id: 'depth-chart', label: 'Depth Chart' },
+    { id: 'team-needs', label: 'Team Needs' },
     { id: 'transactions', label: 'Transactions' },
     { id: 'draft-picks', label: 'Draft Picks' },
     { id: 'salary-cap', label: 'Salary Cap' },
@@ -69,7 +107,7 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
   }, [activeTab]);
 
   return (
-    <div 
+    <div
       className="bg-white border-b border-gray-200 sticky top-0 z-10"
       style={{
         contain: 'layout style paint',
@@ -77,7 +115,25 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
         containIntrinsicSize: '0 57px'
       }}
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative">
+        {/* Left fade indicator */}
+        {canScrollLeft && (
+          <div
+            className="absolute left-0 top-0 bottom-0 w-12 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to right, rgb(255,255,255) 0%, rgba(255,255,255,0) 100%)'
+            }}
+          />
+        )}
+        {/* Right fade indicator */}
+        {canScrollRight && (
+          <div
+            className="absolute right-0 top-0 bottom-0 w-24 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to left, rgb(255,255,255) 0%, rgb(255,255,255) 30%, rgba(255,255,255,0) 100%)'
+            }}
+          />
+        )}
         <nav ref={navRef} className="flex space-x-8 overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
             <a
