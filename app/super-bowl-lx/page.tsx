@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: 'Pro Football Network',
     images: [
       {
-        url: 'https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png',
+        url: '/super-bowl-lx-og.png',
         width: 1200,
         height: 630,
         alt: 'Super Bowl LX - Patriots vs Seahawks',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Super Bowl LX: Patriots vs Seahawks',
     description: 'Complete Super Bowl LX coverage featuring the New England Patriots vs Seattle Seahawks. February 8, 2026 at Levi\'s Stadium.',
-    images: ['https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png'],
+    images: ['/super-bowl-lx-og.png'],
     site: '@PFN365',
     creator: '@PFN365',
   },
@@ -91,7 +91,7 @@ const jsonLd = {
     name: 'National Football League',
     url: 'https://www.nfl.com',
   },
-  image: 'https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png',
+  image: 'https://www.profootballnetwork.com/super-bowl-lx-og.png',
 };
 
 export default function SuperBowlLXPage() {
