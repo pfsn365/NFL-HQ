@@ -13,6 +13,14 @@ interface FutureDraftPick {
   tradeNotes?: string;
 }
 
+// In-memory cache for draft order data (shared across all team requests)
+interface DraftOrderCache {
+  data: any[][] | null;
+  timestamp: number;
+}
+let draftOrderCache: DraftOrderCache = { data: null, timestamp: 0 };
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
 // Team slug to abbreviation mapping
 const TEAM_SLUG_TO_ABBR: Record<string, string> = {
   'new-york-jets': 'NYJ',
@@ -102,28 +110,39 @@ export async function GET(
       );
     }
 
-    // Fetch draft order from Sportskeeda
-    const response = await fetch(
-      'https://statics.sportskeeda.com/assets/sheets/tools/draft-order/draft_order.json',
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)',
-        },
-        next: { revalidate: 3600 } // Cache for 1 hour
-      }
-    );
+    // Check in-memory cache first
+    const now = Date.now();
+    let rawData: string[][];
 
-    if (!response.ok) {
-      throw new Error(`Sportskeeda API error: ${response.status}`);
-    }
-
-    const rawData: string[][] = await response.json();
-
-    if (!rawData || !Array.isArray(rawData) || rawData.length < 2) {
-      return NextResponse.json(
-        { error: 'No draft order data found' },
-        { status: 404 }
+    if (draftOrderCache.data && (now - draftOrderCache.timestamp) < CACHE_DURATION) {
+      rawData = draftOrderCache.data;
+    } else {
+      // Fetch draft order from Sportskeeda
+      const response = await fetch(
+        'https://statics.sportskeeda.com/assets/sheets/tools/draft-order/draft_order.json',
+        {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)',
+          },
+          next: { revalidate: 3600 } // Server-side cache for 1 hour
+        }
       );
+
+      if (!response.ok) {
+        throw new Error(`Sportskeeda API error: ${response.status}`);
+      }
+
+      rawData = await response.json();
+
+      if (!rawData || !Array.isArray(rawData) || rawData.length < 2) {
+        return NextResponse.json(
+          { error: 'No draft order data found' },
+          { status: 404 }
+        );
+      }
+
+      // Update cache
+      draftOrderCache = { data: rawData, timestamp: now };
     }
 
     // Skip header row and transform data
