@@ -6,7 +6,6 @@ import LayoutStabilizer from '@/components/LayoutStabilizer';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getContrastTextColor } from '@/utils/colorHelpers';
-import futureDraftPicksData from '@/data/futureDraftPicks.json';
 
 // Helper function to generate player slug from name
 const getPlayerSlug = (playerName: string) => {
@@ -101,26 +100,36 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(getApiPath(`nfl/teams/api/draft-picks/${team.id}`));
+      // Fetch historical picks and future picks in parallel
+      const [historicalResponse, futureResponse] = await Promise.all([
+        fetch(getApiPath(`nfl/teams/api/draft-picks/${team.id}`)),
+        fetch(getApiPath(`nfl/teams/api/future-draft-picks/${team.id}`))
+      ]);
 
-      if (!response.ok) {
-        if (response.status === 404) {
+      if (!historicalResponse.ok) {
+        if (historicalResponse.status === 404) {
           throw new Error('Draft picks data not available for this team yet');
         }
-        throw new Error(`Failed to fetch draft picks: ${response.status}`);
+        throw new Error(`Failed to fetch draft picks: ${historicalResponse.status}`);
       }
 
-      const data: DraftPicksResponse = await response.json();
+      const historicalData: DraftPicksResponse = await historicalResponse.json();
 
-      if (!data.picks || !Array.isArray(data.picks)) {
+      if (!historicalData.picks || !Array.isArray(historicalData.picks)) {
         throw new Error('Invalid draft picks data received');
       }
 
-      // Get future picks for this team
-      const futurePicks = (futureDraftPicksData as any)[team.id] || [];
+      // Get future picks from API (fallback to empty array if API fails)
+      let futurePicks: DraftPick[] = [];
+      if (futureResponse.ok) {
+        const futureData = await futureResponse.json();
+        if (futureData.picks && Array.isArray(futureData.picks)) {
+          futurePicks = futureData.picks;
+        }
+      }
 
       // Combine historical and future picks
-      const allPicks = [...data.picks, ...futurePicks];
+      const allPicks = [...historicalData.picks, ...futurePicks];
 
       setDraftData(allPicks);
     } catch (err) {
