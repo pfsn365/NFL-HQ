@@ -301,23 +301,23 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
           <div className="space-y-6">
             {sortedYears.map(year => (
               <div key={year}>
-                {/* Year Header */}
-                <div className="mb-3">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 inline-block px-4 py-2 rounded-lg" style={{ backgroundColor: `${team.primaryColor}20`, color: team.primaryColor }}>
-                    {year} Draft Class
-                  </h3>
-                </div>
-
                 {/* Picks Table for this year */}
                 <table className="w-full text-sm mb-6">
                   <thead>
+                    {/* Year Header Row */}
                     <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                      <th scope="col" className="text-left p-3 font-medium">Name</th>
-                      <th scope="col" className="text-left p-3 font-medium">POS</th>
-                      <th scope="col" className="text-left p-3 font-medium">Round</th>
-                      <th scope="col" className="text-left p-3 font-medium">Rnd. Pick</th>
-                      <th scope="col" className="text-left p-3 font-medium">OVR. Pick</th>
-                      <th scope="col" className="text-left p-3 font-medium hidden sm:table-cell">College</th>
+                      <th scope="col" colSpan={6} className="text-left p-3">
+                        <span className="text-lg font-bold">{year} Draft Class</span>
+                      </th>
+                    </tr>
+                    {/* Column Headers Row */}
+                    <tr className="bg-gray-100 border-b border-gray-200">
+                      <th scope="col" className="text-left p-3 font-medium text-gray-700">Name</th>
+                      <th scope="col" className="text-left p-3 font-medium text-gray-700">POS</th>
+                      <th scope="col" className="text-left p-3 font-medium text-gray-700">Round</th>
+                      <th scope="col" className="text-left p-3 font-medium text-gray-700">Rnd. Pick</th>
+                      <th scope="col" className="text-left p-3 font-medium text-gray-700">OVR. Pick</th>
+                      <th scope="col" className="text-left p-3 font-medium text-gray-700 hidden sm:table-cell">College</th>
                     </tr>
                   </thead>
                   <tbody>
