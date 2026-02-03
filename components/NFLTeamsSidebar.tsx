@@ -2,23 +2,17 @@
 
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { getAllTeams, TeamData } from '@/data/teams';
 
 interface NFLTeamsSidebarProps {
-  currentTeam?: TeamData;
-  currentTab?: string;
   isMobile?: boolean;
 }
 
-const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentTab = 'overview', isMobile = false }) => {
+const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isTeamsExpanded, setIsTeamsExpanded] = useState(false);
   const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
   const [isImpactRankingsExpanded, setIsImpactRankingsExpanded] = useState(false);
   const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(true);
   const [isSuperBowlLXExpanded, setIsSuperBowlLXExpanded] = useState(false);
-  const allTeams = getAllTeams();
   const pathname = usePathname();
 
   // Helper to normalize pathname by removing trailing slashes for comparison
@@ -41,14 +35,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
 
   // Check if we're on the Super Bowl LX page
   const isSuperBowlLXPage = normalizedPathname === '/super-bowl-lx';
-
-  // Function to generate team URL based on current tab
-  const getTeamUrl = (teamId: string) => {
-    if (currentTab === 'overview') {
-      return `/nfl-hq/teams/${teamId}`;
-    }
-    return `/nfl-hq/teams/${teamId}/${currentTab}`;
-  };
 
   const nflTools = [
     { title: 'NFL Free Agency Tracker', url: '/nfl-hq/free-agency-tracker', external: false },
@@ -329,57 +315,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
               )}
             </div>
 
-            {/* NFL TEAMS Section */}
-            <div className="px-4 py-2 border-b border-gray-800">
-              <div
-                role="button"
-                tabIndex={0}
-                aria-expanded={isTeamsExpanded}
-                aria-controls="nfl-teams-menu"
-                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                onClick={() => setIsTeamsExpanded(!isTeamsExpanded)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsTeamsExpanded(!isTeamsExpanded); } }}
-              >
-                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">NFL Teams</div>
-                <svg
-                  className={`w-4 h-4 text-[#0050A0] transform transition-transform duration-300 ease-out ${isTeamsExpanded ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-              {isTeamsExpanded && (
-                <div className="grid grid-cols-2 gap-1">
-                  {allTeams.map((team) => {
-                    const isCurrentTeam = currentTeam?.id === team.id;
-                    return (
-                      <a
-                        key={team.id}
-                        href={getTeamUrl(team.id)}
-                        className={`flex items-center gap-2 p-2 rounded text-sm transition-colors ${
-                          isCurrentTeam ? 'bg-[#0050A0] text-white' : 'text-white hover:bg-gray-800'
-                        }`}
-                      >
-                        <img
-                          src={team.logoUrl}
-                          alt={team.abbreviation}
-                          className="w-5 h-5 flex-shrink-0"
-                        />
-                        <div className="text-xs">{team.abbreviation}</div>
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
             {/* OTHER TOOLS Section */}
             <div className="px-4 py-2">
               <div
@@ -646,73 +581,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
               </React.Fragment>
             );
           })}
-
-          {/* NFL Teams Section */}
-          <li className="mb-2 pt-6">
-            <div className="px-3 mb-2">
-              <div className="flex items-center justify-between min-w-0">
-                <div className="flex items-center gap-2 min-w-0 flex-shrink">
-                  <div className="h-0.5 w-3 bg-gray-600 rounded flex-shrink-0"></div>
-                  <span className="text-xs font-bold text-gray-100 uppercase tracking-wider truncate">
-                    NFL Teams {currentTab && `- ${currentTab.replace('-', ' ').toUpperCase()}`}
-                  </span>
-                </div>
-                <div className="flex-1 ml-3 h-px bg-gradient-to-r from-gray-800 to-transparent flex-shrink-0"></div>
-              </div>
-            </div>
-          </li>
-          {(isTeamsExpanded ? allTeams : allTeams.slice(0, 8)).map((team) => {
-            const isCurrentTeam = currentTeam?.id === team.id;
-            return (
-              <li key={team.id}>
-                <a
-                  href={getTeamUrl(team.id)}
-                  className={`
-                    relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200
-                    ${isCurrentTeam
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
-                    }
-                  `}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <img
-                      src={team.logoUrl}
-                      alt={team.abbreviation}
-                      width={16}
-                      height={16}
-                      className="w-4 h-4 flex-shrink-0"
-                    />
-                    <span className="text-sm font-medium truncate">
-                      {team.fullName}
-                    </span>
-                  </div>
-                </a>
-              </li>
-            );
-          })}
-
-          {allTeams.length > 8 && !isTeamsExpanded && (
-            <li className="mb-4">
-              <button
-                onClick={() => setIsTeamsExpanded(true)}
-                className="w-full text-left px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-200 hover:bg-gray-800/50 hover:text-white"
-              >
-                <span className="text-xs font-medium">+ Show More Teams</span>
-              </button>
-            </li>
-          )}
-
-          {isTeamsExpanded && (
-            <li className="mb-4">
-              <button
-                onClick={() => setIsTeamsExpanded(false)}
-                className="w-full text-left px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-200 hover:bg-gray-800/50 hover:text-white"
-              >
-                <span className="text-xs font-medium">- Show Fewer Teams</span>
-              </button>
-            </li>
-          )}
 
           {/* Other Tools Section */}
           <li className="pt-6">
