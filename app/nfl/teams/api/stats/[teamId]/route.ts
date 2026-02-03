@@ -250,7 +250,8 @@ export async function GET(
         ...(rawTeamStats?.scoring?.touchdowns || []),
         ...(rawTeamStats?.scoring?.two_point_conversions || []),
         ...(rawTeamStats?.scoring?.penalties || []),
-        ...(rawTeamStats?.scoring?.first_downs || [])
+        ...(rawTeamStats?.scoring?.first_downs || []),
+        ...(rawTeamStats?.scoring?.safeties || [])
       ].filter(item => item && typeof item === 'object'),
       fieldGoals: rawTeamStats?.field_goals || [],
       returning: [

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { getApiPath } from '@/utils/api';
+import PlayerImage from '@/components/PlayerImage';
 
 // SWR fetcher function
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -56,6 +57,32 @@ interface DepthChartData {
   defense: DepthChartPosition[];
   specialTeams: DepthChartPosition[];
 }
+
+interface PFSNPlayer {
+  playerName: string;
+  normalizedName: string;
+  position: string;
+  team: string;
+  score: number;
+  grade: string;
+  seasonRank: number;
+  overallRank: number;
+}
+
+interface PFSNResponse {
+  players: Record<string, PFSNPlayer>;
+  positionMap: Record<string, string>;
+  totalPlayers: number;
+}
+
+// Helper function to normalize player names for matching
+function normalizePlayerName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+    .replace(/(jr|sr|ii|iii|iv)$/g, '');
+}
+
 
 // Position groupings for organizing players
 const positionGroups = {
@@ -160,6 +187,15 @@ export default function RostersDepthChartsTab() {
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 300000 }
   );
+
+  // PFSN Impact data
+  const { data: pfsnData } = useSWR<PFSNResponse>(
+    getApiPath('api/nfl/pfsn-impact'),
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 300000 }
+  );
+
+  const pfsnPlayers = pfsnData?.players || null;
 
   const patriotsRoster = patriotsData?.roster || null;
   const seahawksRoster = seahawksData?.roster || null;
@@ -340,6 +376,46 @@ export default function RostersDepthChartsTab() {
       );
     }
 
+    // Helper to get player's PFSN Impact score
+    const getPlayerScore = (playerName: string): number | null => {
+      if (!pfsnPlayers) return null;
+      const normalized = normalizePlayerName(playerName);
+      const player = pfsnPlayers[normalized];
+      return player?.score || null;
+    };
+
+    // Render a player cell with image and score
+    const renderPlayerCell = (player: DepthChartPlayer | undefined) => {
+      if (!player) {
+        return <span className="text-gray-400">-</span>;
+      }
+
+      const score = getPlayerScore(player.name);
+
+      return (
+        <div className="flex items-center gap-2">
+          <PlayerImage
+            slug={player.slug}
+            name={player.name}
+            size="sm"
+            teamColor={team.primaryColor}
+          />
+          <Link
+            href={`/players/${player.slug}`}
+            className="font-medium hover:underline cursor-pointer"
+            style={{ color: team.primaryColor }}
+          >
+            {player.name}
+          </Link>
+          {score && (
+            <span className="text-xs font-semibold text-blue-600">
+              {score.toFixed(1)}
+            </span>
+          )}
+        </div>
+      );
+    };
+
     const PositionTable = ({ title, positions }: { title: string; positions: DepthChartPosition[] }) => (
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
@@ -347,11 +423,11 @@ export default function RostersDepthChartsTab() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: team.primaryColor }} className="text-white">
-                <th scope="col" className="text-left p-3 font-medium">POS</th>
-                <th scope="col" className="text-left p-3 font-medium">STARTER</th>
-                <th scope="col" className="text-left p-3 font-medium">2ND</th>
-                <th scope="col" className="text-left p-3 font-medium">3RD</th>
-                <th scope="col" className="text-left p-3 font-medium">4TH</th>
+                <th scope="col" className="text-left p-3 font-medium w-16">POS</th>
+                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">STARTER</th>
+                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">2ND</th>
+                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">3RD</th>
+                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">4TH</th>
               </tr>
             </thead>
             <tbody>
@@ -364,58 +440,10 @@ export default function RostersDepthChartsTab() {
                 return (
                   <tr key={position.abbreviation} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="p-3 font-medium text-gray-900">{position.abbreviation}</td>
-                    <td className="p-3">
-                      {starter ? (
-                        <Link
-                          href={`/nfl-hq/players/${starter.slug}`}
-                          className="font-medium hover:underline cursor-pointer"
-                          style={{ color: team.primaryColor }}
-                        >
-                          {starter.name}
-                        </Link>
-                      ) : (
-                        <span className="text-gray-600">-</span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      {second ? (
-                        <Link
-                          href={`/nfl-hq/players/${second.slug}`}
-                          className="hover:underline cursor-pointer"
-                          style={{ color: team.primaryColor }}
-                        >
-                          {second.name}
-                        </Link>
-                      ) : (
-                        <span className="text-gray-600">-</span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      {third ? (
-                        <Link
-                          href={`/nfl-hq/players/${third.slug}`}
-                          className="hover:underline cursor-pointer"
-                          style={{ color: team.primaryColor }}
-                        >
-                          {third.name}
-                        </Link>
-                      ) : (
-                        <span className="text-gray-600">-</span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      {fourth ? (
-                        <Link
-                          href={`/nfl-hq/players/${fourth.slug}`}
-                          className="hover:underline cursor-pointer"
-                          style={{ color: team.primaryColor }}
-                        >
-                          {fourth.name}
-                        </Link>
-                      ) : (
-                        <span className="text-gray-600">-</span>
-                      )}
-                    </td>
+                    <td className="p-3">{renderPlayerCell(starter)}</td>
+                    <td className="p-3">{renderPlayerCell(second)}</td>
+                    <td className="p-3">{renderPlayerCell(third)}</td>
+                    <td className="p-3">{renderPlayerCell(fourth)}</td>
                   </tr>
                 );
               })}

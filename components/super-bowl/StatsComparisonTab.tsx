@@ -153,21 +153,23 @@ export default function StatsComparisonTab() {
     );
   };
 
-  // Calculate points scored: TDs*6 + Extra Points + FGs*3 + 2PTs*2
+  // Calculate points scored: TDs*6 + Extra Points + FGs*3 + 2PTs*2 + Safeties*2
   const calculatePointsScored = (stats: TeamStats): number => {
     const touchdowns = getTeamStat(stats.touchdowns || [], 'total');
     const extraPoints = getTeamStat(stats.kicking || [], 'extra points made');
     const fieldGoals = getTeamStat(stats.fieldGoals || [], 'field goals made');
-    const twoPointConversions = getTeamStat(stats.scoring || [], 'made');
-    return (touchdowns * 6) + extraPoints + (fieldGoals * 3) + (twoPointConversions * 2);
+    const twoPointConversions = getTeamStat(stats.scoring || [], '2pt conversions made');
+    const safeties = getTeamStat(stats.scoring || [], 'safeties');
+    return (touchdowns * 6) + extraPoints + (fieldGoals * 3) + (twoPointConversions * 2) + (safeties * 2);
   };
 
   const calculatePointsAllowed = (stats: TeamStats): number => {
     const touchdowns = getTeamStat(stats.touchdowns || [], 'total', 'opponent');
     const extraPoints = getTeamStat(stats.kicking || [], 'extra points made', 'opponent');
     const fieldGoals = getTeamStat(stats.fieldGoals || [], 'field goals made', 'opponent');
-    const twoPointConversions = getTeamStat(stats.scoring || [], 'made', 'opponent');
-    return (touchdowns * 6) + extraPoints + (fieldGoals * 3) + (twoPointConversions * 2);
+    const twoPointConversions = getTeamStat(stats.scoring || [], '2pt conversions made', 'opponent');
+    const safeties = getTeamStat(stats.scoring || [], 'safeties', 'opponent');
+    return (touchdowns * 6) + extraPoints + (fieldGoals * 3) + (twoPointConversions * 2) + (safeties * 2);
   };
 
   const renderTeamStats = () => {
