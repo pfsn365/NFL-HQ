@@ -381,7 +381,7 @@ export default function RostersDepthChartsTab() {
       if (!pfsnPlayers) return null;
       const normalized = normalizePlayerName(playerName);
       const player = pfsnPlayers[normalized];
-      return player?.score || null;
+      return player?.score ?? null;
     };
 
     // Render a player cell with image and score
@@ -427,7 +427,6 @@ export default function RostersDepthChartsTab() {
                 <th scope="col" className="text-left p-3 font-medium min-w-[220px]">STARTER</th>
                 <th scope="col" className="text-left p-3 font-medium min-w-[220px]">2ND</th>
                 <th scope="col" className="text-left p-3 font-medium min-w-[220px]">3RD</th>
-                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">4TH</th>
               </tr>
             </thead>
             <tbody>
@@ -435,7 +434,6 @@ export default function RostersDepthChartsTab() {
                 const starter = position.players.find(p => p.depth === 1);
                 const second = position.players.find(p => p.depth === 2);
                 const third = position.players.find(p => p.depth === 3);
-                const fourth = position.players.find(p => p.depth === 4);
 
                 return (
                   <tr key={position.abbreviation} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
@@ -443,7 +441,6 @@ export default function RostersDepthChartsTab() {
                     <td className="p-3">{renderPlayerCell(starter)}</td>
                     <td className="p-3">{renderPlayerCell(second)}</td>
                     <td className="p-3">{renderPlayerCell(third)}</td>
-                    <td className="p-3">{renderPlayerCell(fourth)}</td>
                   </tr>
                 );
               })}

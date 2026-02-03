@@ -171,8 +171,8 @@ export async function GET() {
     const allResults = await Promise.all(fetchPromises);
     const allPlayers: PFSNPlayerWithMeta[] = allResults.flat();
 
-    // Filter to only current season (2024) players and process
-    const currentSeason = 2024;
+    // Filter to only current season (2025) players and process
+    const currentSeason = 2025;
     const playersMap: Record<string, ProcessedPlayer> = {};
 
     for (const player of allPlayers) {

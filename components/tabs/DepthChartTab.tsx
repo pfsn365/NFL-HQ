@@ -80,7 +80,7 @@ const PositionTable = ({
     if (!pfsnPlayers) return null;
     const normalized = normalizePlayerName(playerName);
     const player = pfsnPlayers[normalized];
-    return player?.score || null;
+    return player?.score ?? null;
   };
 
   // Render a player cell with image and score
