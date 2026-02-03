@@ -7,30 +7,14 @@ import { SWRErrorFallback } from '@/components/ErrorBoundary';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getContrastTextColor } from '@/utils/colorHelpers';
-import { fetcher, defaultSWROptions, staticDataOptions } from '@/lib/fetcher';
+import { fetcher, defaultSWROptions } from '@/lib/fetcher';
 import PlayerImage from '@/components/PlayerImage';
 
 interface DepthChartPlayer {
   name: string;
   slug: string;
   depth: number;
-}
-
-interface PFSNPlayer {
-  playerName: string;
-  normalizedName: string;
-  position: string;
-  team: string;
-  score: number;
-  grade: string;
-  seasonRank: number;
-  overallRank: number;
-}
-
-interface PFSNResponse {
-  players: Record<string, PFSNPlayer>;
-  positionMap: Record<string, string>;
-  totalPlayers: number;
+  impactScore: number;
 }
 
 interface DepthChartPosition {
@@ -55,41 +39,20 @@ interface DepthChartResponse {
 }
 
 
-// Helper function to normalize player names for matching
-function normalizePlayerName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
-    .replace(/(jr|sr|ii|iii|iv)$/g, '');
-}
-
-
 const PositionTable = ({
   title,
   positions,
-  team,
-  pfsnPlayers
+  team
 }: {
   title: string;
   positions: DepthChartPosition[];
   team: TeamData;
-  pfsnPlayers: Record<string, PFSNPlayer> | null;
 }) => {
-  // Helper to get player's PFSN Impact score
-  const getPlayerScore = (playerName: string): number | null => {
-    if (!pfsnPlayers) return null;
-    const normalized = normalizePlayerName(playerName);
-    const player = pfsnPlayers[normalized];
-    return player?.score ?? null;
-  };
-
   // Render a player cell with image and score
   const renderPlayerCell = (player: DepthChartPlayer | undefined) => {
     if (!player) {
       return <span className="text-gray-400">-</span>;
     }
-
-    const score = getPlayerScore(player.name);
 
     return (
       <div className="flex items-center gap-2">
@@ -106,9 +69,9 @@ const PositionTable = ({
         >
           {player.name}
         </Link>
-        {score && (
+        {player.impactScore > 0 && (
           <span className="text-xs font-semibold text-blue-600">
-            {score.toFixed(1)}
+            {player.impactScore.toFixed(1)}
           </span>
         )}
       </div>
@@ -165,15 +128,7 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
     defaultSWROptions
   );
 
-  // Fetch PFSN Impact data for scores (static data, cached for 5 min)
-  const { data: pfsnData } = useSWR<PFSNResponse>(
-    getApiPath('api/nfl/pfsn-impact'),
-    fetcher,
-    staticDataOptions
-  );
-
   const depthChartData = data?.positions;
-  const pfsnPlayers = pfsnData?.players || null;
 
   // Tab header component - reused across loading/error/data states
   const TabHeader = () => (
@@ -235,7 +190,6 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
           title={`Offense | OC: ${team.offensiveCoordinator}`}
           positions={depthChartData.offense}
           team={team}
-          pfsnPlayers={pfsnPlayers}
         />
       )}
 
@@ -244,7 +198,6 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
           title={`Defense | DC: ${team.defensiveCoordinator}`}
           positions={depthChartData.defense}
           team={team}
-          pfsnPlayers={pfsnPlayers}
         />
       )}
 
@@ -253,7 +206,6 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
           title={`Special Teams | STC: ${team.specialTeamsCoordinator}`}
           positions={depthChartData.specialTeams}
           team={team}
-          pfsnPlayers={pfsnPlayers}
         />
       )}
     </LayoutStabilizer>

@@ -44,6 +44,7 @@ interface DepthChartPlayer {
   name: string;
   slug: string;
   depth: number;
+  impactScore: number;
 }
 
 interface DepthChartPosition {
@@ -57,32 +58,6 @@ interface DepthChartData {
   defense: DepthChartPosition[];
   specialTeams: DepthChartPosition[];
 }
-
-interface PFSNPlayer {
-  playerName: string;
-  normalizedName: string;
-  position: string;
-  team: string;
-  score: number;
-  grade: string;
-  seasonRank: number;
-  overallRank: number;
-}
-
-interface PFSNResponse {
-  players: Record<string, PFSNPlayer>;
-  positionMap: Record<string, string>;
-  totalPlayers: number;
-}
-
-// Helper function to normalize player names for matching
-function normalizePlayerName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
-    .replace(/(jr|sr|ii|iii|iv)$/g, '');
-}
-
 
 // Position groupings for organizing players
 const positionGroups = {
@@ -187,15 +162,6 @@ export default function RostersDepthChartsTab() {
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 300000 }
   );
-
-  // PFSN Impact data
-  const { data: pfsnData } = useSWR<PFSNResponse>(
-    getApiPath('api/nfl/pfsn-impact'),
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 300000 }
-  );
-
-  const pfsnPlayers = pfsnData?.players || null;
 
   const patriotsRoster = patriotsData?.roster || null;
   const seahawksRoster = seahawksData?.roster || null;
@@ -376,21 +342,11 @@ export default function RostersDepthChartsTab() {
       );
     }
 
-    // Helper to get player's PFSN Impact score
-    const getPlayerScore = (playerName: string): number | null => {
-      if (!pfsnPlayers) return null;
-      const normalized = normalizePlayerName(playerName);
-      const player = pfsnPlayers[normalized];
-      return player?.score ?? null;
-    };
-
     // Render a player cell with image and score
     const renderPlayerCell = (player: DepthChartPlayer | undefined) => {
       if (!player) {
         return <span className="text-gray-400">-</span>;
       }
-
-      const score = getPlayerScore(player.name);
 
       return (
         <div className="flex items-center gap-2">
@@ -407,9 +363,9 @@ export default function RostersDepthChartsTab() {
           >
             {player.name}
           </Link>
-          {score && (
+          {player.impactScore > 0 && (
             <span className="text-xs font-semibold text-blue-600">
-              {score.toFixed(1)}
+              {player.impactScore.toFixed(1)}
             </span>
           )}
         </div>

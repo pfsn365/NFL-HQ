@@ -34,6 +34,118 @@ interface DepthChartPlayer {
   name: string;
   slug: string;
   depth: number;
+  impactScore: number;
+}
+
+// Google Sheets configuration for PFSN Impact Grades (same as roster API)
+const GOOGLE_SHEETS_CONFIG: Record<string, { spreadsheetId: string; gid: string }> = {
+  QB: { spreadsheetId: '17d7EIFBHLChlSoi6vRFArwviQRTJn0P0TOvQUNx8hU8', gid: '1456950409' },
+  SAF: { spreadsheetId: '1SKr25H4brSE4dRf7JGpkytwLAKvt4jH-_wlCoqbFPXE', gid: '1216441503' },
+  CB: { spreadsheetId: '1fUwD_rShGMrn7ypJyQsy4mCofqP7Q6J0Un8rsGW7h7U', gid: '1146203009' },
+  LB: { spreadsheetId: '1mNCbJ8RxNZOSp_DuocR_5C7e_wqfiIPy4Rb9fS7GTBE', gid: '519296058' },
+  EDGE: { spreadsheetId: '1RLSAJusOAcjnA1VDROtWFdfKUF4VYUV9JQ6tPinuGAQ', gid: '0' },
+  DT: { spreadsheetId: '1N_V-cyIhROKXNatG1F_uPXTyP6BhuoNu_TebgjMQ6YM', gid: '0' },
+  OL: { spreadsheetId: '1bKmYM1QyPSsJ9FyPtVZuxV0_HiUBw1o2loyU_55pXKA', gid: '1321084176' },
+  TE: { spreadsheetId: '16LsyT1QLP-2ZdG_WNdHjn6ZMrFFu7q13qxDkKyTuseM', gid: '53851653' },
+  WR: { spreadsheetId: '1h-HIZVjq1TM8FZ_5FYfxEZ3lPwtw_9ZWeqLzAi0EUIM', gid: '1964031106' },
+  RB: { spreadsheetId: '1lXXHd9OzHA6Zp4yW1HZKsIJybLthW7tS93l4y4yCBzE', gid: '0' },
+};
+
+const POSITION_COLUMN_MAPPINGS: Record<string, { playerCol: number; scoreCol: number; rankCol: number; headerRows: number }> = {
+  QB: { playerCol: 2, scoreCol: 4, rankCol: 1, headerRows: 1 },
+  SAF: { playerCol: 1, scoreCol: -3, rankCol: -4, headerRows: 10 },
+  CB: { playerCol: 1, scoreCol: -3, rankCol: -4, headerRows: 10 },
+  LB: { playerCol: 2, scoreCol: -3, rankCol: -4, headerRows: 10 },
+  EDGE: { playerCol: 1, scoreCol: -3, rankCol: -4, headerRows: 10 },
+  DT: { playerCol: 1, scoreCol: -3, rankCol: -4, headerRows: 10 },
+  OL: { playerCol: 3, scoreCol: -9, rankCol: -11, headerRows: 10 },
+  TE: { playerCol: 1, scoreCol: -3, rankCol: -4, headerRows: 10 },
+  WR: { playerCol: 1, scoreCol: -7, rankCol: -2, headerRows: 9 },
+  RB: { playerCol: 2, scoreCol: 0, rankCol: -4, headerRows: 10 },
+};
+
+interface ImpactGrade {
+  player: string;
+  score: number;
+}
+
+let impactGradesCache: Map<string, number> | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+
+function normalizePlayerName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(jr|sr|ii|iii|iv)$/g, '');
+}
+
+function generateNameVariations(name: string): string[] {
+  const normalized = normalizePlayerName(name);
+  const variations = [normalized];
+  variations.push(normalizePlayerName(name.replace(/\./g, '')));
+  variations.push(normalizePlayerName(name.replace(/-/g, ' ')));
+  variations.push(normalizePlayerName(name.replace(/\s+(jr\.?|sr\.?|ii|iii|iv|v)$/i, '')));
+  return [...new Set(variations)];
+}
+
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') inQuotes = !inQuotes;
+    else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
+    else current += char;
+  }
+  result.push(current);
+  return result;
+}
+
+async function fetchPositionGrades(position: string): Promise<ImpactGrade[]> {
+  try {
+    const config = GOOGLE_SHEETS_CONFIG[position];
+    const mapping = POSITION_COLUMN_MAPPINGS[position];
+    if (!config || !mapping) return [];
+
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${config.spreadsheetId}/export?format=csv&gid=${config.gid}`;
+    const response = await fetch(csvUrl, { headers: { 'User-Agent': 'NFL-HQ/1.0' }, next: { revalidate: 86400 } });
+    if (!response.ok) return [];
+
+    const csvText = await response.text();
+    const lines = csvText.split('\n').filter(line => line.trim());
+    const grades: ImpactGrade[] = [];
+
+    for (let i = mapping.headerRows; i < lines.length; i++) {
+      const values = parseCSVLine(lines[i]);
+      if (values.length < 3) continue;
+      const getCol = (col: number) => col < 0 ? values[values.length + col] : values[col];
+      const player = getCol(mapping.playerCol)?.trim() || '';
+      const scoreStr = getCol(mapping.scoreCol)?.trim() || '0';
+      const rankStr = getCol(mapping.rankCol)?.trim() || '0';
+      const score = parseFloat(scoreStr.replace('%', '')) || 0;
+      const rank = parseInt(rankStr) || 0;
+      if (!player || player.toLowerCase() === 'player' || player.toLowerCase().includes('season')) continue;
+      if (score <= 0 && rank <= 0) continue;
+      grades.push({ player, score: score > 0 ? score : 50 });
+    }
+    return grades;
+  } catch { return []; }
+}
+
+async function getAllImpactGrades(): Promise<Map<string, number>> {
+  if (impactGradesCache && Date.now() - cacheTimestamp < CACHE_DURATION) return impactGradesCache;
+  const gradesMap = new Map<string, number>();
+  const positions = Object.keys(GOOGLE_SHEETS_CONFIG);
+  const allGradesResults = await Promise.all(positions.map(pos => fetchPositionGrades(pos)));
+  for (const grades of allGradesResults) {
+    for (const grade of grades) {
+      for (const variant of generateNameVariations(grade.player)) {
+        gradesMap.set(variant, grade.score);
+      }
+    }
+  }
+  impactGradesCache = gradesMap;
+  cacheTimestamp = Date.now();
+  return gradesMap;
 }
 
 interface DepthChartPosition {
@@ -128,6 +240,25 @@ export async function GET(
       );
     }
 
+    // Fetch impact grades
+    const impactGrades = await getAllImpactGrades();
+
+    // Helper to get player's impact score
+    const getPlayerImpactScore = (playerName: string): number => {
+      const normalizedName = normalizePlayerName(playerName);
+      let score = impactGrades.get(normalizedName) || 0;
+      if (!score) {
+        for (const variant of generateNameVariations(playerName)) {
+          const variantScore = impactGrades.get(variant);
+          if (variantScore && variantScore > 0) {
+            score = variantScore;
+            break;
+          }
+        }
+      }
+      return score;
+    };
+
     // Transform the data to our format
     const transformedPositions: DepthChartPosition[] = data.positions.map(position => {
       const players: DepthChartPlayer[] = [];
@@ -137,7 +268,8 @@ export async function GET(
         players.push({
           name: depthEntry.player.name,
           slug: depthEntry.player.slug,
-          depth: depthEntry.depth
+          depth: depthEntry.depth,
+          impactScore: getPlayerImpactScore(depthEntry.player.name)
         });
       });
 
