@@ -92,19 +92,20 @@ export default function StatsComparisonTab() {
     { revalidateOnFocus: false, dedupingInterval: 300000 }
   );
 
-  // Transform data to expected format
-  const patriotsData: TeamStatsData | null = patriotsRaw ? {
+  // Transform data to expected format (check for API error responses)
+  const patriotsData: TeamStatsData | null = (patriotsRaw && !patriotsRaw.error) ? {
     teamStats: patriotsRaw.teamStats,
     playerStats: patriotsRaw.playerStats,
   } : null;
 
-  const seahawksData: TeamStatsData | null = seahawksRaw ? {
+  const seahawksData: TeamStatsData | null = (seahawksRaw && !seahawksRaw.error) ? {
     teamStats: seahawksRaw.teamStats,
     playerStats: seahawksRaw.playerStats,
   } : null;
 
   const loading = !patriotsRaw || !seahawksRaw;
-  const error = (patriotsError || seahawksError) ? 'Failed to load stats' : null;
+  const apiError = patriotsRaw?.error || seahawksRaw?.error;
+  const error = (patriotsError || seahawksError) ? 'Failed to load stats' : apiError ? `API Error: ${apiError}` : null;
 
   // Helper to get stat value from team stats array
   const getTeamStat = (stats: TeamStat[], statName: string, key: 'own' | 'opponent' | 'net' = 'own'): number => {
@@ -173,10 +174,20 @@ export default function StatsComparisonTab() {
   };
 
   const renderTeamStats = () => {
-    if (!patriotsData?.teamStats || !seahawksData?.teamStats) {
+    // Check if we have valid team stats data (not just empty objects)
+    const hasPatriotsStats = patriotsData?.teamStats &&
+      (patriotsData.teamStats.offense?.length > 0 || patriotsData.teamStats.passing?.length > 0);
+    const hasSeahawksStats = seahawksData?.teamStats &&
+      (seahawksData.teamStats.offense?.length > 0 || seahawksData.teamStats.passing?.length > 0);
+
+    if (!hasPatriotsStats || !hasSeahawksStats) {
       return (
         <div className="text-center py-8 text-gray-600">
-          No team stats available
+          <p>No team stats available</p>
+          <p className="text-xs mt-2 text-gray-500">
+            {!hasPatriotsStats && 'Patriots stats missing. '}
+            {!hasSeahawksStats && 'Seahawks stats missing.'}
+          </p>
         </div>
       );
     }

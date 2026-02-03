@@ -199,7 +199,7 @@ export async function GET(
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
         },
-        cache: 'force-cache'
+        next: { revalidate: 3600 } // Revalidate every hour
       } as RequestInit
     );
 
@@ -209,7 +209,11 @@ export async function GET(
 
     const data: SportsKeedaStatsResponse = await response.json();
 
+    // Debug logging
+    console.log(`[Stats API] Team: ${teamSlug}, Has data.data: ${!!data.data}, Has leaders: ${!!data.data?.leaders}, Has team_stats: ${!!data.data?.team_stats}`);
+
     if (!data.data || !data.data.leaders || !Array.isArray(data.data.leaders)) {
+      console.log(`[Stats API] Missing data for ${teamSlug}:`, JSON.stringify(data).slice(0, 500));
       return NextResponse.json(
         { error: 'No stats data found' },
         { status: 404 }
@@ -229,45 +233,51 @@ export async function GET(
     // Extract team stats with all nested data
     const rawTeamStats = data.data.team_stats;
 
+    // Helper to safely get array from potentially non-array value
+    const toArray = (val: unknown): TeamStat[] => {
+      if (Array.isArray(val)) return val;
+      return [];
+    };
+
     // Helper to flatten nested fumbles data
     const fumbleStats: TeamStat[] = [];
     if (rawTeamStats?.fumbles) {
       const fumbles = rawTeamStats.fumbles as any;
-      if (fumbles.fumbles_lost) fumbleStats.push(...fumbles.fumbles_lost.map((s: TeamStat) => ({ ...s, name: `Lost: ${s.name}` })));
-      if (fumbles.fumbles_forced) fumbleStats.push(...fumbles.fumbles_forced.map((s: TeamStat) => ({ ...s, name: `Forced: ${s.name}` })));
-      if (fumbles.fumbles_recovered) fumbleStats.push(...fumbles.fumbles_recovered.map((s: TeamStat) => ({ ...s, name: `Recovered: ${s.name}` })));
-      if (fumbles.own_fumbles) fumbleStats.push(...fumbles.own_fumbles.map((s: TeamStat) => ({ ...s, name: `Own: ${s.name}` })));
-      if (fumbles.opponent_fumbles) fumbleStats.push(...fumbles.opponent_fumbles.map((s: TeamStat) => ({ ...s, name: `Opp: ${s.name}` })));
+      toArray(fumbles.fumbles_lost).forEach((s: TeamStat) => fumbleStats.push({ ...s, name: `Lost: ${s.name}` }));
+      toArray(fumbles.fumbles_forced).forEach((s: TeamStat) => fumbleStats.push({ ...s, name: `Forced: ${s.name}` }));
+      toArray(fumbles.fumbles_recovered).forEach((s: TeamStat) => fumbleStats.push({ ...s, name: `Recovered: ${s.name}` }));
+      toArray(fumbles.own_fumbles).forEach((s: TeamStat) => fumbleStats.push({ ...s, name: `Own: ${s.name}` }));
+      toArray(fumbles.opponent_fumbles).forEach((s: TeamStat) => fumbleStats.push({ ...s, name: `Opp: ${s.name}` }));
     }
 
     const teamStats: TransformedTeamStats = {
-      offense: rawTeamStats?.offense || [],
-      passing: rawTeamStats?.passing || [],
-      rushing: rawTeamStats?.rushing || [],
-      defense: rawTeamStats?.defense || [],
+      offense: toArray(rawTeamStats?.offense),
+      passing: toArray(rawTeamStats?.passing),
+      rushing: toArray(rawTeamStats?.rushing),
+      defense: toArray(rawTeamStats?.defense),
       scoring: [
         // Convert scoring object to array format
-        ...(rawTeamStats?.scoring?.touchdowns || []),
-        ...(rawTeamStats?.scoring?.two_point_conversions || []),
-        ...(rawTeamStats?.scoring?.penalties || []),
-        ...(rawTeamStats?.scoring?.first_downs || []),
-        ...(rawTeamStats?.scoring?.safeties || [])
+        ...toArray(rawTeamStats?.scoring?.touchdowns),
+        ...toArray(rawTeamStats?.scoring?.two_point_conversions),
+        ...toArray(rawTeamStats?.scoring?.penalties),
+        ...toArray(rawTeamStats?.scoring?.first_downs),
+        ...toArray(rawTeamStats?.scoring?.safeties)
       ].filter(item => item && typeof item === 'object'),
-      fieldGoals: rawTeamStats?.field_goals || [],
+      fieldGoals: toArray(rawTeamStats?.field_goals),
       returning: [
         // Convert returning object to array format
-        ...(rawTeamStats?.returning?.punt_returning || []),
-        ...(rawTeamStats?.returning?.kickoff_returning || []),
-        ...(rawTeamStats?.returning?.interception || [])
+        ...toArray(rawTeamStats?.returning?.punt_returning),
+        ...toArray(rawTeamStats?.returning?.kickoff_returning),
+        ...toArray(rawTeamStats?.returning?.interception)
       ].filter(item => item && typeof item === 'object'),
-      punting: rawTeamStats?.punting || [],
-      kickoffs: rawTeamStats?.kickoffs || [],
-      miscellaneous: rawTeamStats?.miscellaneous || [],
+      punting: toArray(rawTeamStats?.punting),
+      kickoffs: toArray(rawTeamStats?.kickoffs),
+      miscellaneous: toArray(rawTeamStats?.miscellaneous),
       fumbles: fumbleStats,
-      kicking: rawTeamStats?.kicking || [],
-      interceptions: rawTeamStats?.returning?.interception || [],
-      firstDowns: rawTeamStats?.scoring?.first_downs || [],
-      touchdowns: rawTeamStats?.scoring?.touchdowns || [],
+      kicking: toArray(rawTeamStats?.kicking),
+      interceptions: toArray(rawTeamStats?.returning?.interception),
+      firstDowns: toArray(rawTeamStats?.scoring?.first_downs),
+      touchdowns: toArray(rawTeamStats?.scoring?.touchdowns),
     };
 
     // Extract player stats directly

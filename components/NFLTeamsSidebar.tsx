@@ -52,19 +52,22 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
 
   const nflTools = [
     { title: 'NFL Free Agency Tracker', url: '/nfl-hq/free-agency-tracker', external: false },
+    { title: 'NFL Ultimate GM Simulator', url: 'https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/', external: true },
+    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', external: true },
     { title: 'NFL Schedule', url: '/nfl-hq/schedule', external: false },
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
     { title: 'NFL Injury Report', url: '/nfl-hq/injuries', external: false },
     { title: 'NFL Stat Leaders', url: '/nfl-hq/stats', external: false },
-    { title: 'NFL Ultimate GM Simulator', url: 'https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/', external: true },
     { title: 'NFL Draft Hub', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', external: true },
-    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor', external: true },
     { title: 'NFL Power Rankings Builder', url: '/nfl-hq/power-rankings-builder', external: false },
     { title: 'NFL Player Rankings Builder', url: '/nfl-hq/player-rankings-builder', external: false },
     { title: 'NFL Transactions', url: '/nfl-hq/transactions', external: false },
-    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', external: true },
+    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor', external: true },
+    { title: 'NFL Offseason Manager', url: 'https://www.profootballnetwork.com/nfl-offseason-salary-cap-free-agency-manager', external: true },
     { title: 'NFL Salary Cap Tracker', url: '/nfl-hq/salary-cap-tracker', external: false },
     { title: 'NFL Player Pages', url: '/nfl-hq/players', external: false },
+    { title: 'NFL Player Guessing Game', url: 'https://www.profootballnetwork.com/nfl-player-guessing-game/', external: true },
+    { title: 'NFL Connections', url: 'https://www.profootballnetwork.com/games/nfl-connections/', external: true },
   ];
 
 
@@ -76,6 +79,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
     { title: 'NBA Mock Draft Simulator', url: 'https://www.profootballnetwork.com/nba-mock-draft-simulator' },
     { title: 'World Cup Simulator', url: 'https://www.profootballnetwork.com/fifa-world-cup-simulator/' },
     { title: 'MLB Playoff Predictor', url: 'https://www.profootballnetwork.com/mlb-playoff-predictor/' },
+    { title: 'Tennis Simulator', url: 'https://www.profootballnetwork.com/tennis-simulator/' },
   ];
 
   const impactRankings = [
@@ -285,7 +289,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                           </div>
                         </a>
                         {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
-                        {tool.title === 'NFL Free Agency Tracker' && (
+                        {tool.title === 'NFL Ultimate GM Simulator' && (
                           <div>
                             <button
                               onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
@@ -600,7 +604,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ currentTeam, currentT
                   </a>
                 </li>
                 {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
-                {tool.title === 'NFL Free Agency Tracker' && (
+                {tool.title === 'NFL Ultimate GM Simulator' && (
                   <>
                     <li>
                       <button
