@@ -25,11 +25,11 @@ export const metadata: Metadata = {
     title: 'Super Bowl LX: Patriots vs Seahawks',
     description: 'Complete Super Bowl LX coverage featuring the New England Patriots vs Seattle Seahawks. February 8, 2026 at Levi\'s Stadium.',
     type: 'website',
-    url: 'https://www.profootballnetwork.com/super-bowl-lx',
+    url: 'https://www.profootballnetwork.com/nfl-hq/super-bowl-lx',
     siteName: 'Pro Football Network',
     images: [
       {
-        url: '/super-bowl-lx-og.png',
+        url: 'https://www.profootballnetwork.com/nfl-hq/super-bowl-lx-og.png',
         width: 1200,
         height: 630,
         alt: 'Super Bowl LX - Patriots vs Seahawks',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Super Bowl LX: Patriots vs Seahawks',
     description: 'Complete Super Bowl LX coverage featuring the New England Patriots vs Seattle Seahawks. February 8, 2026 at Levi\'s Stadium.',
-    images: ['/super-bowl-lx-og.png'],
+    images: ['https://www.profootballnetwork.com/nfl-hq/super-bowl-lx-og.png'],
     site: '@PFN365',
     creator: '@PFN365',
   },
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: 'https://www.profootballnetwork.com/super-bowl-lx',
+    canonical: 'https://www.profootballnetwork.com/nfl-hq/super-bowl-lx',
   },
 };
 
@@ -91,7 +91,7 @@ const jsonLd = {
     name: 'National Football League',
     url: 'https://www.nfl.com',
   },
-  image: 'https://www.profootballnetwork.com/super-bowl-lx-og.png',
+  image: 'https://www.profootballnetwork.com/nfl-hq/super-bowl-lx-og.png',
 };
 
 export default function SuperBowlLXPage() {
