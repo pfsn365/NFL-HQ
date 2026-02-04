@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import HistoryTab from '@/components/super-bowl/HistoryTab';
 import HeadToHeadTab from '@/components/super-bowl/HeadToHeadTab';
@@ -72,7 +72,6 @@ interface Article {
 
 export default function SuperBowlLXContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<MainTab>(() => {
     const validTabs: MainTab[] = ['overview', 'path', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
@@ -98,7 +97,9 @@ export default function SuperBowlLXContent() {
   // Handle tab change and update URL
   const handleTabChange = (tabId: MainTab) => {
     setActiveTab(tabId);
-    router.push(`/super-bowl-lx?tab=${tabId}`, { scroll: false });
+    // Preserve the current pathname (handles both /super-bowl-lx and /nfl-hq/super-bowl-lx)
+    const newUrl = `${window.location.pathname}?tab=${tabId}`;
+    window.history.replaceState(null, '', newUrl);
   };
 
   useEffect(() => {
