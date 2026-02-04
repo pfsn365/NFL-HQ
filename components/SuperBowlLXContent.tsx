@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import HistoryTab from '@/components/super-bowl/HistoryTab';
 import HeadToHeadTab from '@/components/super-bowl/HeadToHeadTab';
@@ -72,6 +72,7 @@ interface Article {
 
 export default function SuperBowlLXContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const tabParam = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<MainTab>(() => {
     const validTabs: MainTab[] = ['overview', 'path', 'rosters', 'injuries', 'stats', 'head-to-head', 'history'];
@@ -93,6 +94,12 @@ export default function SuperBowlLXContent() {
       setActiveTab('overview');
     }
   }, [tabParam]);
+
+  // Handle tab change and update URL
+  const handleTabChange = (tabId: MainTab) => {
+    setActiveTab(tabId);
+    router.push(`/super-bowl-lx?tab=${tabId}`, { scroll: false });
+  };
 
   useEffect(() => {
     fetchSuperBowlArticles();
@@ -181,7 +188,7 @@ export default function SuperBowlLXContent() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
-                  Super Bowl LX
+                  Super Bowl HQ
                 </h1>
                 <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
                   Super Bowl LX coverage and information
@@ -211,7 +218,7 @@ export default function SuperBowlLXContent() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as MainTab)}
+                  onClick={() => handleTabChange(tab.id as MainTab)}
                   className={`py-3 sm:py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
                     activeTab === tab.id
                       ? 'border-[#0050A0] text-[#0050A0]'

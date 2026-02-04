@@ -179,7 +179,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                           alt="Super Bowl LX"
                           className="h-5 w-5 object-contain"
                         />
-                        Super Bowl LX
+                        Super Bowl HQ
                       </div>
                       <svg
                         className={`w-3 h-3 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
@@ -432,7 +432,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                     alt="Super Bowl LX"
                     className="h-6 w-6 object-contain"
                   />
-                  <span className="text-sm font-medium">Super Bowl LX</span>
+                  <span className="text-sm font-medium">Super Bowl HQ</span>
                 </div>
                 <svg
                   className={`w-4 h-4 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
