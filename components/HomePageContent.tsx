@@ -680,8 +680,7 @@ export default function HomePageContent() {
               </p>
 
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-sm font-semibold text-gray-700">Free Agent Marketplace</p>
-                <p className="text-xs text-gray-600 mt-1">Player signings & availability</p>
+                <p className="text-base font-semibold text-gray-700">Free Agent Hub</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -707,8 +706,7 @@ export default function HomePageContent() {
               </p>
 
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-sm font-semibold text-gray-700">Drag & Drop Rankings</p>
-                <p className="text-xs text-gray-600 mt-1">Build your custom list</p>
+                <p className="text-base font-semibold text-gray-700">Drag & Drop Rankings</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -734,8 +732,7 @@ export default function HomePageContent() {
               </p>
 
               <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-sm font-semibold text-gray-700">Cap Space Tracker</p>
-                <p className="text-xs text-gray-600 mt-1">Team financials</p>
+                <p className="text-base font-semibold text-gray-700">Cap Space Tracker</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -761,8 +758,7 @@ export default function HomePageContent() {
               </p>
 
               <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-sm font-semibold text-gray-700">Live Injury Updates</p>
-                <p className="text-xs text-gray-600 mt-1">Player availability</p>
+                <p className="text-base font-semibold text-gray-700">Live Injury Updates</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -788,8 +784,7 @@ export default function HomePageContent() {
               </p>
 
               <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-sm font-semibold text-gray-700">Recent Moves</p>
-                <p className="text-xs text-gray-600 mt-1">Trades & signings</p>
+                <p className="text-base font-semibold text-gray-700">Recent Moves</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
