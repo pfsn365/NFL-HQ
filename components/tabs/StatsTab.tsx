@@ -20,6 +20,15 @@ const getPlayerImageSlug = (playerName: string) => {
   return playerName.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
 };
 
+// Helper function to get player initials
+const getPlayerInitials = (playerName: string) => {
+  const parts = playerName.split(' ').filter(part => part.length > 0);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return playerName.substring(0, 2).toUpperCase();
+};
+
 interface PlayerStats {
   player: string;
   gp: number;
@@ -265,95 +274,6 @@ const columnHeaders: { [key: string]: { [key: string]: string } } = {
 };
 
 
-const glossaryData = {
-  'General': {
-    'GP': 'Games Played',
-    'YDS': 'Yards',
-    'TD': 'Touchdowns',
-    'LNG': 'Longest',
-    'AVG': 'Average'
-  },
-  'Passing': {
-    'CMP': 'Completions',
-    'ATT': 'Attempts',
-    'CMP%': 'Completion Percentage',
-    'Y/A': 'Yards per Attempt',
-    'Y/G': 'Yards per Game',
-    'TD%': 'Touchdown Percentage',
-    'INT': 'Interceptions',
-    'INT%': 'Interception Percentage',
-    'SACK': 'Total Sacks',
-    'SYL': 'Sack Yards Lost',
-    'QBR': 'QB Rating'
-  },
-  'Rushing': {
-    'ATT': 'Attempts',
-    'Y/A': 'Yards per Attempt',
-    'Y/G': 'Yards per Game',
-    'STF': 'Stuffs',
-    'STFYL': 'Stuffed Yards Lost',
-    'STF%': 'Stuffed Percentage'
-  },
-  'Receiving': {
-    'REC': 'Receptions',
-    'TGT': 'Targets',
-    'Y/A': 'Yards per Reception',
-    'Y/G': 'Yards per Game',
-    'YAC': 'Yards after Catch',
-    'YAC/A': 'Average Yards after Catch',
-    '1stD': 'First Downs'
-  },
-  'Scoring': {
-    'PASS': 'Passing Touchdowns',
-    'RUSH': 'Rushing Touchdowns',
-    'REC': 'Receiving Touchdowns',
-    'RET': 'Returning Touchdowns',
-    '2PT': 'Two Point Conversions',
-    'XPT': 'Extra Points',
-    'FG': 'Field Goals',
-    'SAF': 'Safeties',
-    'PTS': 'Total Points',
-    'PPG': 'Points Per Game'
-  },
-  'Defense': {
-    'SOLO': 'Solo Tackles',
-    'AST': 'Tackle Assists',
-    'TOT': 'Total Tackles',
-    'SACKS': 'Sacks',
-    'SYDS': 'Sack Yards',
-    'INT': 'Interceptions',
-    'PD': 'Passes Defended',
-    'FF': 'Forced Fumbles',
-    'FR': 'Fumble Recoveries'
-  },
-  'Kicking': {
-    'FGM': 'Field Goals Made',
-    'FGA': 'Field Goals Attempted',
-    'FG%': 'Field Goal Percentage',
-    '0-19': 'Made-Attempts (0-19 yards)',
-    '20-29': 'Made-Attempts (20-29 yards)',
-    '30-39': 'Made-Attempts (30-39 yards)',
-    '40-49': 'Made-Attempts (40-49 yards)',
-    '50+': 'Made-Attempts (50+ yards)',
-    'XPM': 'Extra Points Made',
-    'XPA': 'Extra Points Attempted',
-    'XP%': 'Extra Point Percentage'
-  },
-  'Punting': {
-    'PUNTS': 'Total Punts',
-    'NET': 'Net Average Yards',
-    'PBLK': 'Punts Blocked',
-    'IN20': 'Punts Inside 20',
-    'IN10': 'Punts Inside 10',
-    'TB': 'Touchbacks'
-  },
-  'Returning': {
-    'KR': 'Kickoff Returns',
-    'PR': 'Punt Returns',
-    'FC': 'Fair Catches'
-  }
-};
-
 interface StatsTabProps {
   team: TeamData;
 }
@@ -361,7 +281,6 @@ interface StatsTabProps {
 export default function StatsTab({ team }: StatsTabProps) {
   const [viewType, setViewType] = useState('players');
   const [selectedCategory, setSelectedCategory] = useState('passing');
-  const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [liveTeamStats, setLiveTeamStats] = useState<LiveTeamStats | null>(null);
   const [livePlayerStats, setLivePlayerStats] = useState<LivePlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -783,8 +702,15 @@ export default function StatsTab({ team }: StatsTabProps) {
                           className="font-medium hover:underline cursor-pointer flex items-center gap-2"
                           style={{ color: team.primaryColor }}
                         >
-                          {!imageErrors.has(value) && (
-                            <div className="relative w-8 h-8 flex-shrink-0">
+                          <div className="relative w-8 h-8 flex-shrink-0">
+                            {imageErrors.has(value) ? (
+                              <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white"
+                                style={{ backgroundColor: team.primaryColor }}
+                              >
+                                {getPlayerInitials(value)}
+                              </div>
+                            ) : (
                               <Image
                                 src={`https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${getPlayerImageSlug(value)}.png`}
                                 alt={value}
@@ -795,8 +721,8 @@ export default function StatsTab({ team }: StatsTabProps) {
                                   setImageErrors(prev => new Set(prev).add(value));
                                 }}
                               />
-                            </div>
-                          )}
+                            )}
+                          </div>
                           {value}
                         </a>
                       ) : key === 'category' && viewType === 'team' ? (
@@ -819,36 +745,6 @@ export default function StatsTab({ team }: StatsTabProps) {
         </table>
       </div>
 
-      {/* Collapsible Glossary */}
-      <div className="border-t pt-6">
-        <button
-          onClick={() => setIsGlossaryOpen(!isGlossaryOpen)}
-          className="flex items-center justify-between w-full text-left"
-        >
-          <h3 className="text-lg font-semibold text-gray-800">Glossary</h3>
-          <span className="text-2xl text-gray-600">
-            {isGlossaryOpen ? '−' : '+'}
-          </span>
-        </button>
-        
-        {isGlossaryOpen && (
-          <div className="mt-4 space-y-6">
-            {Object.entries(glossaryData).map(([category, terms]) => (
-              <div key={category}>
-                <h4 className="text-base font-semibold text-gray-900 mb-3 pb-1 border-b border-gray-200">{category}</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-sm">
-                  {Object.entries(terms).map(([abbrev, definition]) => (
-                    <div key={abbrev} className="flex">
-                      <span className="font-semibold text-gray-900 w-20 flex-shrink-0">{abbrev}</span>
-                      <span className="text-gray-600">{definition}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </LayoutStabilizer>
   );
 }
