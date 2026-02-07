@@ -334,11 +334,14 @@ img {
   }
 }
 
-/* Ticker adjustment when sidebar collapses */
+/* Ticker adjustment - always transition left for smooth sidebar toggle */
 @media (min-width: 1024px) {
+  .fixed.lg\:left-64 {
+    transition: left 0.3s;
+  }
+
   body.sidebar-collapsed .fixed.lg\:left-64 {
     left: 0 !important;
-    transition: left 0.3s;
   }
 }
 
