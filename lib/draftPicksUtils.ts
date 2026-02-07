@@ -264,16 +264,9 @@ export function buildDraftBoard(
     const pickNumber = index + 1;
     const { owningTeamId, pickData} = findPickOwner(originalTeam.id, 1);
 
-    // Debug picks 15 and 27
-    if (pickNumber === 15 || pickNumber === 27) {
-      console.log(`[DEBUG] Pick ${pickNumber}: originalTeam=${originalTeam.id}, owningTeamId=${owningTeamId}, pickData=`, pickData);
-    }
-
     const owningTeam = allTeams.find(t => t.id === owningTeamId);
 
     if (!owningTeam) {
-      console.warn(`[Draft Board] Pick ${pickNumber}: No owning team found - originalTeam=${originalTeam.id}, owningTeamId=${owningTeamId}`);
-      console.warn(`[Draft Board] Available teams:`, allTeams.map(t => t.id).slice(0, 5));
       return;
     }
 

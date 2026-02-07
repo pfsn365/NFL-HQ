@@ -293,7 +293,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 <th
                   key={String(column.key)}
                   scope="col"
-                  className={`p-3 font-medium whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass} ${
+                  className={`p-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass} ${
                     isSortable ? 'cursor-pointer hover:opacity-90 active:opacity-75 transition-opacity' : ''
                   }`}
                   onClick={isSortable ? () => handleSort(String(column.key)) : undefined}

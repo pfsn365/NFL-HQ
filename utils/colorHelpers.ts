@@ -3,6 +3,73 @@
  */
 
 /**
+ * Theme colors - single source of truth for app-wide colors
+ */
+export const theme = {
+  // Primary brand color (NFL blue)
+  primary: '#0050A0',
+  primaryHover: '#003d7a',
+
+  // Status colors
+  success: {
+    bg: 'bg-green-50',
+    text: 'text-green-700',
+    border: 'border-green-200',
+  },
+  error: {
+    bg: 'bg-red-50',
+    text: 'text-red-700',
+    border: 'border-red-200',
+  },
+  warning: {
+    bg: 'bg-yellow-50',
+    text: 'text-yellow-700',
+    border: 'border-yellow-200',
+  },
+  info: {
+    bg: 'bg-blue-50',
+    text: 'text-blue-700',
+    border: 'border-blue-200',
+  },
+} as const;
+
+/**
+ * Standardized UI component classes
+ */
+export const ui = {
+  // Card styles
+  card: 'bg-white rounded-lg shadow-sm border border-gray-200',
+  cardHover: 'bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow',
+
+  // Button styles
+  buttonBase: 'px-4 py-2 min-h-[44px] rounded-lg font-medium transition-colors cursor-pointer',
+  buttonPrimary: 'px-4 py-2 min-h-[44px] rounded-lg font-medium transition-colors cursor-pointer bg-[#0050A0] text-white hover:bg-[#003d7a]',
+  buttonSecondary: 'px-4 py-2 min-h-[44px] rounded-lg font-medium transition-colors cursor-pointer bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300',
+  buttonGhost: 'px-4 py-2 min-h-[44px] rounded-lg font-medium transition-colors cursor-pointer text-gray-700 hover:bg-gray-100',
+
+  // Container padding
+  containerPadding: 'p-4 sm:p-6',
+
+  // Table styles
+  tableHeader: 'text-left font-semibold uppercase tracking-wide text-xs',
+  tableCell: 'p-3 whitespace-nowrap',
+
+  // Form styles
+  input: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0] outline-none transition-colors',
+  select: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0] outline-none transition-colors cursor-pointer',
+
+  // Empty state
+  emptyState: 'text-center py-12 text-gray-500',
+
+  // Error state
+  errorState: 'bg-red-50 border border-red-200 rounded-lg p-4 text-red-700',
+
+  // Loading spinner
+  spinner: 'animate-spin rounded-full h-8 w-8 border-b-2 border-[#0050A0]',
+  spinnerLarge: 'animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0]',
+} as const;
+
+/**
  * Calculate relative luminance of a hex color
  * Based on WCAG 2.1 formula
  */
@@ -46,6 +113,7 @@ export function getContrastTextColor(hexColor: string): string {
 
 /**
  * Get Tailwind color classes for position badge based on position abbreviation
+ * This is the single source of truth for position colors across the app
  */
 export const getPositionColor = (position: string): string => {
   const pos = position.toUpperCase();
@@ -55,31 +123,39 @@ export const getPositionColor = (position: string): string => {
     return 'bg-purple-100 text-purple-700 border-purple-200';
   }
   // Running Backs
-  else if (pos === 'RB' || pos === 'FB') {
+  if (pos === 'RB' || pos === 'FB' || pos === 'HB') {
     return 'bg-green-100 text-green-700 border-green-200';
   }
-  // Wide Receivers / Tight Ends
-  else if (pos === 'WR' || pos === 'TE') {
+  // Wide Receivers
+  if (pos === 'WR') {
     return 'bg-blue-100 text-blue-700 border-blue-200';
   }
+  // Tight Ends
+  if (pos === 'TE') {
+    return 'bg-orange-100 text-orange-700 border-orange-200';
+  }
   // Offensive Line
-  else if (pos === 'OT' || pos === 'OG' || pos === 'C' || pos === 'OL') {
+  if (['OT', 'OG', 'C', 'OL', 'T', 'G', 'OC', 'LT', 'RT', 'LG', 'RG'].includes(pos)) {
     return 'bg-amber-100 text-amber-700 border-amber-200';
   }
   // Defensive Line
-  else if (pos === 'DE' || pos === 'DT' || pos === 'NT' || pos === 'DL') {
+  if (['DE', 'DT', 'NT', 'DL', 'EDGE'].includes(pos)) {
     return 'bg-red-100 text-red-700 border-red-200';
   }
   // Linebackers
-  else if (pos === 'LB' || pos === 'ILB' || pos === 'OLB' || pos === 'MLB') {
-    return 'bg-orange-100 text-orange-700 border-orange-200';
+  if (['LB', 'ILB', 'OLB', 'MLB', 'WILL', 'MIKE', 'SAM'].includes(pos)) {
+    return 'bg-indigo-100 text-indigo-700 border-indigo-200';
   }
-  // Defensive Backs
-  else if (pos === 'CB' || pos === 'S' || pos === 'FS' || pos === 'SS' || pos === 'DB') {
+  // Cornerbacks
+  if (pos === 'CB') {
+    return 'bg-teal-100 text-teal-700 border-teal-200';
+  }
+  // Safeties
+  if (['S', 'FS', 'SS', 'SAF', 'DB'].includes(pos)) {
     return 'bg-cyan-100 text-cyan-700 border-cyan-200';
   }
   // Special Teams
-  else if (pos === 'K' || pos === 'P' || pos === 'LS') {
+  if (['K', 'P', 'LS', 'PR', 'KR'].includes(pos)) {
     return 'bg-pink-100 text-pink-700 border-pink-200';
   }
 

@@ -209,11 +209,7 @@ export async function GET(
 
     const data: SportsKeedaStatsResponse = await response.json();
 
-    // Debug logging
-    console.log(`[Stats API] Team: ${teamSlug}, Has data.data: ${!!data.data}, Has leaders: ${!!data.data?.leaders}, Has team_stats: ${!!data.data?.team_stats}`);
-
     if (!data.data || !data.data.leaders || !Array.isArray(data.data.leaders)) {
-      console.log(`[Stats API] Missing data for ${teamSlug}:`, JSON.stringify(data).slice(0, 500));
       return NextResponse.json(
         { error: 'No stats data found' },
         { status: 404 }

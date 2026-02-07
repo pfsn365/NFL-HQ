@@ -44,7 +44,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
     { title: 'NFL Injury Report', url: '/nfl-hq/injuries', external: false },
     { title: 'NFL Stat Leaders', url: '/nfl-hq/stats', external: false },
-    { title: 'NFL Draft Hub', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', external: true },
+    { title: 'NFL Draft HQ', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', external: true },
     { title: 'NFL Power Rankings Builder', url: '/nfl-hq/power-rankings-builder', external: false },
     { title: 'NFL Player Rankings Builder', url: '/nfl-hq/player-rankings-builder', external: false },
     { title: 'NFL Transactions', url: '/nfl-hq/transactions', external: false },
@@ -58,8 +58,9 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
 
 
   const otherTools = [
-    { title: 'Fantasy Football Hub', url: 'https://www.profootballnetwork.com/fantasy/football/' },
+    { title: 'Fantasy Football HQ', url: 'https://www.profootballnetwork.com/fantasy/football/' },
     { title: 'CFB Transfer Portal Tracker', url: 'https://www.profootballnetwork.com/cfb-hq/transfer-portal-tracker' },
+    { title: 'CFB HQ', url: 'https://www.profootballnetwork.com/cfb-hq' },
     { title: 'CFB Playoff Predictor', url: 'https://www.profootballnetwork.com/cfb/playoff-predictor-cfb-cta/' },
     { title: 'NBA HQ', url: 'https://www.profootballnetwork.com/nba-hq/' },
     { title: 'NBA Mock Draft Simulator', url: 'https://www.profootballnetwork.com/nba-mock-draft-simulator' },
@@ -233,7 +234,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                 tabIndex={0}
                 aria-expanded={isNFLToolsExpanded}
                 aria-controls="nfl-tools-menu"
-                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0050A0] rounded"
                 onClick={() => setIsNFLToolsExpanded(!isNFLToolsExpanded)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsNFLToolsExpanded(!isNFLToolsExpanded); } }}
               >
@@ -322,7 +323,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                 tabIndex={0}
                 aria-expanded={isOtherToolsExpanded}
                 aria-controls="other-tools-menu"
-                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0050A0] rounded"
                 onClick={() => setIsOtherToolsExpanded(!isOtherToolsExpanded)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOtherToolsExpanded(!isOtherToolsExpanded); } }}
               >

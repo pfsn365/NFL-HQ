@@ -196,7 +196,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading draft picks...</p>
         </div>
       </LayoutStabilizer>
@@ -243,7 +243,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-[#0050A0] focus:border-transparent cursor-pointer"
           >
             <option value="All">Year: All</option>
             {years.map(year => (
@@ -256,7 +256,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
           <select
             value={selectedRound}
             onChange={(e) => setSelectedRound(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-[#0050A0] focus:border-transparent cursor-pointer"
           >
             <option value="All">Round: All</option>
             {rounds.map(round => (
@@ -269,7 +269,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
           <select
             value={selectedPosition}
             onChange={(e) => setSelectedPosition(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-[#0050A0] focus:border-transparent cursor-pointer"
           >
             <option value="All">Position: All</option>
             {positions.map(position => (
@@ -286,7 +286,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
             placeholder="Search Player..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0050A0] focus:border-transparent"
           />
         </div>
       </div>
@@ -312,12 +312,12 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
                     </tr>
                     {/* Column Headers Row */}
                     <tr className="bg-gray-100 border-b border-gray-200">
-                      <th scope="col" className="text-left p-3 font-medium text-gray-700">Name</th>
-                      <th scope="col" className="text-left p-3 font-medium text-gray-700">POS</th>
-                      <th scope="col" className="text-left p-3 font-medium text-gray-700">Round</th>
-                      <th scope="col" className="text-left p-3 font-medium text-gray-700">Rnd. Pick</th>
-                      <th scope="col" className="text-left p-3 font-medium text-gray-700">OVR. Pick</th>
-                      <th scope="col" className="text-left p-3 font-medium text-gray-700 hidden sm:table-cell">College</th>
+                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">NAME</th>
+                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">POS</th>
+                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">ROUND</th>
+                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">RND PICK</th>
+                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">OVR PICK</th>
+                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700 hidden sm:table-cell">COLLEGE</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -271,7 +271,7 @@ function TeamRow({ team, compact = false, isWinner = false, isPicked = false, ca
       className={`flex items-center justify-between ${compact ? 'py-1.5' : 'py-2'}
         ${isWinner ? 'font-semibold' : ''}
         ${isPicked ? 'bg-green-50 -mx-1.5 px-1.5 rounded' : ''}
-        ${isInteractive ? 'cursor-pointer hover:bg-gray-50 active:bg-gray-100 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 -mx-1.5 px-1.5 rounded transition-colors' : ''}`}
+        ${isInteractive ? 'cursor-pointer hover:bg-gray-50 active:bg-gray-100 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0050A0] -mx-1.5 px-1.5 rounded transition-colors' : ''}`}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {team.seed > 0 && (

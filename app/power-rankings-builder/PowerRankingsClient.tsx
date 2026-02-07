@@ -167,6 +167,7 @@ export default function PowerRankingsClient() {
   const [logoDataUrls, setLogoDataUrls] = useState<Record<string, string>>({});
   const [logoImages, setLogoImages] = useState<Record<string, HTMLImageElement>>({});
   const [logosLoaded, setLogosLoaded] = useState(false);
+  const [logosLoadingStarted, setLogosLoadingStarted] = useState(false);
   const [pfsnLogoImage, setPfsnLogoImage] = useState<HTMLImageElement | null>(null);
   const actionsMenuRef = useRef<HTMLDivElement>(null);
 
@@ -330,8 +331,11 @@ export default function PowerRankingsClient() {
     }
   }, []);
 
-  // Pre-load all team logos as data URLs and Image objects on mount
+  // Pre-load all team logos as data URLs and Image objects (only when user wants to export)
   useEffect(() => {
+    // Only start loading when explicitly triggered (deferred to avoid initial page load overhead)
+    if (!logosLoadingStarted) return;
+
     const preloadLogos = async () => {
       const urls: Record<string, string> = {};
       const images: Record<string, HTMLImageElement> = {};
@@ -378,12 +382,11 @@ export default function PowerRankingsClient() {
       setLogoDataUrls(urls);
       setLogoImages(images);
       setLogosLoaded(true);
-      console.log('All logos preloaded:', Object.keys(urls).length);
     };
 
     preloadLogos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, [logosLoadingStarted]); // Only run when loading is triggered
 
   // Load rankings from URL on mount (only runs once)
   useEffect(() => {
@@ -703,6 +706,13 @@ export default function PowerRankingsClient() {
   };
 
   const handleDownload = async (count: 5 | 10 | 32) => {
+    // Trigger logo loading if not already started
+    if (!logosLoadingStarted) {
+      setLogosLoadingStarted(true);
+      showToast('Loading team logos for image export. Please wait...', 'info');
+      return;
+    }
+
     if (!logosLoaded) {
       showToast('Logos are still loading. Please wait a moment and try again.', 'info');
       return;

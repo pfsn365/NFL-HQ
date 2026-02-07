@@ -194,7 +194,6 @@ export async function GET(
     // Try to return cached data if available
     const cachedData = statsCache.get(teamId);
     if (cachedData) {
-      console.log(`Returning cached stats for ${teamId} from ${cachedData.lastUpdated}`);
       return NextResponse.json({
         ...cachedData,
         fromCache: true,

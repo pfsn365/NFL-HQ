@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
+import { getPositionColor, getStatusColor } from '@/utils/colorHelpers';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface InjuryData {
@@ -24,19 +25,19 @@ export default function InjuriesClient() {
   const [selectedPosition, setSelectedPosition] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [lastUpdated, setLastUpdated] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Function to normalize name for matching
-  function normalizePlayerName(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/\s+(jr|sr|ii|iii|iv|v)\.?$/i, '')
-      .replace(/[.\-']/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
+  // Debounce search query (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Generate player slug for linking to player pages
   function generatePlayerSlug(name: string): string {
@@ -49,11 +50,20 @@ export default function InjuriesClient() {
   }
 
   useEffect(() => {
-    async function fetchInjuriesAndRosters() {
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    async function fetchInjuries() {
       setLoading(true);
       try {
-        // Fetch injuries
-        const injuryResponse = await fetch(getApiPath('nfl/teams/api/injuries'));
+        // Single API call - injuries endpoint already includes team info
+        const injuryResponse = await fetch(
+          getApiPath('nfl/teams/api/injuries'),
+          { signal: abortControllerRef.current?.signal }
+        );
         if (!injuryResponse.ok) throw new Error('Failed to fetch injuries');
 
         const injuryData = await injuryResponse.json();
@@ -62,54 +72,9 @@ export default function InjuriesClient() {
           throw new Error('Invalid injury data format');
         }
 
+        // Use injury data directly - team info is already included
         const rawInjuries = injuryData.injuries.ALL;
-
-        // Fetch all team rosters in parallel (using client-side getApiPath which works)
-        const rosterPromises = allTeams.map(team =>
-          fetch(getApiPath(`nfl/teams/api/roster/${team.id}`))
-            .then(res => res.ok ? res.json() : null)
-            .catch(() => null)
-        );
-
-        const rosterResponses = await Promise.all(rosterPromises);
-
-        // Build player-to-team map from rosters
-        const playerToTeamMap = new Map<string, string>();
-
-        rosterResponses.forEach((rosterData, index) => {
-          if (rosterData && rosterData.roster) {
-            const team = allTeams[index];
-            const allPlayers = [
-              ...(rosterData.roster.activeRoster || []),
-              ...(rosterData.roster.practiceSquad || []),
-              ...(rosterData.roster.injuredReserve || []),
-              ...(rosterData.roster.physicallyUnableToPerform || []),
-              ...(rosterData.roster.nonFootballInjuryReserve || []),
-              ...(rosterData.roster.suspended || []),
-              ...(rosterData.roster.exempt || []),
-            ];
-
-            allPlayers.forEach((player: any) => {
-              const normalizedName = normalizePlayerName(player.name);
-              playerToTeamMap.set(normalizedName, team.abbreviation);
-            });
-          }
-        });
-
-        console.log(`[INJURIES CLIENT] Built player-to-team map with ${playerToTeamMap.size} players`);
-
-        // Match injuries to teams
-        const injuriesWithTeams = rawInjuries.map((injury: any) => {
-          const normalizedName = normalizePlayerName(injury.player);
-          const teamAbbr = playerToTeamMap.get(normalizedName) || injury.team || 'N/A';
-
-          return {
-            ...injury,
-            team: teamAbbr
-          };
-        });
-
-        setInjuries(injuriesWithTeams);
+        setInjuries(rawInjuries);
         setLastUpdated(
           injuryData.lastUpdated
             ? new Date(injuryData.lastUpdated).toLocaleDateString('en-US', {
@@ -120,13 +85,22 @@ export default function InjuriesClient() {
             : new Date().toLocaleDateString()
         );
       } catch (error) {
+        // Ignore abort errors
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error('Error fetching injuries:', error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchInjuriesAndRosters();
+    fetchInjuries();
+
+    // Cleanup on unmount
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   // Get unique positions for filter in specified order
@@ -152,11 +126,11 @@ export default function InjuriesClient() {
       const matchesPosition = selectedPosition === 'all' || injury.position === selectedPosition;
       const matchesStatus = selectedStatus === 'all' || injury.status.toLowerCase().includes(selectedStatus.toLowerCase());
       const matchesSearch =
-        searchQuery === '' ||
-        injury.player.toLowerCase().includes(searchQuery.toLowerCase());
+        debouncedSearch === '' ||
+        injury.player.toLowerCase().includes(debouncedSearch.toLowerCase());
       return matchesTeam && matchesPosition && matchesStatus && matchesSearch;
     });
-  }, [injuries, selectedTeam, selectedPosition, selectedStatus, searchQuery]);
+  }, [injuries, selectedTeam, selectedPosition, selectedStatus, debouncedSearch]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredInjuries.length / itemsPerPage);
@@ -167,7 +141,7 @@ export default function InjuriesClient() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTeam, selectedPosition, selectedStatus, searchQuery]);
+  }, [selectedTeam, selectedPosition, selectedStatus, debouncedSearch]);
 
   // Group injuries by team
   const injuriesByTeam = useMemo(() => {
@@ -182,22 +156,6 @@ export default function InjuriesClient() {
   }, [filteredInjuries]);
 
   const teamNames = Object.keys(injuriesByTeam).sort();
-
-  // Get status badge color (matching team page injury report colors)
-  const getStatusColor = (status: string) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower.includes('ir') || statusLower.includes('injured reserve'))
-      return 'bg-red-100 text-red-800 border-red-600';
-    if (statusLower.includes('pup') || statusLower.includes('physically unable'))
-      return 'bg-purple-50 text-purple-700 border-purple-400';
-    if (statusLower.includes('nfi') || statusLower.includes('non-football'))
-      return 'bg-indigo-50 text-indigo-700 border-indigo-400';
-    if (statusLower.includes('out')) return 'bg-red-50 text-red-700 border-red-400';
-    if (statusLower.includes('doubtful')) return 'bg-orange-50 text-orange-700 border-orange-400';
-    if (statusLower.includes('questionable')) return 'bg-yellow-50 text-yellow-700 border-yellow-400';
-    if (statusLower.includes('probable')) return 'bg-green-50 text-green-700 border-green-400';
-    return 'bg-gray-100 text-gray-700 border-gray-200';
-  };
 
   const getTeamInfo = (teamAbbr: string) => {
     return allTeams.find(t => t.abbreviation === teamAbbr);
@@ -214,29 +172,6 @@ export default function InjuriesClient() {
       .trim();
 
     return simplified;
-  };
-
-  // Get position badge color
-  const getPositionColor = (position: string) => {
-    const pos = position.toUpperCase();
-    // Quarterbacks
-    if (pos === 'QB') return 'bg-purple-100 text-purple-700 border-purple-200';
-    // Running Backs
-    if (pos === 'RB' || pos === 'FB') return 'bg-green-100 text-green-700 border-green-200';
-    // Wide Receivers / Tight Ends
-    if (pos === 'WR' || pos === 'TE') return 'bg-blue-100 text-blue-700 border-blue-200';
-    // Offensive Line
-    if (pos === 'OT' || pos === 'OG' || pos === 'C' || pos === 'OL') return 'bg-amber-100 text-amber-700 border-amber-200';
-    // Defensive Line
-    if (pos === 'DE' || pos === 'DT' || pos === 'NT' || pos === 'DL' || pos === 'EDGE') return 'bg-red-100 text-red-700 border-red-200';
-    // Linebackers
-    if (pos === 'LB' || pos === 'ILB' || pos === 'OLB' || pos === 'MLB') return 'bg-orange-100 text-orange-700 border-orange-200';
-    // Defensive Backs
-    if (pos === 'CB' || pos === 'S' || pos === 'FS' || pos === 'SS' || pos === 'DB') return 'bg-cyan-100 text-cyan-700 border-cyan-200';
-    // Special Teams
-    if (pos === 'K' || pos === 'P' || pos === 'LS') return 'bg-pink-100 text-pink-700 border-pink-200';
-    // Default
-    return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   return (

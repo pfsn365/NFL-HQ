@@ -709,7 +709,7 @@ function SchedulePageInner() {
                       aria-label={hasDetails ? `${awayTeam?.name || game.away_team.abbr} at ${homeTeam?.name || game.home_team.abbr} - ${isFinal ? 'Final' : game.status}. Click for details` : undefined}
                       onClick={() => hasDetails && toggleGameExpand(game.event_id)}
                       onKeyDown={(e) => { if (hasDetails && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleGameExpand(game.event_id); } }}
-                      className={`p-5 ${hasDetails ? 'cursor-pointer hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500' : ''}`}
+                      className={`p-5 ${hasDetails ? 'cursor-pointer hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#0050A0]' : ''}`}
                     >
                       <div className="flex items-center gap-6">
                         {/* Both Teams - Left Side */}
@@ -1296,7 +1296,7 @@ export default function SchedulePageContent() {
       <div className="flex h-screen bg-gray-50">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading schedule...</p>
           </div>
         </div>

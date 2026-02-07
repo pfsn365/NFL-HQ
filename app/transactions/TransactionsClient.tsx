@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
+import { getPositionColor } from '@/utils/colorHelpers';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface Transaction {
@@ -37,13 +38,19 @@ export default function TransactionsClient() {
   const [selectedPosition, setSelectedPosition] = useState('all');
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
   const [lastUpdated, setLastUpdated] = useState('');
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Fetch all transactions once
   useEffect(() => {
+    abortControllerRef.current = new AbortController();
+
     async function fetchTransactions() {
       setLoading(true);
       try {
-        const response = await fetch(getApiPath('api/nfl/transactions?limit=500'));
+        const response = await fetch(
+          getApiPath('api/nfl/transactions?limit=500'),
+          { signal: abortControllerRef.current?.signal }
+        );
         if (!response.ok) throw new Error('Failed to fetch transactions');
 
         const data = await response.json();
@@ -55,6 +62,8 @@ export default function TransactionsClient() {
           year: 'numeric'
         }));
       } catch (error) {
+        // Ignore abort errors
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error('Error fetching transactions:', error);
       } finally {
         setLoading(false);
@@ -62,6 +71,13 @@ export default function TransactionsClient() {
     }
 
     fetchTransactions();
+
+    // Cleanup on unmount
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   // Get unique positions from all transactions
@@ -130,29 +146,6 @@ export default function TransactionsClient() {
 
   const getTeamInfo = (teamId: string) => {
     return allTeams.find(t => t.id === teamId);
-  };
-
-  // Get position badge color
-  const getPositionColor = (position: string) => {
-    const pos = position.toUpperCase();
-    // Quarterbacks
-    if (pos === 'QB') return 'bg-purple-100 text-purple-700 border-purple-200';
-    // Running Backs
-    if (pos === 'RB' || pos === 'FB') return 'bg-green-100 text-green-700 border-green-200';
-    // Wide Receivers / Tight Ends
-    if (pos === 'WR' || pos === 'TE') return 'bg-blue-100 text-blue-700 border-blue-200';
-    // Offensive Line
-    if (pos === 'OT' || pos === 'OG' || pos === 'C' || pos === 'OL' || pos === 'G' || pos === 'T') return 'bg-amber-100 text-amber-700 border-amber-200';
-    // Defensive Line
-    if (pos === 'DE' || pos === 'DT' || pos === 'NT' || pos === 'DL' || pos === 'EDGE') return 'bg-red-100 text-red-700 border-red-200';
-    // Linebackers
-    if (pos === 'LB' || pos === 'ILB' || pos === 'OLB' || pos === 'MLB') return 'bg-orange-100 text-orange-700 border-orange-200';
-    // Defensive Backs
-    if (pos === 'CB' || pos === 'S' || pos === 'FS' || pos === 'SS' || pos === 'DB') return 'bg-cyan-100 text-cyan-700 border-cyan-200';
-    // Special Teams
-    if (pos === 'K' || pos === 'P' || pos === 'LS') return 'bg-pink-100 text-pink-700 border-pink-200';
-    // Default
-    return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   return (

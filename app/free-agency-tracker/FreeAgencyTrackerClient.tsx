@@ -5,6 +5,7 @@ import Link from 'next/link';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
+import { getPositionColor } from '@/utils/colorHelpers';
 
 // TypeScript Interfaces
 interface FreeAgent {
@@ -56,41 +57,6 @@ function mapTeamNameToId(teamName: string): string | undefined {
     t.fullName.toLowerCase() === normalized ||
     t.abbreviation.toLowerCase() === normalized
   )?.id;
-}
-
-function getPositionColor(position: string): string {
-  const pos = position.toUpperCase();
-
-  // Quarterback
-  if (pos === 'QB') return 'bg-purple-100 text-purple-700 border-purple-200';
-
-  // Running Backs
-  if (pos === 'RB' || pos === 'FB') return 'bg-green-100 text-green-700 border-green-200';
-
-  // Receivers
-  if (pos === 'WR' || pos === 'TE') return 'bg-blue-100 text-blue-700 border-blue-200';
-
-  // Offensive Line
-  if (pos === 'OT' || pos === 'OG' || pos === 'OC' || pos === 'C' || pos === 'OL' || pos === 'G' || pos === 'T')
-    return 'bg-amber-100 text-amber-700 border-amber-200';
-
-  // Defensive Line
-  if (pos === 'DE' || pos === 'DT' || pos === 'NT' || pos === 'EDGE' || pos === 'DL')
-    return 'bg-red-100 text-red-700 border-red-200';
-
-  // Linebackers
-  if (pos === 'LB' || pos === 'ILB' || pos === 'OLB' || pos === 'MLB')
-    return 'bg-orange-100 text-orange-700 border-orange-200';
-
-  // Defensive Backs
-  if (pos === 'CB' || pos === 'S' || pos === 'FS' || pos === 'SS' || pos === 'DB')
-    return 'bg-cyan-100 text-cyan-700 border-cyan-200';
-
-  // Special Teams
-  if (pos === 'K' || pos === 'P' || pos === 'LS')
-    return 'bg-pink-100 text-pink-700 border-pink-200';
-
-  return 'bg-gray-100 text-gray-700 border-gray-200';
 }
 
 function getPositionImpactUrl(position: string): string {
@@ -175,6 +141,15 @@ export default function FreeAgencyTrackerClient() {
   const [selectedFaType, setSelectedFaType] = useState('all');
   const [selectedSignedStatus, setSelectedSignedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search query (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Sorting States
   const [sortKey, setSortKey] = useState<SortKey>('rank');
@@ -251,7 +226,7 @@ export default function FreeAgencyTrackerClient() {
       const matchesTeam = selectedTeam === 'all' || agent.teamId === selectedTeam;
       const matchesPosition = selectedPosition === 'all' || agent.position === selectedPosition;
       const matchesFaType = selectedFaType === 'all' || agent.faType === selectedFaType;
-      const matchesSearch = searchQuery.trim() === '' || agent.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = debouncedSearch.trim() === '' || agent.name.toLowerCase().includes(debouncedSearch.toLowerCase());
 
       let matchesSignedStatus = true;
       if (selectedSignedStatus === 'unsigned') {
@@ -262,7 +237,7 @@ export default function FreeAgencyTrackerClient() {
 
       return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus && matchesSearch;
     });
-  }, [allFreeAgents, selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
+  }, [allFreeAgents, selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, debouncedSearch]);
 
   // Sorting Logic
   const sortedFreeAgents = useMemo(() => {

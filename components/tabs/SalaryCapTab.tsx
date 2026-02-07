@@ -130,7 +130,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <TabHeader />
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading salary cap data...</p>
         </div>
       </LayoutStabilizer>

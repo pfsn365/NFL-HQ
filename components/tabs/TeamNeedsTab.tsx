@@ -208,7 +208,7 @@ export default function TeamNeedsTab({ team }: TeamNeedsTabProps) {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'position' | 'need')}
-            className="text-base sm:text-sm border border-gray-300 rounded-lg px-3 py-2 sm:py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+            className="text-base sm:text-sm border border-gray-300 rounded-lg px-3 py-2 sm:py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#0050A0] touch-manipulation"
           >
             <option value="need">Need Level (Highest First)</option>
             <option value="position">Position Order</option>

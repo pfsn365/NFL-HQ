@@ -72,17 +72,8 @@ export async function GET(
 
     const data = await response.json();
 
-    // Log the raw response for debugging
-    console.log(`PFSN API Response for ${pfsnTeamAbbr}:`, {
-      status: data.status,
-      feedsLength: data.feeds?.length || 0,
-      sampleFeed: data.feeds?.[0]
-    });
-
     // Extract articles from the feeds array
     const articles = data.feeds || [];
-
-    console.log(`Found ${articles.length} ${pfsnTeamAbbr} articles from PFSN API`);
 
     // Map the PFSN API structure to our expected format
     const mappedNews = articles.slice(0, 12).map((article: any) => ({

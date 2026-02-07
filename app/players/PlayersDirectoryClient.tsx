@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
+import { getPositionColor } from '@/utils/colorHelpers';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface PlayerWithTeam {
@@ -47,20 +48,6 @@ const POSITIONS = [
   { value: 'S', label: 'Safety' },
 ];
 
-function getPositionColor(position: string): string {
-  const pos = position.toUpperCase();
-  if (pos === 'QB') return 'bg-purple-100 text-purple-700';
-  if (pos === 'RB' || pos === 'FB') return 'bg-green-100 text-green-700';
-  if (pos === 'WR') return 'bg-blue-100 text-blue-700';
-  if (pos === 'TE') return 'bg-orange-100 text-orange-700';
-  if (['OT', 'OG', 'C', 'T', 'G', 'OL', 'OC'].includes(pos)) return 'bg-yellow-100 text-yellow-700';
-  if (['DE', 'DT', 'NT', 'EDGE', 'DL'].includes(pos)) return 'bg-red-100 text-red-700';
-  if (pos === 'LB' || pos === 'ILB' || pos === 'MLB' || pos === 'OLB') return 'bg-indigo-100 text-indigo-700';
-  if (pos === 'CB') return 'bg-teal-100 text-teal-700';
-  if (['S', 'FS', 'SS', 'SAF'].includes(pos)) return 'bg-cyan-100 text-cyan-700';
-  return 'bg-gray-100 text-gray-700';
-}
-
 export default function PlayersDirectoryClient() {
   const allTeams = getAllTeams();
   const [players, setPlayers] = useState<PlayerWithTeam[]>([]);
@@ -76,6 +63,7 @@ export default function PlayersDirectoryClient() {
 
   // Debounced search value
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -92,40 +80,58 @@ export default function PlayersDirectoryClient() {
   }, [selectedTeam, selectedPosition, itemsPerPage]);
 
   // Fetch players from API
-  const fetchPlayers = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: itemsPerPage.toString(),
-      });
-
-      if (debouncedSearch) params.set('search', debouncedSearch);
-      if (selectedTeam !== 'all') params.set('team', selectedTeam);
-      if (selectedPosition !== 'all') params.set('position', selectedPosition);
-
-      const response = await fetch(getApiPath(`api/nfl/players?${params.toString()}`));
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch players');
-      }
-
-      const data = await response.json();
-      setPlayers(data.players);
-      setPagination(data.pagination);
-    } catch (err) {
-      console.error('Error fetching players:', err);
-      setError('Failed to load player data. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, itemsPerPage, debouncedSearch, selectedTeam, selectedPosition]);
-
   useEffect(() => {
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    async function fetchPlayers() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+        });
+
+        if (debouncedSearch) params.set('search', debouncedSearch);
+        if (selectedTeam !== 'all') params.set('team', selectedTeam);
+        if (selectedPosition !== 'all') params.set('position', selectedPosition);
+
+        const response = await fetch(
+          getApiPath(`api/nfl/players?${params.toString()}`),
+          { signal: abortControllerRef.current?.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch players');
+        }
+
+        const data = await response.json();
+        setPlayers(data.players);
+        setPagination(data.pagination);
+      } catch (err) {
+        // Ignore abort errors
+        if (err instanceof Error && err.name === 'AbortError') return;
+        console.error('Error fetching players:', err);
+        setError('Failed to load player data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchPlayers();
-  }, [fetchPlayers]);
+
+    // Cleanup on unmount
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [currentPage, itemsPerPage, debouncedSearch, selectedTeam, selectedPosition]);
 
   const handleImageError = (slug: string) => {
     setImageErrors(prev => new Set(prev).add(slug));
@@ -186,7 +192,7 @@ export default function PlayersDirectoryClient() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name, team, or position..."
-                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0]"
                 />
               </div>
 
@@ -199,7 +205,7 @@ export default function PlayersDirectoryClient() {
                   id="team"
                   value={selectedTeam}
                   onChange={(e) => setSelectedTeam(e.target.value)}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0] cursor-pointer"
                 >
                   <option value="all">All Teams</option>
                   {allTeams.map((team) => (
@@ -217,7 +223,7 @@ export default function PlayersDirectoryClient() {
                   id="position"
                   value={selectedPosition}
                   onChange={(e) => setSelectedPosition(e.target.value)}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0] cursor-pointer"
                 >
                   {POSITIONS.map((pos) => (
                     <option key={pos.value} value={pos.value}>{pos.label}</option>

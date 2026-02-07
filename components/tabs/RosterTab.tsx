@@ -143,7 +143,7 @@ export default function RosterTab({ team }: RosterTabProps) {
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={800}>
         <TabHeader />
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading roster...</p>
         </div>
       </LayoutStabilizer>
@@ -258,14 +258,14 @@ export default function RosterTab({ team }: RosterTabProps) {
                     <table className="min-w-full text-sm">
                       <thead>
                         <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                          <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-12">#</th>
-                          <th scope="col" className="text-left px-3 py-3 font-medium whitespace-nowrap min-w-[200px]">Name</th>
-                          <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-24">Impact Grade</th>
-                          <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-24">Experience</th>
-                          <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-16">Age</th>
-                          <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-16">Height</th>
-                          <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-16">Weight</th>
-                          <th scope="col" className="text-left px-3 py-3 font-medium whitespace-nowrap min-w-[120px]">College</th>
+                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-12">#</th>
+                          <th scope="col" className="text-left px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap min-w-[200px]">NAME</th>
+                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-24">IMPACT</th>
+                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-24">EXP</th>
+                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">AGE</th>
+                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">HT</th>
+                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">WT</th>
+                          <th scope="col" className="text-left px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap min-w-[120px]">COLLEGE</th>
                         </tr>
                       </thead>
                       <tbody>

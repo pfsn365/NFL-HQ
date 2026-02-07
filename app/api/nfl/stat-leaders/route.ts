@@ -127,8 +127,6 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100');
     const includeAllStats = searchParams.get('includeAllStats') === 'true';
 
-    console.log('Fetching stat leaders for season:', season);
-
     // Fetch stats and rosters from all 32 teams in parallel
     const allTeamSlugs = Object.values(teamIdMap);
 
@@ -295,11 +293,6 @@ export async function GET(request: NextRequest) {
     // Convert Map back to array for further processing
     const allPlayers = Array.from(playersBySlug.values());
 
-    console.log(`Collected stats for ${allPlayers.length} players`);
-
-    if (allPlayers.length === 0) {
-      console.warn('No players found in API responses');
-    }
 
     // Determine positions from stat-based inference
     // This is sufficient for stat leaders display (QB, RB, WR, DEF)

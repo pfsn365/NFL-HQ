@@ -8,7 +8,7 @@ export const pageview = (url) => {
   }
 }
 
-export const event = ({ action, category, label, value }) => {
+const event = ({ action, category, label, value }) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', action, {
       event_category: category,
@@ -18,23 +18,7 @@ export const event = ({ action, category, label, value }) => {
   }
 }
 
-export const trackClick = (elementName, elementCategory) => {
-  event({
-    action: 'click',
-    category: elementCategory || 'engagement',
-    label: elementName,
-  })
-}
-
-export const trackSearch = (searchTerm) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'search', {
-      search_term: searchTerm,
-    })
-  }
-}
-
-export const trackViewItem = (itemId, itemName, itemCategory) => {
+const trackViewItem = (itemId, itemName, itemCategory) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'view_item', {
       currency: 'USD',
@@ -51,7 +35,7 @@ export const trackViewItem = (itemId, itemName, itemCategory) => {
   }
 }
 
-export const trackSelectContent = (contentType, itemId) => {
+const trackSelectContent = (contentType, itemId) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'select_content', {
       content_type: contentType,
@@ -60,39 +44,10 @@ export const trackSelectContent = (contentType, itemId) => {
   }
 }
 
-export const trackShare = (method, contentType, itemId) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'share', {
-      method: method,
-      content_type: contentType,
-      item_id: itemId,
-    })
-  }
-}
-
-export const trackFormSubmit = (formName) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'generate_lead', {
-      value: 0,
-      currency: 'USD',
-      form_name: formName,
-    })
-  }
-}
-
 export const trackPageEngagement = (engagementTime) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'page_view', {
       engagement_time_msec: engagementTime,
-    })
-  }
-}
-
-export const trackException = (description, fatal = false) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'exception', {
-      description: description,
-      fatal: fatal,
     })
   }
 }
@@ -114,23 +69,6 @@ export const trackScheduleView = (teamId, season) => {
   })
 }
 
-export const trackRosterView = (teamId) => {
-  event({
-    action: 'view_roster',
-    category: 'team_content',
-    label: teamId,
-  })
-}
-
-export const trackPlayerView = (playerId, playerName, teamId) => {
-  trackViewItem(playerId, playerName, 'NFL Player')
-  event({
-    action: 'view_player',
-    category: 'team_content',
-    label: `${teamId}_${playerId}`,
-  })
-}
-
 export const trackNewsClick = (articleTitle, teamId) => {
   event({
     action: 'click_news_article',
@@ -144,13 +82,5 @@ export const trackStandingsView = (division) => {
     action: 'view_standings',
     category: 'team_content',
     label: division,
-  })
-}
-
-export const trackStatsView = (teamId, statCategory) => {
-  event({
-    action: 'view_stats',
-    category: 'team_content',
-    label: `${teamId}_${statCategory}`,
   })
 }

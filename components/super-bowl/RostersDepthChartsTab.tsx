@@ -240,14 +240,14 @@ export default function RostersDepthChartsTab() {
                 <table className="min-w-full text-sm">
                   <thead>
                     <tr style={{ backgroundColor: team.primaryColor }} className="text-white">
-                      <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-12">#</th>
-                      <th scope="col" className="text-left px-3 py-3 font-medium whitespace-nowrap min-w-[200px]">Name</th>
-                      <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-24">Impact Grade</th>
-                      <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-24">Experience</th>
-                      <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-16">Age</th>
-                      <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-16 hidden sm:table-cell">Height</th>
-                      <th scope="col" className="text-center px-3 py-3 font-medium whitespace-nowrap w-16 hidden sm:table-cell">Weight</th>
-                      <th scope="col" className="text-left px-3 py-3 font-medium whitespace-nowrap min-w-[120px] hidden md:table-cell">College</th>
+                      <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-12">#</th>
+                      <th scope="col" className="text-left px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap min-w-[200px]">NAME</th>
+                      <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-24">IMPACT</th>
+                      <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-24">EXP</th>
+                      <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">AGE</th>
+                      <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16 hidden sm:table-cell">HT</th>
+                      <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16 hidden sm:table-cell">WT</th>
+                      <th scope="col" className="text-left px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap min-w-[120px] hidden md:table-cell">COLLEGE</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -336,7 +336,7 @@ export default function RostersDepthChartsTab() {
     if (!depthChartData) {
       return (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading depth chart...</p>
         </div>
       );
@@ -379,10 +379,10 @@ export default function RostersDepthChartsTab() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: team.primaryColor }} className="text-white">
-                <th scope="col" className="text-left p-3 font-medium w-16">POS</th>
-                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">STARTER</th>
-                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">2ND</th>
-                <th scope="col" className="text-left p-3 font-medium min-w-[220px]">3RD</th>
+                <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide w-16">POS</th>
+                <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">STARTER</th>
+                <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">2ND</th>
+                <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">3RD</th>
               </tr>
             </thead>
             <tbody>

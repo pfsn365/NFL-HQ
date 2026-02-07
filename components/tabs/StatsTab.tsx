@@ -595,7 +595,7 @@ export default function StatsTab({ team }: StatsTabProps) {
       {/* Loading and Error States for Live Stats */}
       {loading && (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading live {viewType === 'team' ? 'team' : 'player'} stats...</p>
         </div>
       )}
@@ -671,7 +671,7 @@ export default function StatsTab({ team }: StatsTabProps) {
           <thead>
             <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
               {Object.entries(currentHeaders).map(([key, header]) => (
-                <th key={key} className="text-left p-2 sm:p-3 font-medium whitespace-nowrap">
+                <th key={key} className="text-left p-2 sm:p-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">
                   {viewType === 'players' && key !== 'player' ? (
                     <button
                       onClick={() => handleSort(key)}

@@ -96,8 +96,6 @@ async function fetchRotoballerInjuries(): Promise<Record<string, InjuryData[]>> 
       injuries['ALL'].push(injury)
     })
 
-    console.log(`[INJURY API] Processed ${Object.keys(injuryData).length} injuries from Rotoballer`);
-
     return injuries
 
   } catch (error) {

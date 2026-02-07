@@ -216,7 +216,6 @@ export async function GET(
 
     // If Sportskeeda fails, try PFSN scraper for specific teams
     if (useFallback && teamIdToPFSNName[teamId]) {
-      console.log(`Using PFSN fallback for ${teamId}`);
       const pfsnData = await scrapePFSNSalaryCapData(teamId);
 
       if (pfsnData) {

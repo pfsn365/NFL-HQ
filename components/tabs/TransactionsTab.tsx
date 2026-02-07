@@ -205,7 +205,7 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <TabHeader />
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading transactions...</p>
         </div>
       </LayoutStabilizer>
@@ -241,10 +241,10 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                    <th scope="col" className="text-left p-3 font-medium w-24">DATE</th>
-                    <th scope="col" className="text-left p-3 font-medium">PLAYER</th>
-                    <th scope="col" className="p-3 font-medium w-20 text-center">POS</th>
-                    <th scope="col" className="text-left p-3 font-medium">TRANSACTION</th>
+                    <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide w-24">DATE</th>
+                    <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide">PLAYER</th>
+                    <th scope="col" className="p-3 font-semibold text-xs uppercase tracking-wide w-20 text-center">POS</th>
+                    <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide">TRANSACTION</th>
                   </tr>
                 </thead>
                 <tbody>

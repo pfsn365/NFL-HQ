@@ -678,7 +678,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               <select
                 value={selectedGameLogSeason || ''}
                 onChange={(e) => setSelectedGameLogSeason(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white cursor-pointer"
               >
                 {player.gameLog.availableSeasons.map((year) => (
                   <option key={year} value={year}>{year}-{String(year + 1).slice(-2)}</option>
@@ -687,7 +687,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
             </div>
             {gameLogLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0050A0]"></div>
               </div>
             ) : gameLogData && gameLogData.games.length > 0 ? (
               <div className="overflow-x-auto">
@@ -783,7 +783,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               <select
                 value={selectedSeason}
                 onChange={(e) => setSelectedSeason(e.target.value === 'career' ? 'career' : parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white cursor-pointer"
               >
                 <option value="career">Career Totals</option>
                 {player.careerStats.availableSeasons.map((year) => (

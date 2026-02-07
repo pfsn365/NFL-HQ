@@ -138,9 +138,6 @@ export async function GET(
       const tagXmlData = await tagResponse.text();
       const tagArticles = parseRssFeed(tagXmlData, 'tag-feed');
       allArticles = allArticles.concat(tagArticles);
-      console.log(`Found ${tagArticles.length} articles from tag feed for ${teamId}`);
-    } else {
-      console.warn(`Tag feed error for ${teamId}: ${tagResponse.status} ${tagResponse.statusText}`);
     }
 
     // Parse team HQ feed if successful
@@ -148,9 +145,6 @@ export async function GET(
       const teamHqXmlData = await teamHqResponse.text();
       const teamHqArticles = parseRssFeed(teamHqXmlData, 'team-hq-feed');
       allArticles = allArticles.concat(teamHqArticles);
-      console.log(`Found ${teamHqArticles.length} articles from team HQ feed for ${teamId}`);
-    } else {
-      console.warn(`Team HQ feed error for ${teamId}: ${teamHqResponse.status} ${teamHqResponse.statusText}`);
     }
 
     // If both feeds failed, throw an error
@@ -169,8 +163,6 @@ export async function GET(
       const dateB = new Date(b.pubDate).getTime();
       return dateB - dateA; // Descending order (newest first)
     });
-
-    console.log(`Total unique articles after combining feeds for ${teamId}: ${articles.length}`);
 
     return NextResponse.json({
       success: true,

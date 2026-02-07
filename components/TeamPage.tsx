@@ -369,11 +369,8 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
 
         // Fetch fresh stats
         const response = await fetch(getApiPath(`nfl/teams/api/team-stats/${team.id}/`));
-        console.log('Team stats response status:', response.status);
         if (response.ok) {
           const data = await response.json();
-          console.log('Team stats data:', data);
-          console.log('Setting teamStats to:', data.stats);
           setTeamStats(data.stats);
 
           // Cache the successful response

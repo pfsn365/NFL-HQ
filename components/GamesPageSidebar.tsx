@@ -33,7 +33,7 @@ const GamesPageSidebar: React.FC<GamesPageSidebarProps> = ({ currentGame, isMobi
   ];
 
   const fantasyTools = [
-    { title: 'Fantasy Football Hub', url: 'https://www.profootballnetwork.com/fantasy/football' },
+    { title: 'Fantasy Football HQ', url: 'https://www.profootballnetwork.com/fantasy/football' },
     { title: 'Trade Analyzer', url: 'https://www.profootballnetwork.com/fantasy-football-trade-analyzer' },
     { title: 'Start/Sit Optimizer', url: 'https://www.profootballnetwork.com/who-should-i-start-fantasy-optimizer' },
     { title: 'Waiver Wire Assistant', url: 'https://www.profootballnetwork.com/fantasy-football-waiver-wire' },

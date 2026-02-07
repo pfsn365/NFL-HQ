@@ -94,33 +94,14 @@ export function useINPOptimization(options: INPOptimizationOptions = {}) {
   };
 }
 
-// React hook for optimizing tab changes specifically
-export function useOptimizedTabChange(onTabChange: (tab: string) => void) {
-
-  const optimizedTabChange = useCallback(
-    (tab: string) => {
-      // Call tab change immediately for responsive UI
-      onTabChange(tab);
-    },
-    [onTabChange]
-  );
-
-  return optimizedTabChange;
-}
-
 // Global INP monitoring and optimization
 export function useINPMonitoring() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     // Monitor long tasks that could affect INP
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry.duration > 50) { // Long task threshold
-          console.warn(`⚠️ Long task detected: ${entry.duration}ms`, entry);
-
-        }
-      }
+    const observer = new PerformanceObserver(() => {
+      // Performance monitoring - long tasks are observed but not logged in production
     });
 
     observer.observe({ entryTypes: ['longtask'] });
