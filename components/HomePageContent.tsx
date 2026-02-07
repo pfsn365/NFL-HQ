@@ -11,22 +11,6 @@ import { getApiPath } from '@/utils/api';
 export default function HomePageContent() {
   const allTeams = getAllTeams();
 
-  // Featured teams (popular/successful franchises)
-  const featuredTeamIds = [
-    'kansas-city-chiefs',
-    'philadelphia-eagles',
-    'san-francisco-49ers',
-    'buffalo-bills',
-    'dallas-cowboys',
-    'green-bay-packers',
-    'baltimore-ravens',
-    'detroit-lions'
-  ];
-
-  const featuredTeams = featuredTeamIds
-    .map(id => allTeams.find(team => team.id === id))
-    .filter((team): team is NonNullable<typeof team> => team !== undefined);
-
   // Top 5 standings - fetch from API
   const [topStandings, setTopStandings] = useState<Array<{ teamId: string; teamName: string; wins: number; losses: number; ties?: number; winPct: number }>>([
     { teamId: 'kansas-city-chiefs', teamName: 'Kansas City Chiefs', wins: 15, losses: 1, winPct: 0.938 },
@@ -131,6 +115,43 @@ export default function HomePageContent() {
   const [statLeaders, setStatLeaders] = useState<StatLeaders | null>(null);
   const [statLeadersLoading, setStatLeadersLoading] = useState(true);
 
+  // Latest articles state
+  interface Article {
+    title: string;
+    link: string;
+    pubDate: string;
+    description: string;
+    featuredImage?: string;
+    author?: string;
+    category?: string;
+  }
+  const [latestArticles, setLatestArticles] = useState<Article[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(true);
+
+  // Format relative time for articles
+  const getRelativeTime = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) {
+      return `${diffMins}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else if (diffDays < 7) {
+      return `${diffDays}d ago`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+  };
+
   // Fetch stat leaders
   useEffect(() => {
     async function fetchStatLeaders() {
@@ -160,6 +181,29 @@ export default function HomePageContent() {
     }
 
     fetchStatLeaders();
+  }, []);
+
+  // Fetch latest articles
+  useEffect(() => {
+    async function fetchLatestArticles() {
+      try {
+        // Fetch from the Insights feed (most general news)
+        const response = await fetch(getApiPath('api/proxy-rss?url=' + encodeURIComponent('https://www.profootballnetwork.com/insights/feed/')));
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.articles && Array.isArray(data.articles)) {
+            setLatestArticles(data.articles.slice(0, 3));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching latest articles:', err);
+      } finally {
+        setArticlesLoading(false);
+      }
+    }
+
+    fetchLatestArticles();
   }, []);
 
   return (
@@ -607,52 +651,80 @@ export default function HomePageContent() {
           </div>
           </div>
 
-          {/* Featured Teams Section */}
+          {/* Latest NFL Articles Section */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Featured Teams
-                </h2>
-              </div>
-              <Link
-                href="/teams"
-                className="hidden md:flex items-center gap-2 text-[#0050A0] hover:text-[#ff5722] font-semibold text-sm transition-colors"
-              >
-              View All Teams →
-            </Link>
-          </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4">
-              {featuredTeams.map((team) => (
-                <Link
-                  key={team.id}
-                  href={`/teams/${team.id}`}
-                  className="group relative bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-[#013369] hover:bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-center aspect-square"
-                >
-                  <div className="relative w-20 h-20 mb-2">
-                    <img
-                      src={team.logoUrl}
-                      alt={team.fullName}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                      {team.abbreviation}
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Latest NFL Articles</h2>
             </div>
 
-            {/* View all teams button for mobile */}
-            <div className="mt-6 md:hidden text-center">
+            {articlesLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-gray-50 rounded-lg overflow-hidden animate-pulse">
+                    <div className="w-full aspect-video bg-gray-200"></div>
+                    <div className="p-4">
+                      <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+                      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : latestArticles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {latestArticles.map((article, index) => (
+                  <a
+                    key={`${article.link}-${index}`}
+                    href={article.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                  >
+                    {article.featuredImage ? (
+                      <div className="w-full aspect-video overflow-hidden bg-gray-200">
+                        <img
+                          src={article.featuredImage}
+                          alt={article.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-video bg-gradient-to-br from-[#0050A0] to-[#003A75] flex items-center justify-center">
+                        <span className="text-white text-3xl font-bold opacity-30">PFN</span>
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="text-base font-semibold text-gray-900 group-hover:text-[#0050A0] line-clamp-2 mb-2 transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                        {article.description}
+                      </p>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500">
+                          {getRelativeTime(article.pubDate)}
+                        </span>
+                        <span className="font-medium text-[#0050A0]">
+                          Read More →
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Unable to load articles</p>
+              </div>
+            )}
+
+            {/* See All NFL Articles button */}
+            <div className="mt-6 text-center">
               <Link
-                href="/teams"
+                href="/articles"
                 className="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white font-medium rounded-lg transition-all cursor-pointer"
               >
-                View All 32 Teams
+                See All NFL Articles
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

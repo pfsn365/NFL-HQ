@@ -9,9 +9,10 @@ interface NFLTeamsSidebarProps {
 
 const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
+  // On mobile, start with menus collapsed for easier navigation; on desktop, expand them
+  const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(!isMobile);
   const [isImpactRankingsExpanded, setIsImpactRankingsExpanded] = useState(false);
-  const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(true);
+  const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(!isMobile);
   const [isSuperBowlLXExpanded, setIsSuperBowlLXExpanded] = useState(false);
   const pathname = usePathname();
 
@@ -44,6 +45,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
     { title: 'NFL Injury Report', url: '/nfl-hq/injuries', external: false },
     { title: 'NFL Stat Leaders', url: '/nfl-hq/stats', external: false },
+    { title: 'NFL Articles', url: '/nfl-hq/articles', external: false },
     { title: 'NFL Draft HQ', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', external: true },
     { title: 'NFL Power Rankings Builder', url: '/nfl-hq/power-rankings-builder', external: false },
     { title: 'NFL Player Rankings Builder', url: '/nfl-hq/player-rankings-builder', external: false },
@@ -147,7 +149,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
         </div>
 
         {isExpanded && (
-          <div className="bg-black border-t border-gray-800">
+          <div className="bg-black border-t border-gray-800 max-h-[calc(100vh-57px)] overflow-y-auto">
             {/* Home, Super Bowl LX, and Browse All Teams */}
             <div className="px-4 py-2 border-b border-gray-800">
               <div className="grid grid-cols-1 gap-1">
