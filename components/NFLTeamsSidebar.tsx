@@ -39,13 +39,13 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
 
   const nflTools = [
     { title: 'NFL Free Agency Tracker', url: '/nfl-hq/free-agency-tracker', external: false },
+    { title: 'NFL Articles', url: '/nfl-hq/articles', external: false },
     { title: 'NFL Ultimate GM Simulator', url: 'https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/', external: true },
     { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', external: true },
     { title: 'NFL Schedule', url: '/nfl-hq/schedule', external: false },
     { title: 'NFL Standings', url: '/nfl-hq/standings', external: false },
     { title: 'NFL Injury Report', url: '/nfl-hq/injuries', external: false },
     { title: 'NFL Stat Leaders', url: '/nfl-hq/stats', external: false },
-    { title: 'NFL Articles', url: '/nfl-hq/articles', external: false },
     { title: 'NFL Draft HQ', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', external: true },
     { title: 'NFL Power Rankings Builder', url: '/nfl-hq/power-rankings-builder', external: false },
     { title: 'NFL Player Rankings Builder', url: '/nfl-hq/player-rankings-builder', external: false },

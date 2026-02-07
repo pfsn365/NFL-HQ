@@ -338,29 +338,22 @@ export default function ArticlesClient() {
 
                           {/* Article Content */}
                           <div className="p-4">
-                            {/* Top row: Category + Date */}
-                            <div className="flex items-center justify-between mb-2">
-                              {article.category ? (
-                                <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded">
-                                  {article.category}
-                                </span>
-                              ) : (
-                                <span></span>
-                              )}
-                              <span className="text-xs text-gray-500">
-                                {getRelativeTime(article.pubDate)}
+                            {/* Category Badge */}
+                            {article.category && (
+                              <span className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded mb-2">
+                                {article.category}
                               </span>
-                            </div>
+                            )}
                             <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ color: '#0050A0' }}>
                               {article.title}
                             </h3>
                             <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                               {article.description}
                             </p>
-                            {/* Bottom row: Author + Read More */}
+                            {/* Bottom row: Date + Read More */}
                             <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-500 truncate max-w-[120px]">
-                                {article.author && article.author !== 'PFSN' ? article.author : 'PFSN'}
+                              <span className="text-gray-500">
+                                {getRelativeTime(article.pubDate)}
                               </span>
                               <span className="font-medium flex-shrink-0" style={{ color: '#0050A0' }}>
                                 Read More &rarr;
