@@ -461,8 +461,8 @@ export default function NFLPlayoffBracket() {
         </button>
       </div>
 
-      <div className="bg-blue-50 border-b border-blue-200 px-4 py-2">
-        <p className="text-sm text-blue-700">Click on a team to pick them as the winner. Your picks will advance through the bracket.</p>
+      <div className="bg-[#0050A0]/10 border-b border-[#0050A0]/30 px-4 py-2">
+        <p className="text-sm text-[#003A75]">Click on a team to pick them as the winner. Your picks will advance through the bracket.</p>
       </div>
 
       <div className="px-4 pt-2 pb-4 overflow-x-auto">
@@ -474,7 +474,7 @@ export default function NFLPlayoffBracket() {
               {/* AFC Wild Card */}
               <div className="flex flex-col gap-3 w-[155px]">
                 <div className="text-center mb-2 text-sm font-bold text-[#0050A0]">AFC</div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center">Wild Card</div>
+                <div className="text-xs font-semibold text-gray-600 text-center">Wild Card</div>
                 <MatchupCard matchup={displayData['afc-wc-1']} compact userPick={userPicks['afc-wc-1']} onPickWinner={handlePickWinner} canPick />
                 <MatchupCard matchup={displayData['afc-wc-2']} compact userPick={userPicks['afc-wc-2']} onPickWinner={handlePickWinner} canPick />
                 <MatchupCard matchup={displayData['afc-wc-3']} compact userPick={userPicks['afc-wc-3']} onPickWinner={handlePickWinner} canPick />
@@ -482,7 +482,7 @@ export default function NFLPlayoffBracket() {
 
               {/* AFC Divisional */}
               <div className="flex flex-col gap-3 w-[155px] justify-around">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center">Divisional</div>
+                <div className="text-xs font-semibold text-gray-600 text-center">Divisional</div>
                 <div className="flex-1 flex flex-col justify-around">
                   <MatchupCard matchup={displayData['afc-div-1']} compact userPick={userPicks['afc-div-1']} onPickWinner={handlePickWinner} canPick />
                   <MatchupCard matchup={displayData['afc-div-2']} compact userPick={userPicks['afc-div-2']} onPickWinner={handlePickWinner} canPick />
@@ -491,7 +491,7 @@ export default function NFLPlayoffBracket() {
 
               {/* AFC Championship */}
               <div className="flex flex-col w-[155px]">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center">AFC Champ</div>
+                <div className="text-xs font-semibold text-gray-600 text-center">AFC Champ</div>
                 <div className="flex-1 flex flex-col justify-center">
                   <MatchupCard matchup={displayData['afc-conf']} compact userPick={userPicks['afc-conf']} onPickWinner={handlePickWinner} canPick />
                 </div>
@@ -500,7 +500,7 @@ export default function NFLPlayoffBracket() {
 
             {/* Super Bowl Center */}
             <div className="flex flex-col w-[190px] justify-center">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center mb-2">Super Bowl LX</div>
+              <div className="text-xs font-semibold text-gray-600 text-center mb-2">Super Bowl LX</div>
               <MatchupCard matchup={displayData['superbowl']} userPick={userPicks['superbowl']} onPickWinner={handlePickWinner} canPick />
               <div className="mt-3 text-center">
                 <div className={`inline-block rounded-lg px-4 py-2 ${champion ? 'bg-yellow-100 border border-yellow-300' : 'bg-gray-100 border border-gray-200'}`}>
@@ -524,7 +524,7 @@ export default function NFLPlayoffBracket() {
               {/* NFC Wild Card */}
               <div className="flex flex-col gap-3 w-[155px]">
                 <div className="text-center mb-2 text-sm font-bold text-[#0050A0]">NFC</div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center">Wild Card</div>
+                <div className="text-xs font-semibold text-gray-600 text-center">Wild Card</div>
                 <MatchupCard matchup={displayData['nfc-wc-1']} compact userPick={userPicks['nfc-wc-1']} onPickWinner={handlePickWinner} canPick />
                 <MatchupCard matchup={displayData['nfc-wc-2']} compact userPick={userPicks['nfc-wc-2']} onPickWinner={handlePickWinner} canPick />
                 <MatchupCard matchup={displayData['nfc-wc-3']} compact userPick={userPicks['nfc-wc-3']} onPickWinner={handlePickWinner} canPick />
@@ -532,7 +532,7 @@ export default function NFLPlayoffBracket() {
 
               {/* NFC Divisional */}
               <div className="flex flex-col gap-3 w-[155px] justify-around">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center">Divisional</div>
+                <div className="text-xs font-semibold text-gray-600 text-center">Divisional</div>
                 <div className="flex-1 flex flex-col justify-around">
                   <MatchupCard matchup={displayData['nfc-div-1']} compact userPick={userPicks['nfc-div-1']} onPickWinner={handlePickWinner} canPick />
                   <MatchupCard matchup={displayData['nfc-div-2']} compact userPick={userPicks['nfc-div-2']} onPickWinner={handlePickWinner} canPick />
@@ -541,7 +541,7 @@ export default function NFLPlayoffBracket() {
 
               {/* NFC Championship */}
               <div className="flex flex-col w-[155px]">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center">NFC Champ</div>
+                <div className="text-xs font-semibold text-gray-600 text-center">NFC Champ</div>
                 <div className="flex-1 flex flex-col justify-center">
                   <MatchupCard matchup={displayData['nfc-conf']} compact userPick={userPicks['nfc-conf']} onPickWinner={handlePickWinner} canPick />
                 </div>

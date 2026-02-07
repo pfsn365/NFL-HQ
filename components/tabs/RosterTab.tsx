@@ -258,14 +258,14 @@ export default function RosterTab({ team }: RosterTabProps) {
                     <table className="min-w-full text-sm">
                       <thead>
                         <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-12">#</th>
-                          <th scope="col" className="text-left px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap min-w-[200px]">NAME</th>
-                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-24">IMPACT</th>
-                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-24">EXP</th>
-                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">AGE</th>
-                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">HT</th>
-                          <th scope="col" className="text-center px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap w-16">WT</th>
-                          <th scope="col" className="text-left px-3 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap min-w-[120px]">COLLEGE</th>
+                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-12">#</th>
+                          <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap min-w-[200px]">Name</th>
+                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-24">Impact</th>
+                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-24">Exp</th>
+                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Age</th>
+                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Ht</th>
+                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Wt</th>
+                          <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap min-w-[120px]">College</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -303,7 +303,7 @@ export default function RosterTab({ team }: RosterTabProps) {
                                   href={getPositionImpactUrl(player.position)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="font-semibold hover:underline text-blue-600"
+                                  className="font-semibold hover:underline text-[#0050A0]"
                                 >
                                   {player.impactPlus.toFixed(1)}
                                 </a>

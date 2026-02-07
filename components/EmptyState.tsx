@@ -30,7 +30,7 @@ export default function EmptyState({ title, message, icon = 'data', action }: Em
         );
       case 'info':
         return (
-          <svg className="h-12 w-12 text-blue-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-12 w-12 text-[#0050A0] mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
@@ -54,7 +54,7 @@ export default function EmptyState({ title, message, icon = 'data', action }: Em
       {action && (
         <button
           onClick={action.onClick}
-          className="mt-4 px-4 py-2 min-h-[44px] rounded-lg font-medium transition-colors cursor-pointer bg-[#0050A0] text-white hover:bg-[#003d7a]"
+          className="mt-4 px-4 py-2 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white rounded-lg font-medium transition-all cursor-pointer"
         >
           {action.label}
         </button>

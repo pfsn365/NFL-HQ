@@ -40,7 +40,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
             href="/"
-            className="px-8 py-3 bg-[#0050A0] hover:bg-[#003d7a] text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+            className="px-8 py-3 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white font-semibold rounded-lg transition-all cursor-pointer shadow-lg hover:shadow-xl"
           >
             Go to Homepage
           </Link>

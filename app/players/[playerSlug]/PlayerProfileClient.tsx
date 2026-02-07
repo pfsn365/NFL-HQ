@@ -580,12 +580,12 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                 <>
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-blue-100 text-blue-700 border-2 border-blue-300"
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-[#0050A0]/10 text-[#0050A0] border-2 border-[#0050A0]/30"
                     >
                       {player.pfsnImpact.grade}
                     </div>
                     <div className="text-left">
-                      <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-2xl font-bold text-[#0050A0]">
                         {player.pfsnImpact.score}
                       </div>
                     </div>
@@ -624,31 +624,31 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Age</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Age</dt>
               <dd className="font-medium text-gray-900">{player.age || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Height</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Height</dt>
               <dd className="font-medium text-gray-900">{player.height || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Weight</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Weight</dt>
               <dd className="font-medium text-gray-900">{player.weight ? `${player.weight} lbs` : '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Experience</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Experience</dt>
               <dd className="font-medium text-gray-900">{player.experienceLabel || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">College</dt>
+              <dt className="text-xs text-gray-600 font-semibold">College</dt>
               <dd className="font-medium text-gray-900">{player.college || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Birthplace</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Birthplace</dt>
               <dd className="font-medium text-gray-900">{player.birthPlace || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Birth Date</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Birth Date</dt>
               <dd className="font-medium text-gray-900">
                 {player.birthDate
                   ? new Date(player.birthDate).toLocaleDateString('en-US', {
@@ -660,7 +660,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase tracking-wide">Draft</dt>
+              <dt className="text-xs text-gray-600 font-semibold">Draft</dt>
               <dd className="font-medium text-gray-900">
                 {player.draft || 'Undrafted'}
               </dd>
@@ -694,11 +694,11 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-200">
-                      <th scope="col" className="text-left py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">WK</th>
-                      <th scope="col" className="text-left py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">OPP</th>
-                      <th scope="col" className="text-center py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">RESULT</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Wk</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Opp</th>
+                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Result</th>
                       {gameLogData.statLabels.slice(0, 8).map((label) => (
-                        <th key={label.name} className="text-center py-3 px-2 font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">
+                        <th key={label.name} className="text-center py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">
                           {label.label}
                         </th>
                       ))}
@@ -727,7 +727,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                                 {opponentTeam ? (
                                   <Link
                                     href={`/teams/${opponentTeam.id}`}
-                                    className="hover:text-blue-600 hover:underline"
+                                    className="hover:text-[#0050A0] hover:underline"
                                   >
                                     {game.opponent}
                                   </Link>
@@ -808,7 +808,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                 return (
                   <div key={category.name} className="bg-gray-50 rounded-lg overflow-hidden">
                     <div className="bg-gray-800 px-4 py-2">
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                      <h3 className="text-sm font-bold text-white">
                         {category.displayName}
                       </h3>
                     </div>
@@ -817,7 +817,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                         <thead>
                           <tr className="bg-gray-100 border-b border-gray-200">
                             {category.labels.map((label, index) => (
-                              <th key={index} className="text-center py-2.5 px-3 font-semibold text-gray-500 text-xs uppercase tracking-wide whitespace-nowrap">
+                              <th key={index} className="text-center py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 whitespace-nowrap">
                                 {label}
                               </th>
                             ))}
@@ -893,7 +893,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                     e.preventDefault();
                     setVisibleArticles(prev => Math.min(prev + 3, articles.length));
                   }}
-                  className="text-white px-8 py-4 rounded-lg font-medium transition-colors hover:opacity-90 text-base min-h-[48px] bg-[#0050A0] cursor-pointer"
+                  className="px-8 py-4 min-h-[48px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white rounded-lg font-medium transition-all cursor-pointer text-base"
                 >
                   Show More Articles
                 </button>

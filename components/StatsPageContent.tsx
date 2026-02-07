@@ -270,16 +270,22 @@ export default function StatsPageContent() {
       {/* Main content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Stat Leaders
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               2025 NFL Season Statistical Leaders
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -317,7 +323,7 @@ export default function StatsPageContent() {
           ) : filteredLeaders ? (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
               {/* Table Header */}
-              <div className="bg-gradient-to-r from-[#0050A0] to-blue-700 text-white px-6 py-4">
+              <div className="bg-gradient-to-r from-[#0050A0] to-[#003A75] text-white px-6 py-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold">
                     {activeCategoryInfo.label}
@@ -349,12 +355,12 @@ export default function StatsPageContent() {
                   <table className="w-full min-w-[480px] sm:min-w-[560px] md:min-w-[640px]">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th scope="col" className="pl-3 sm:pl-4 md:pl-6 pr-2 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-10 sm:w-12 md:w-16">Rank</th>
-                        <th scope="col" className="px-2 sm:px-3 md:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Player</th>
-                        <th scope="col" className="px-2 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-16 sm:w-20 md:w-24">Position</th>
-                        <th scope="col" className="px-2 sm:px-3 md:px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20 sm:w-24">Team</th>
-                        <th scope="col" className="px-2 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-12 sm:w-16 md:w-20">GP</th>
-                        <th scope="col" className="px-3 sm:px-4 md:px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider w-16 sm:w-20 md:w-24">
+                        <th scope="col" className="pl-3 sm:pl-4 md:pl-6 pr-2 py-3 text-left text-xs font-semibold text-gray-600 w-10 sm:w-12 md:w-16">Rank</th>
+                        <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600">Player</th>
+                        <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 sm:w-20 md:w-24">Position</th>
+                        <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-20 sm:w-24">Team</th>
+                        <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-gray-600 w-12 sm:w-16 md:w-20">GP</th>
+                        <th scope="col" className="py-3 px-3 sm:px-4 text-right text-xs font-semibold text-gray-600 w-16 sm:w-20 md:w-24">
                           {showPerGame ? `${activeCategoryInfo.abbr}/G` : activeCategoryInfo.abbr}
                         </th>
                       </tr>
@@ -664,7 +670,7 @@ export default function StatsPageContent() {
                   {/* Passing Stats */}
                   {(selectedPlayer.passingYards && parseInt(selectedPlayer.passingYards) > 0) && (
                     <div>
-                      <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Passing</h4>
+                      <h4 className="text-xs font-semibold text-gray-600 mb-2">Passing</h4>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
                           <div className="text-2xl font-bold text-[#0050A0]">{selectedPlayer.passingYards}</div>
@@ -685,7 +691,7 @@ export default function StatsPageContent() {
                   {/* Rushing Stats */}
                   {(selectedPlayer.rushingYards && parseInt(selectedPlayer.rushingYards) > 0) && (
                     <div>
-                      <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Rushing</h4>
+                      <h4 className="text-xs font-semibold text-gray-600 mb-2">Rushing</h4>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
                           <div className="text-2xl font-bold text-[#0050A0]">{selectedPlayer.rushingYards}</div>
@@ -706,7 +712,7 @@ export default function StatsPageContent() {
                   {/* Receiving Stats */}
                   {(selectedPlayer.receivingYards && parseInt(selectedPlayer.receivingYards) > 0) && (
                     <div>
-                      <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Receiving</h4>
+                      <h4 className="text-xs font-semibold text-gray-600 mb-2">Receiving</h4>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
                           <div className="text-2xl font-bold text-[#0050A0]">{selectedPlayer.receivingYards}</div>
@@ -727,7 +733,7 @@ export default function StatsPageContent() {
                   {/* Defensive Stats */}
                   {(selectedPlayer.tackles && parseInt(selectedPlayer.tackles) > 0) && (
                     <div>
-                      <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Defense</h4>
+                      <h4 className="text-xs font-semibold text-gray-600 mb-2">Defense</h4>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
                           <div className="text-2xl font-bold text-[#0050A0]">{selectedPlayer.tackles}</div>
@@ -749,7 +755,7 @@ export default function StatsPageContent() {
                 {/* Player Profile Link */}
                 <Link
                   href={`/players/${selectedPlayer.name.toLowerCase().replace(/[.\s]+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-')}`}
-                  className="mt-4 block w-full text-center bg-[#0050A0] text-white py-3 rounded-lg font-semibold hover:bg-[#003d7a] transition-colors"
+                  className="mt-4 block w-full text-center min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white py-3 rounded-lg font-semibold transition-all cursor-pointer"
                 >
                   View {selectedPlayer.name} Profile
                 </Link>

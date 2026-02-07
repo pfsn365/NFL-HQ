@@ -63,7 +63,7 @@ function PositionNeedCard({ need, teamColor, isExpanded, onToggle }: {
 }) {
   return (
     <div
-      className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md active:shadow-md transition-shadow cursor-pointer select-none"
+      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-[#0050A0] hover:shadow-md transition-all cursor-pointer select-none"
       onClick={onToggle}
     >
       {/* Increased padding for better touch targets on mobile */}

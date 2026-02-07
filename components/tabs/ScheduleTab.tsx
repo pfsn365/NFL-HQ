@@ -184,12 +184,12 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-16">Week</th>
-                <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-20">Date</th>
-                <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Opponent</th>
-                <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-16 hidden sm:table-cell">Time</th>
-                <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-16 hidden md:table-cell">TV</th>
-                <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-24">Result</th>
+                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16">Week</th>
+                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-20">Date</th>
+                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600">Opponent</th>
+                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden sm:table-cell">Time</th>
+                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden md:table-cell">TV</th>
+                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-24">Result</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -214,12 +214,12 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-16">Week</th>
-              <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-20">Date</th>
-              <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Opponent</th>
-              <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-16 hidden sm:table-cell">Time</th>
-              <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-16 hidden md:table-cell">TV</th>
-              <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-24">Result</th>
+              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16">Week</th>
+              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-20">Date</th>
+              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600">Opponent</th>
+              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden sm:table-cell">Time</th>
+              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden md:table-cell">TV</th>
+              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-24">Result</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -281,7 +281,7 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchSchedule}
-            className="inline-flex items-center px-4 py-2 min-h-[44px] border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-[#0050A0] hover:bg-[#003d7a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0050A0]"
+            className="inline-flex items-center px-4 py-2 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white text-sm font-medium rounded-lg shadow-sm transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0050A0]"
           >
             Try Again
           </button>

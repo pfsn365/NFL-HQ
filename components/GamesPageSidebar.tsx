@@ -54,22 +54,6 @@ const GamesPageSidebar: React.FC<GamesPageSidebarProps> = ({ currentGame, isMobi
     { title: 'NFL Word Fumble', url: 'https://www.profootballnetwork.com/nfl-word-fumble-player-name-game/' },
   ];
 
-  const nbaGames = [
-    { title: 'NBA Duo', url: 'https://www.profootballnetwork.com/games/nba-duo/' },
-    { title: 'NBA Player Guessing Game', url: 'https://www.profootballnetwork.com/nba-player-guessing-game/' },
-  ];
-
-  const nhlGames = [
-    { title: 'NHL Duo', url: 'https://www.profootballnetwork.com/games/nhl-duo/' },
-    { title: 'NHL Cards', url: 'https://www.profootballnetwork.com/nhlcards/' },
-  ];
-
-  const otherGames = [
-    { title: 'MLB Duo', url: 'https://www.profootballnetwork.com/games/mlb-duo/' },
-    { title: 'Tennis Duo', url: 'https://www.profootballnetwork.com/games/tennis-duo/' },
-    { title: 'WWE Guessing Game', url: 'https://www.profootballnetwork.com/wwe-player-guessing-game/' },
-  ];
-
 
   // Mobile version - NFL Octobox style with team links
   if (isMobile) {
@@ -260,7 +244,7 @@ const GamesPageSidebar: React.FC<GamesPageSidebarProps> = ({ currentGame, isMobi
                   className={`
                     relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200
                     ${isCurrentTeam
-                      ? 'bg-blue-600/20 text-blue-400 border-l-2 border-blue-500'
+                      ? 'bg-[#0050A0]/20 text-[#0050A0] border-l-2 border-[#0050A0]'
                       : 'text-gray-100 hover:bg-gray-800/50 active:bg-gray-700/50 hover:text-white'
                     }
                   `}

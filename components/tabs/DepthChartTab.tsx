@@ -70,7 +70,7 @@ const PositionTable = ({
           {player.name}
         </Link>
         {player.impactScore > 0 && (
-          <span className="text-xs font-semibold text-blue-600">
+          <span className="text-xs font-semibold text-[#0050A0]">
             {player.impactScore.toFixed(1)}
           </span>
         )}
@@ -85,11 +85,11 @@ const PositionTable = ({
         <table className="w-full text-sm">
           <thead>
             <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-              <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide w-16">POS</th>
-              <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">STARTER</th>
-              <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">2ND</th>
-              <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">3RD</th>
-              <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide min-w-[220px]">4TH</th>
+              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold w-16">Pos</th>
+              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">Starter</th>
+              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">2nd</th>
+              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">3rd</th>
+              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">4th</th>
             </tr>
           </thead>
           <tbody>

@@ -166,17 +166,14 @@ export function DataTable<T extends Record<string, unknown>>({
     });
   }, [data, sortColumn, sortDirection, sortable]);
 
-  // Get sort icon for column header
+  // Get sort icon for column header - only show on actively sorted column
   const getSortIcon = (columnKey: string) => {
     const column = columns.find((c) => c.key === columnKey);
     if (!sortable || column?.sortable === false) return null;
 
+    // Only show arrow on the actively sorted column
     if (sortColumn !== columnKey) {
-      return (
-        <svg className="w-3 h-3 inline ml-1 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 10l4-4 4 4H8zm0 4l4 4 4-4H8z" />
-        </svg>
-      );
+      return null;
     }
 
     if (sortDirection === 'asc') {
@@ -216,7 +213,7 @@ export function DataTable<T extends Record<string, unknown>>({
       const href = linkConfig.getHref(row);
       const linkStyle = linkConfig.useTeamColor ? { color: teamColor } : {};
       const linkClass = `font-medium hover:underline cursor-pointer ${
-        linkConfig.useTeamColor ? '' : 'text-blue-600'
+        linkConfig.useTeamColor ? '' : 'text-[#0050A0]'
       }`;
 
       if (linkConfig.external) {
@@ -293,15 +290,13 @@ export function DataTable<T extends Record<string, unknown>>({
                 <th
                   key={String(column.key)}
                   scope="col"
-                  className={`p-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass} ${
-                    isSortable ? 'cursor-pointer hover:opacity-90 active:opacity-75 transition-opacity' : ''
+                  className={`py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass} ${
+                    isSortable ? 'cursor-pointer hover:opacity-80 select-none' : ''
                   }`}
                   onClick={isSortable ? () => handleSort(String(column.key)) : undefined}
                 >
-                  <span className="flex items-center justify-start">
-                    {column.header}
-                    {getSortIcon(String(column.key))}
-                  </span>
+                  {column.header}
+                  {getSortIcon(String(column.key))}
                 </th>
               );
             })}

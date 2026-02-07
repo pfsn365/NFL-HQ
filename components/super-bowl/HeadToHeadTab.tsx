@@ -264,7 +264,7 @@ export default function HeadToHeadTab() {
           <div className="p-3 sm:p-4 text-center border-t bg-white">
             <button
               onClick={() => setShowAllGames(!showAllGames)}
-              className="px-4 sm:px-6 py-2 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] text-sm sm:text-base font-medium transition-colors cursor-pointer min-h-[44px]"
+              className="px-4 sm:px-6 py-2 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white rounded-lg text-sm sm:text-base font-medium transition-all cursor-pointer"
             >
               {showAllGames ? 'Show Less' : `Show All ${headToHeadGames.length} Games`}
             </button>

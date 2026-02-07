@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import Pagination from '@/components/Pagination';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getPositionColor } from '@/utils/colorHelpers';
@@ -60,6 +61,28 @@ export default function PlayersDirectoryClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+
+  // Load items per page from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('players_directory_items_per_page');
+    if (stored) {
+      const parsed = parseInt(stored, 10);
+      if ([24, 48, 96].includes(parsed)) {
+        setItemsPerPage(parsed);
+      }
+    }
+  }, []);
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (count: number) => {
+    localStorage.setItem('players_directory_items_per_page', count.toString());
+    setItemsPerPage(count);
+    setCurrentPage(1);
+  };
 
   // Debounced search value
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -160,16 +183,22 @@ export default function PlayersDirectoryClient() {
       {/* Main Content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Players
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               Browse player profiles with bio information and PFSN Impact Grades
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -178,6 +207,7 @@ export default function PlayersDirectoryClient() {
 
         {/* Content */}
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Browse All Players</h2>
           {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -321,99 +351,18 @@ export default function PlayersDirectoryClient() {
                   </div>
                 )}
 
-                {/* Pagination Controls - matching injury report style */}
-                {pagination && totalPages > 1 && (
-                  <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                      <button
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        Previous
-                      </button>
-                      <button
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        Next
-                      </button>
-                    </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-4">
-                        <p className="text-sm text-gray-700">
-                          Page <span className="font-medium">{currentPage}</span> of{' '}
-                          <span className="font-medium">{totalPages}</span>
-                        </p>
-                        {/* Items Per Page */}
-                        <div className="flex items-center gap-2">
-                          <label className="text-sm text-gray-700">Per page:</label>
-                          <select
-                            value={itemsPerPage}
-                            onChange={e => setItemsPerPage(Number(e.target.value))}
-                            className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-sm bg-white cursor-pointer"
-                          >
-                            <option value={24}>24</option>
-                            <option value={48}>48</option>
-                            <option value={96}>96</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div>
-                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                          <button
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            disabled={currentPage === 1}
-                            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                          >
-                            <span className="sr-only">Previous</span>
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-
-                          {/* Page Numbers */}
-                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            let pageNum;
-                            if (totalPages <= 5) {
-                              pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                              pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                              pageNum = totalPages - 4 + i;
-                            } else {
-                              pageNum = currentPage - 2 + i;
-                            }
-
-                            return (
-                              <button
-                                key={pageNum}
-                                onClick={() => setCurrentPage(pageNum)}
-                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium cursor-pointer ${
-                                  currentPage === pageNum
-                                    ? 'z-10 bg-[#0050A0] border-[#0050A0] text-white'
-                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                }`}
-                              >
-                                {pageNum}
-                              </button>
-                            );
-                          })}
-
-                          <button
-                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            disabled={currentPage === totalPages}
-                            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                          >
-                            <span className="sr-only">Next</span>
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        </nav>
-                      </div>
-                    </div>
+                {/* Pagination Controls */}
+                {pagination && pagination.totalPlayers > 0 && (
+                  <div className="bg-gray-50 px-4 border-t border-gray-200">
+                    <Pagination
+                      totalItems={pagination.totalPlayers}
+                      currentPage={currentPage}
+                      onPageChange={handlePageChange}
+                      itemsPerPage={itemsPerPage}
+                      onItemsPerPageChange={handleItemsPerPageChange}
+                      storageKey="players_directory_items_per_page"
+                      itemsPerPageOptions={[24, 48, 96]}
+                    />
                   </div>
                 )}
               </>

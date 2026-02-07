@@ -1,6 +1,5 @@
 'use client';
 
-import { useINPMonitoring } from '../hooks/useINPOptimization';
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { TeamData } from '@/data/teams';
 
@@ -11,8 +10,6 @@ interface NavigationTabsProps {
 }
 
 export default function NavigationTabs({ activeTab, onTabChange, team }: NavigationTabsProps) {
-  // Enable INP monitoring for this component
-  useINPMonitoring();
 
   // Refs for scroll management
   const navRef = useRef<HTMLElement>(null);
@@ -144,11 +141,7 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
                 e.preventDefault();
                 onTabChange(tab.id);
               }}
-              className={`py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-colors will-change-auto cursor-pointer ${
-                activeTab === tab.id
-                  ? 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300 active:text-gray-800'
-                  : 'border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300 active:text-gray-800'
-              }`}
+              className="py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-colors will-change-auto cursor-pointer border-transparent text-gray-600 hover:text-gray-700 hover:border-gray-300 active:text-gray-800"
               style={{
                 contain: 'layout style',
                 transform: 'translateZ(0)', // Force hardware acceleration

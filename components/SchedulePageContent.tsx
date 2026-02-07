@@ -449,16 +449,22 @@ function SchedulePageInner() {
       {/* Main content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Schedule
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               View all NFL games, scores, and game details
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -863,7 +869,7 @@ function SchedulePageInner() {
                           {/* Game Leaders */}
                           {isFinal && (game.hi_pass || game.hi_rush || game.hi_rec) && (
                             <div>
-                              <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-3">Game Leaders</h4>
+                              <h4 className="text-xs font-semibold text-gray-600 mb-3">Game Leaders</h4>
                               <div className="space-y-3">
                                 {game.hi_pass && (
                                   <div className="flex items-center gap-2">
@@ -899,7 +905,7 @@ function SchedulePageInner() {
                           {/* Stadium */}
                           {game.venue && (
                             <div>
-                              <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-3">Stadium</h4>
+                              <h4 className="text-xs font-semibold text-gray-600 mb-3">Stadium</h4>
                               <div className="flex items-start gap-3">
                                 <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -918,7 +924,7 @@ function SchedulePageInner() {
                           {/* TV Broadcast */}
                           {game.tv_stations && game.tv_stations.length > 0 && (
                             <div>
-                              <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-3">Broadcast</h4>
+                              <h4 className="text-xs font-semibold text-gray-600 mb-3">Broadcast</h4>
                               <div className="flex items-start gap-3">
                                 <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -1078,7 +1084,7 @@ function SchedulePageInner() {
                                         {/* Stadium */}
                                         {game.venue && (
                                           <div className="mb-3">
-                                            <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Stadium</h4>
+                                            <h4 className="text-xs font-semibold text-gray-600 mb-1">Stadium</h4>
                                             <div className="text-xs">
                                               <div className="font-semibold text-gray-900">{game.venue.name}</div>
                                               <div className="text-gray-600">
@@ -1091,7 +1097,7 @@ function SchedulePageInner() {
                                         {/* TV Broadcast */}
                                         {game.tv_stations && game.tv_stations.length > 0 && (
                                           <div className="mb-3">
-                                            <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Broadcast</h4>
+                                            <h4 className="text-xs font-semibold text-gray-600 mb-1">Broadcast</h4>
                                             <div className="flex flex-wrap gap-1">
                                               {game.tv_stations.map((station, idx) => (
                                                 <span

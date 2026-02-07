@@ -110,10 +110,6 @@ export default function HomePageContent() {
   }, []);
 
 
-  // Upcoming games - fetch from schedule API
-  const [upcomingGames, setUpcomingGames] = useState<any[]>([]);
-  const [gamesLoading, setGamesLoading] = useState(true);
-
   // Stat leaders - NFL stats
   interface StatLeader {
     playerId: number;
@@ -134,54 +130,6 @@ export default function HomePageContent() {
 
   const [statLeaders, setStatLeaders] = useState<StatLeaders | null>(null);
   const [statLeadersLoading, setStatLeadersLoading] = useState(true);
-
-  // Fetch upcoming games
-  useEffect(() => {
-    async function fetchUpcomingGames() {
-      try {
-        // Fetch schedule from our internal API for the next 7 days
-        const now = new Date();
-        const allGames: any[] = [];
-
-        // Fetch games for next 7 days to find upcoming games
-        for (let i = 0; i < 7; i++) {
-          const date = new Date(now);
-          date.setDate(date.getDate() + i);
-          const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
-
-          const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${dateStr}`));
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.schedule && Array.isArray(data.schedule)) {
-              allGames.push(...data.schedule);
-            }
-          }
-        }
-
-        if (allGames.length > 0) {
-          // Filter for upcoming games (not Final or in progress)
-          const upcoming = allGames
-            .filter((game: any) => game.status === 'Pre-Game')
-            .sort((a: any, b: any) => {
-              const dateA = new Date(a.start_date);
-              const dateB = new Date(b.start_date);
-              return dateA.getTime() - dateB.getTime();
-            })
-            .slice(0, 3); // Get next 3 games
-
-          setUpcomingGames(upcoming);
-        }
-      } catch (err) {
-        console.error('Error fetching upcoming games:', err);
-      } finally {
-        setGamesLoading(false);
-      }
-    }
-
-    fetchUpcomingGames();
-  }, []);
-
 
   // Fetch stat leaders
   useEffect(() => {
@@ -231,16 +179,22 @@ export default function HomePageContent() {
       {/* Main content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL HQ
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               Your destination for NFL teams, stats, rankings, and interactive tools
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -313,150 +267,6 @@ export default function HomePageContent() {
           <NFLPlayoffBracket />
         </div>
 
-        {/* Upcoming Games Section - Hidden */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 hidden">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Upcoming Games</h2>
-              <Link
-                href="/nfl-hq/schedule"
-                className="text-[#0050A0] hover:text-blue-700 font-semibold text-sm transition-colors"
-              >
-                View All Upcoming Games →
-              </Link>
-            </div>
-
-            {gamesLoading ? (
-              /* Loading Skeleton */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="border border-gray-200 rounded-lg p-4 animate-pulse">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-16 mb-1"></div>
-                        <div className="h-3 bg-gray-200 rounded w-12"></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-16 mb-1"></div>
-                        <div className="h-3 bg-gray-200 rounded w-12"></div>
-                      </div>
-                    </div>
-                    <div className="pt-3 border-t border-gray-200">
-                      <div className="h-3 bg-gray-200 rounded w-24 mx-auto"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : upcomingGames.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {upcomingGames.map((game) => {
-                  const awayTeam = allTeams.find(t => t.id === game.away_team.team_slug);
-                  const homeTeam = allTeams.find(t => t.id === game.home_team.team_slug);
-                  const gameDate = new Date(game.start_date);
-                  const gameDateTime = gameDate.toLocaleString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    timeZoneName: 'short'
-                  });
-                  const isFinal = game.status === 'Final';
-                  const isLive = game.status !== 'Pre-Game' && game.status !== 'Final' && (game.has_score || (game.away_team.score !== undefined && game.away_team.score !== null));
-                  const hasScore = game.has_score || (game.status !== 'Pre-Game' && game.away_team.score !== undefined && game.away_team.score !== null);
-                  const gameDateString = gameDate.toISOString().split('T')[0]; // Get YYYY-MM-DD format
-
-                  return (
-                    <Link
-                      key={game.event_id}
-                      href={`/nfl-hq/schedule?view=daily&date=${gameDateString}`}
-                      className={`block border rounded-lg p-4 hover:border-[#0050A0] transition-colors relative ${isLive ? 'border-green-400 ring-2 ring-green-100' : 'border-gray-200'}`}
-                    >
-                      {isLive && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-green-500 text-white text-xs font-bold uppercase rounded">
-                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
-                          Live
-                        </div>
-                      )}
-
-                      {/* Away Team */}
-                      <div className="flex items-center gap-3 mb-3">
-                        {awayTeam && (
-                          <>
-                            <img
-                              src={awayTeam.logoUrl}
-                              alt={game.away_team.abbr}
-                              className="w-8 h-8"
-                            />
-                            <div className="flex-1">
-                              <div className="font-semibold text-gray-900 text-sm">{game.away_team.abbr}</div>
-                              <div className="text-xs text-gray-600">{teamRecords[awayTeam.id] || '0-0'}</div>
-                            </div>
-                          </>
-                        )}
-                        {hasScore && (
-                          <div className={`text-xl font-bold ${
-                            isFinal && game.away_team.is_winner ? 'text-green-600' :
-                            isFinal ? 'text-gray-600' : 'text-gray-900'
-                          }`}>
-                            {game.away_team.score}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Home Team */}
-                      <div className="flex items-center gap-3 mb-3">
-                        {homeTeam && (
-                          <>
-                            <img
-                              src={homeTeam.logoUrl}
-                              alt={game.home_team.abbr}
-                              className="w-8 h-8"
-                            />
-                            <div className="flex-1">
-                              <div className="font-semibold text-gray-900 text-sm">{game.home_team.abbr}</div>
-                              <div className="text-xs text-gray-600">{teamRecords[homeTeam.id] || '0-0'}</div>
-                            </div>
-                          </>
-                        )}
-                        {hasScore && (
-                          <div className={`text-xl font-bold ${
-                            isFinal && game.home_team.is_winner ? 'text-green-600' :
-                            isFinal ? 'text-gray-600' : 'text-gray-900'
-                          }`}>
-                            {game.home_team.score}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Game Status/Time */}
-                      <div className="pt-3 border-t border-gray-200">
-                        {game.status === 'Pre-Game' ? (
-                          <div className="text-xs text-gray-600 text-center">{gameDateTime}</div>
-                        ) : (
-                          <div className={`text-xs font-semibold text-center ${
-                            isFinal ? 'text-gray-600' : 'text-green-600'
-                          }`}>
-                            {game.status}
-                          </div>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>No upcoming games scheduled</p>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Stat Leaders Section */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
@@ -464,7 +274,7 @@ export default function HomePageContent() {
               <h2 className="text-2xl font-bold text-gray-900">Stat Leaders</h2>
               <Link
                 href="/stats"
-                className="text-[#0050A0] hover:text-blue-700 font-semibold text-sm transition-colors"
+                className="text-[#0050A0] hover:text-[#003A75] font-semibold text-sm transition-colors"
               >
                 View All Stats →
               </Link>
@@ -619,7 +429,7 @@ export default function HomePageContent() {
             {/* NFL Standings Card with Preview */}
             <Link
               href="/standings"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -668,7 +478,7 @@ export default function HomePageContent() {
             {/* Free Agency Tracker Card */}
             <Link
               href="/free-agency-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -694,7 +504,7 @@ export default function HomePageContent() {
             {/* Power Rankings Builder Card */}
             <Link
               href="/power-rankings-builder"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -720,7 +530,7 @@ export default function HomePageContent() {
             {/* Salary Cap Tracker Card */}
             <Link
               href="/salary-cap-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -746,7 +556,7 @@ export default function HomePageContent() {
             {/* Injury Report Card */}
             <Link
               href="/injuries"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -772,7 +582,7 @@ export default function HomePageContent() {
             {/* Transactions Card */}
             <Link
               href="/transactions"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
@@ -840,7 +650,7 @@ export default function HomePageContent() {
             <div className="mt-6 md:hidden text-center">
               <Link
                 href="/teams"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#0050A0] hover:bg-[#003d7a] text-white font-medium rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white font-medium rounded-lg transition-all cursor-pointer"
               >
                 View All 32 Teams
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

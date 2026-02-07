@@ -11,7 +11,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+  const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-[#0050A0]';
 
   return (
     <div className={`fixed bottom-4 right-4 z-50 ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-2 duration-200`}>
@@ -880,16 +880,22 @@ export default function PowerRankingsClient() {
       {/* Main Content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Power Rankings Builder
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               Create your own custom NFL power rankings
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -899,8 +905,8 @@ export default function PowerRankingsClient() {
         {/* Content */}
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           {/* Instructions - shown immediately for better LCP */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-900">
+          <div className="bg-[#0050A0]/10 border border-[#0050A0]/30 rounded-lg p-4 mb-6">
+            <p className="text-sm text-[#003A75]">
               <strong>How to use:</strong> {isMobile ? 'Tap a team to select it, then use the arrow buttons to move it up or down. Tap the rank number to jump to a specific position.' : 'Drag and drop teams to reorder, or click the rank number to type a new position.'}
             </p>
           </div>
@@ -988,7 +994,7 @@ export default function PowerRankingsClient() {
                   <button
                     onClick={() => setShowActionsMenu(!showActionsMenu)}
                     disabled={isDownloading}
-                    className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors font-medium flex items-center gap-1.5"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] disabled:bg-[#0050A0]/50 text-white rounded-lg font-medium transition-all cursor-pointer"
                   >
                     {isDownloading ? (
                       <>
@@ -1117,8 +1123,8 @@ export default function PowerRankingsClient() {
                         border-b border-gray-200 transition-all duration-300 ease-in-out relative border-l-4
                         ${isMobile ? 'cursor-pointer' : 'cursor-move'}
                         ${draggedIndex === index ? 'opacity-50 scale-95' : 'scale-100'}
-                        ${dragOverIndex === index ? 'bg-blue-100 shadow-lg' : 'hover:bg-gray-50'}
-                        ${isSelectedForMove ? 'bg-blue-50 ring-2 ring-blue-400 ring-inset' : ''}
+                        ${dragOverIndex === index ? 'bg-[#0050A0]/10 shadow-lg' : 'hover:bg-gray-50'}
+                        ${isSelectedForMove ? 'bg-[#0050A0]/10 ring-2 ring-[#0050A0]/50 ring-inset' : ''}
                       `}
                       style={{
                         borderLeftColor: rankedTeam.team.primaryColor,
@@ -1147,7 +1153,7 @@ export default function PowerRankingsClient() {
                                 e.stopPropagation();
                                 handleRankClick(index);
                               }}
-                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-blue-100 hover:ring-2 hover:ring-blue-300 cursor-pointer transition-all"
+                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-[#0050A0]/10 hover:ring-2 hover:ring-[#0050A0]/30 cursor-pointer transition-all"
                               title="Click to edit rank"
                             >
                               <span className="text-base sm:text-lg font-bold text-gray-900">
@@ -1183,7 +1189,7 @@ export default function PowerRankingsClient() {
                                   moveUp(index);
                                 }}
                                 disabled={index === 0}
-                                className="w-10 h-10 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
+                                className="w-10 h-10 rounded-lg bg-[#0050A0] hover:bg-[#003A75] disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
                                 aria-label="Move up"
                               >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1196,7 +1202,7 @@ export default function PowerRankingsClient() {
                                   moveDown(index);
                                 }}
                                 disabled={index === rankings.length - 1}
-                                className="w-10 h-10 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
+                                className="w-10 h-10 rounded-lg bg-[#0050A0] hover:bg-[#003A75] disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
                                 aria-label="Move down"
                               >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1213,7 +1219,7 @@ export default function PowerRankingsClient() {
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${
                             rankedTeam.team.conference === 'NFC'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-[#0050A0]/10 text-[#0050A0]'
                               : 'bg-red-100 text-red-800'
                           }`}
                         >

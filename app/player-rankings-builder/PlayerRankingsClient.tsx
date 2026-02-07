@@ -913,16 +913,22 @@ export default function PlayerRankingsClient() {
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Player Rankings Builder
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               Create your own custom NFL player rankings
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -942,8 +948,8 @@ export default function PlayerRankingsClient() {
           ) : (
           <>
           {/* Instructions */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-900">
+          <div className="bg-[#0050A0]/10 border border-[#0050A0]/30 rounded-lg p-4 mb-6">
+            <p className="text-sm text-[#003A75]">
               <strong>How to use:</strong> {isMobile ? 'Tap a player to select, then use the arrow buttons to move up or down. Tap the rank number to jump to a specific position.' : 'Drag and drop players to reorder, or click the rank number to move to a specific position.'} Use the X button to remove players. Use filters to view by position.
             </p>
           </div>
@@ -1036,7 +1042,7 @@ export default function PlayerRankingsClient() {
                   <button
                     onClick={() => setShowActionsMenu(!showActionsMenu)}
                     disabled={isDownloading}
-                    className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors font-medium flex items-center gap-1.5"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] disabled:bg-[#0050A0]/50 text-white rounded-lg font-medium transition-all cursor-pointer"
                   >
                     {isDownloading ? (
                       <>
@@ -1162,8 +1168,8 @@ export default function PlayerRankingsClient() {
                           border-b border-gray-200 transition-all duration-300 ease-in-out relative
                           ${isMobile ? 'cursor-pointer' : 'cursor-move'}
                           ${draggedIndex === index ? 'opacity-50 scale-95' : 'scale-100'}
-                          ${dragOverIndex === index ? 'bg-blue-100 shadow-lg' : 'hover:bg-gray-50'}
-                          ${isSelectedForMove ? 'bg-blue-50 ring-2 ring-blue-400 ring-inset' : ''}
+                          ${dragOverIndex === index ? 'bg-[#0050A0]/10 shadow-lg' : 'hover:bg-gray-50'}
+                          ${isSelectedForMove ? 'bg-[#0050A0]/10 ring-2 ring-[#0050A0]/50 ring-inset' : ''}
                           border-l-4
                         `}
                         style={{
@@ -1193,7 +1199,7 @@ export default function PlayerRankingsClient() {
                                   e.stopPropagation();
                                   handleRankClick(index);
                                 }}
-                                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-100 flex items-center justify-center hover:bg-blue-100 active:bg-blue-200 hover:ring-2 hover:ring-blue-300 cursor-pointer transition-all"
+                                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-100 flex items-center justify-center hover:bg-[#0050A0]/10 active:bg-[#0050A0]/20 hover:ring-2 hover:ring-[#0050A0]/30 cursor-pointer transition-all"
                                 title="Click to edit rank"
                               >
                                 <span className="text-base sm:text-lg font-bold text-gray-900">
@@ -1230,7 +1236,7 @@ export default function PlayerRankingsClient() {
                                     moveUp(index);
                                   }}
                                   disabled={index === 0}
-                                  className="w-10 h-10 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
+                                  className="w-10 h-10 rounded-lg bg-[#0050A0] hover:bg-[#003A75] disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
                                   aria-label="Move up"
                                 >
                                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1243,7 +1249,7 @@ export default function PlayerRankingsClient() {
                                     moveDown(index);
                                   }}
                                   disabled={index === rankings.length - 1}
-                                  className="w-10 h-10 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
+                                  className="w-10 h-10 rounded-lg bg-[#0050A0] hover:bg-[#003A75] disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
                                   aria-label="Move down"
                                 >
                                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1286,7 +1292,7 @@ export default function PlayerRankingsClient() {
                         {/* Impact Grade */}
                         <td className="hidden lg:table-cell px-3 py-4 text-center">
                           {rankedPlayer.player.impactGrade && rankedPlayer.player.impactGrade > 0 ? (
-                            <span className="font-semibold text-blue-600">
+                            <span className="font-semibold text-[#0050A0]">
                               {rankedPlayer.player.impactGrade.toFixed(1)}
                             </span>
                           ) : (
@@ -1398,7 +1404,7 @@ export default function PlayerRankingsClient() {
                   return (
                     <div
                       key={player.id}
-                      className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-500 transition-colors"
+                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-[#0050A0] hover:shadow-md transition-all"
                     >
                       <div className="flex items-center gap-3">
                         {team && (

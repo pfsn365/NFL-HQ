@@ -312,12 +312,12 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
                     </tr>
                     {/* Column Headers Row */}
                     <tr className="bg-gray-100 border-b border-gray-200">
-                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">NAME</th>
-                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">POS</th>
-                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">ROUND</th>
-                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">RND PICK</th>
-                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700">OVR PICK</th>
-                      <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide text-gray-700 hidden sm:table-cell">COLLEGE</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Name</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Pos</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Round</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Rnd Pick</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Ovr Pick</th>
+                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 hidden sm:table-cell">College</th>
                     </tr>
                   </thead>
                   <tbody>

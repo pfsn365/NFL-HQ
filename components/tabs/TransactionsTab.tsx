@@ -241,10 +241,10 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                    <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide w-24">DATE</th>
-                    <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide">PLAYER</th>
-                    <th scope="col" className="p-3 font-semibold text-xs uppercase tracking-wide w-20 text-center">POS</th>
-                    <th scope="col" className="text-left p-3 font-semibold text-xs uppercase tracking-wide">TRANSACTION</th>
+                    <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold w-24">Date</th>
+                    <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold">Player</th>
+                    <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold w-20 text-center">Pos</th>
+                    <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold">Transaction</th>
                   </tr>
                 </thead>
                 <tbody>

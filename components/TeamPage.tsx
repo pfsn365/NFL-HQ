@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { TeamData, getAllTeams } from '@/data/teams';
 import { useSEO } from '@/hooks/useSEO';
-import { useINPMonitoring } from '@/hooks/useINPOptimization';
 import PerformanceMonitor from '@/components/PerformanceMonitor';
 import CriticalCSS from '@/components/CriticalCSS';
 import {
@@ -237,10 +236,6 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
 
   // Update SEO metadata based on active tab
   useSEO(team, activeTab);
-
-  // Performance monitoring
-  useINPMonitoring();
-
 
   // Analytics tracking
   useEffect(() => {

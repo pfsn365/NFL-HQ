@@ -94,12 +94,9 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
   }, [salaryCapData?.players, sortField, sortDirection]);
 
   const getSortIcon = (field: SortField) => {
+    // Only show arrow on actively sorted column
     if (sortField !== field) {
-      return (
-        <svg className="w-3 h-3 inline ml-1" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 10l4-4 4 4H8zm0 4l4 4 4-4H8z" opacity="0.5"/>
-        </svg>
-      );
+      return null;
     }
     if (sortDirection === 'asc') {
       return (
@@ -173,7 +170,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 card-hover" style={{ borderLeftColor: team.primaryColor }}>
               <div className="text-center">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Salary Cap</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Salary Cap</h4>
                 <div className="text-2xl font-bold text-gray-900 mb-1">${(salaryCapData.teamSummary.salaryCap / 1000000).toFixed(1)}M</div>
                 <div className="text-sm text-gray-600">2026 Season</div>
               </div>
@@ -181,7 +178,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
 
             <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 card-hover" style={{ borderLeftColor: team.primaryColor }}>
               <div className="text-center">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Available Cap Space</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Available Cap Space</h4>
                 <div className={`text-2xl font-bold mb-1 ${salaryCapData.teamSummary.capSpace > 0 ? 'text-green-600' : 'text-red-600'}`}>
                   ${(salaryCapData.teamSummary.capSpace / 1000000).toFixed(1)}M
                 </div>
@@ -193,7 +190,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
 
             <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 card-hover" style={{ borderLeftColor: team.primaryColor }}>
               <div className="text-center">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Active Cap Spend</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Active Cap Spend</h4>
                 <div className="text-2xl font-bold text-gray-900 mb-1">${(salaryCapData.teamSummary.activeCapSpend / 1000000).toFixed(1)}M</div>
                 <div className="text-sm text-gray-600">
                   {((salaryCapData.teamSummary.activeCapSpend / salaryCapData.teamSummary.salaryCap) * 100).toFixed(1)}% of cap
@@ -203,7 +200,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
 
             <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 card-hover" style={{ borderLeftColor: team.primaryColor }}>
               <div className="text-center">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Dead Money</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Dead Money</h4>
                 <div className="text-2xl font-bold text-gray-900 mb-1">${(salaryCapData.teamSummary.deadMoney / 1000000).toFixed(1)}M</div>
                 <div className="text-sm text-gray-600">
                   {((salaryCapData.teamSummary.deadMoney / salaryCapData.teamSummary.salaryCap) * 100).toFixed(1)}% of cap
@@ -234,55 +231,55 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
               <thead>
                 <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
                   <th
-                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap min-w-[160px]"
+                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap min-w-[160px]"
                     onClick={() => handleSort('name')}
                   >
-                    PLAYER {getSortIcon('name')}
+                    Player{getSortIcon('name')}
                   </th>
                   <th
-                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                     onClick={() => handleSort('capHit')}
                   >
-                    CAP HIT {getSortIcon('capHit')}
+                    Cap Hit{getSortIcon('capHit')}
                   </th>
                   <th
-                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                     onClick={() => handleSort('baseSalary')}
                   >
-                    BASE SALARY {getSortIcon('baseSalary')}
+                    Base Salary{getSortIcon('baseSalary')}
                   </th>
                   <th
-                    className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                     onClick={() => handleSort('guaranteed')}
                   >
-                    GUARANTEED {getSortIcon('guaranteed')}
+                    Guaranteed{getSortIcon('guaranteed')}
                   </th>
 
                   {showPotentialSavings ? (
                     <>
                       <th
-                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('restructureCapSaving')}
                       >
-                        RESTRUCTURE {getSortIcon('restructureCapSaving')}
+                        Restructure{getSortIcon('restructureCapSaving')}
                       </th>
                       <th
-                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('extensionCapSaving')}
                       >
-                        EXTENSION {getSortIcon('extensionCapSaving')}
+                        Extension{getSortIcon('extensionCapSaving')}
                       </th>
                       <th
-                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('cutSaving')}
                       >
-                        CUT SAVINGS {getSortIcon('cutSaving')}
+                        Cut Savings{getSortIcon('cutSaving')}
                       </th>
                       <th
-                        className="text-left p-3 font-medium cursor-pointer hover:opacity-90 whitespace-nowrap"
+                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('cutDeadMoney')}
                       >
-                        DEAD MONEY {getSortIcon('cutDeadMoney')}
+                        Dead Money{getSortIcon('cutDeadMoney')}
                       </th>
                     </>
                   ) : null}

@@ -394,7 +394,7 @@ export default function InjuryReportTab() {
         <p className="text-red-700 mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] transition-colors cursor-pointer"
+          className="px-4 py-2 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white rounded-lg font-medium transition-all cursor-pointer"
         >
           Try Again
         </button>

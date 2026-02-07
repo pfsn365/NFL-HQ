@@ -563,11 +563,7 @@ export default function StatsTab({ team }: StatsTabProps) {
 
   const getSortIcon = (columnKey: string) => {
     if (sortColumn !== columnKey) {
-      return (
-        <svg className="w-3 h-3 inline ml-1" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 10l4-4 4 4H8zm0 4l4 4 4-4H8z" opacity="0.5"/>
-        </svg>
-      );
+      return null; // Only show arrow on actively sorted column
     }
     if (sortDirection === 'asc') {
       return (
@@ -671,18 +667,15 @@ export default function StatsTab({ team }: StatsTabProps) {
           <thead>
             <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
               {Object.entries(currentHeaders).map(([key, header]) => (
-                <th key={key} className="text-left p-2 sm:p-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">
-                  {viewType === 'players' && key !== 'player' ? (
-                    <button
-                      onClick={() => handleSort(key)}
-                      className="flex items-center hover:opacity-90 w-full text-left cursor-pointer"
-                    >
-                      <span>{header}</span>
-                      {getSortIcon(key)}
-                    </button>
-                  ) : (
-                    header
-                  )}
+                <th
+                  key={key}
+                  onClick={viewType === 'players' && key !== 'player' ? () => handleSort(key) : undefined}
+                  className={`text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap ${
+                    viewType === 'players' && key !== 'player' ? 'cursor-pointer hover:opacity-80 select-none' : ''
+                  }`}
+                >
+                  {header}
+                  {viewType === 'players' && key !== 'player' && getSortIcon(key)}
                 </th>
               ))}
             </tr>
@@ -730,7 +723,7 @@ export default function StatsTab({ team }: StatsTabProps) {
                           {value}
                         </span>
                       ) : key === 'category' ? (
-                        <span className="text-blue-600 font-medium hover:underline cursor-pointer">
+                        <span className="text-[#0050A0] font-medium hover:underline cursor-pointer">
                           {value}
                         </span>
                       ) : (

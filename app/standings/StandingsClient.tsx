@@ -497,7 +497,7 @@ export default function StandingsClient() {
               <th scope="col" className="pl-4 sm:pl-6 pr-2 sm:pr-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold text-white w-10 sm:w-12">#</th>
               <th scope="col" className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold text-white">Team</th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('wins')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -506,7 +506,7 @@ export default function StandingsClient() {
                 </div>
               </th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('losses')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -516,7 +516,7 @@ export default function StandingsClient() {
               </th>
               <th scope="col" className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white">T</th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('winPct')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -525,7 +525,7 @@ export default function StandingsClient() {
                 </div>
               </th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('gamesBack')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -536,7 +536,7 @@ export default function StandingsClient() {
               <th scope="col" className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white">Home</th>
               <th scope="col" className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white">Away</th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('confRecord')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -545,7 +545,7 @@ export default function StandingsClient() {
                 </div>
               </th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('divRecord')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -555,7 +555,7 @@ export default function StandingsClient() {
               </th>
               <th scope="col" className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white">Streak</th>
               <th
-                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003d7a] transition-colors"
+                className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-white cursor-pointer hover:bg-[#003A75] transition-colors"
                 onClick={() => handleSort('last10')}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
@@ -633,16 +633,22 @@ export default function StandingsClient() {
       {/* Main Content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Standings
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               Live standings and playoff race for all 32 teams
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -754,7 +760,7 @@ export default function StandingsClient() {
                           const teamInfo = getTeamInfo(team.teamName);
                           return (
                             <div key={team.teamId} className="flex items-center gap-3 py-2 px-3 bg-blue-50 rounded-lg mb-2 border border-blue-200">
-                              <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                              <span className="w-8 h-8 rounded-full bg-[#0050A0] text-white flex items-center justify-center font-bold text-sm">
                                 {idx + 5}
                               </span>
                               {teamInfo && (
@@ -774,7 +780,7 @@ export default function StandingsClient() {
                   {/* NFC Playoff Picture */}
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-sm">NFC</span>
+                      <span className="bg-[#0050A0]/10 text-[#0050A0] px-3 py-1 rounded-md text-sm">NFC</span>
                     </h3>
                     <div className="space-y-3">
                       {/* Division Winners */}
@@ -806,7 +812,7 @@ export default function StandingsClient() {
                           const teamInfo = getTeamInfo(team.teamName);
                           return (
                             <div key={team.teamId} className="flex items-center gap-3 py-2 px-3 bg-blue-50 rounded-lg mb-2 border border-blue-200">
-                              <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                              <span className="w-8 h-8 rounded-full bg-[#0050A0] text-white flex items-center justify-center font-bold text-sm">
                                 {idx + 5}
                               </span>
                               {teamInfo && (

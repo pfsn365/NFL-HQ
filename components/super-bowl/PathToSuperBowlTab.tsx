@@ -587,7 +587,7 @@ function SOSCard({ team, teamKey }: { team: TeamData; teamKey: 'patriots' | 'sea
 
         {/* Opponent Record */}
         <div className="bg-gray-50 rounded-lg p-4 text-center">
-          <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Combined Opponent Record</div>
+          <div className="text-xs text-gray-600 font-semibold mb-1">Combined Opponent Record</div>
           <div className="text-2xl font-bold text-gray-900">{team.strengthOfSchedule.opponentRecord.combined}</div>
           <div className="text-sm text-gray-600">{team.strengthOfSchedule.opponentRecord.winPct} Win Rate</div>
         </div>
@@ -598,9 +598,9 @@ function SOSCard({ team, teamKey }: { team: TeamData; teamKey: 'patriots' | 'sea
             <div className="text-xs text-green-600 uppercase">vs .500+ Teams</div>
             <div className="text-xl font-bold text-green-700">{team.qualityWins.record}</div>
           </div>
-          <div className="bg-blue-50 rounded p-3 text-center">
-            <div className="text-xs text-blue-600 uppercase">vs Playoff Teams</div>
-            <div className="text-xl font-bold text-blue-700">{team.playoffTeamRecord.record}</div>
+          <div className="bg-[#0050A0]/10 rounded p-3 text-center">
+            <div className="text-xs text-[#0050A0] uppercase">vs Playoff Teams</div>
+            <div className="text-xl font-bold text-[#003A75]">{team.playoffTeamRecord.record}</div>
           </div>
         </div>
       </div>

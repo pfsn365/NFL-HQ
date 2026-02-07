@@ -184,14 +184,20 @@ export default function SuperBowlLXContent() {
       {/* Main content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+                <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
                   Super Bowl HQ
                 </h1>
-                <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+                <p className="text-lg opacity-90 font-medium">
                   Super Bowl LX coverage and information
                 </p>
               </div>
@@ -202,7 +208,7 @@ export default function SuperBowlLXContent() {
               />
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Tab Navigation */}
         <div className="bg-white border-b border-gray-200">
@@ -860,7 +866,7 @@ export default function SuperBowlLXContent() {
                 <p className="text-red-700 mb-4">{articlesError}</p>
                 <button
                   onClick={fetchSuperBowlArticles}
-                  className="px-4 py-2 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] transition-colors"
+                  className="px-4 py-2 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white rounded-lg font-medium transition-all cursor-pointer"
                 >
                   Try Again
                 </button>
@@ -923,7 +929,7 @@ export default function SuperBowlLXContent() {
                   <div className="text-center mt-8">
                     <button
                       onClick={loadMoreArticles}
-                      className="px-6 py-3 bg-[#0050A0] text-white rounded-lg hover:bg-[#003d7a] transition-colors font-medium"
+                      className="px-6 py-3 min-h-[44px] bg-[#0050A0] hover:bg-[#003A75] active:scale-[0.98] text-white rounded-lg font-medium transition-all cursor-pointer"
                     >
                       Show More
                     </button>

@@ -156,14 +156,10 @@ export default function SalaryCapTrackerClient() {
     return allTeams.find(t => t.id === teamId);
   };
 
-  // Sort indicator component
+  // Sort indicator component - only shows on active sort column
   const SortIndicator = ({ column }: { column: SortKey }) => {
     if (sortKey !== column) {
-      return (
-        <svg className="w-4 h-4 text-white opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-      );
+      return null;
     }
 
     return sortDirection === 'asc' ? (
@@ -194,16 +190,22 @@ export default function SalaryCapTrackerClient() {
       {/* Main Content */}
       <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
         {/* Header */}
-        <div className="bg-[#0050A0] text-white pt-[57px] lg:pt-0 pb-4 lg:pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3">
+        <header
+          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          style={{
+            background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
+            boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
+          }}
+        >
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL Salary Cap Tracker by Team
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl opacity-90">
+            <p className="text-lg opacity-90 font-medium">
               Track cap space, active spending, and dead money for all 32 teams
             </p>
           </div>
-        </div>
+        </header>
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
@@ -229,47 +231,47 @@ export default function SalaryCapTrackerClient() {
                   <thead className="bg-[#0050A0] text-white">
                     <tr>
                       <th
-                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003A75] transition-colors"
                         onClick={() => handleSort('teamName')}
                       >
                         <div className="flex items-center gap-1 sm:gap-2">
-                          TEAM
+                          Team
                           <SortIndicator column="teamName" />
                         </div>
                       </th>
                       <th
-                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003A75] transition-colors"
                         onClick={() => handleSort('capSpace')}
                       >
                         <div className="flex items-center gap-1 sm:gap-2">
-                          CAP SPACE
+                          Cap Space
                           <SortIndicator column="capSpace" />
                         </div>
                       </th>
                       <th
-                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003A75] transition-colors"
                         onClick={() => handleSort('salaryCap')}
                       >
                         <div className="flex items-center gap-1 sm:gap-2">
-                          <span className="hidden sm:inline">2026 </span>SALARY CAP
+                          <span className="hidden sm:inline">2026 </span>Salary Cap
                           <SortIndicator column="salaryCap" />
                         </div>
                       </th>
                       <th
-                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003A75] transition-colors"
                         onClick={() => handleSort('activeCapSpend')}
                       >
                         <div className="flex items-center gap-1 sm:gap-2">
-                          ACTIVE<span className="hidden sm:inline"> CAP</span> SPEND
+                          Active<span className="hidden sm:inline"> Cap</span> Spend
                           <SortIndicator column="activeCapSpend" />
                         </div>
                       </th>
                       <th
-                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003d7a] transition-colors"
+                        className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold cursor-pointer hover:bg-[#003A75] transition-colors"
                         onClick={() => handleSort('deadMoney')}
                       >
                         <div className="flex items-center gap-1 sm:gap-2">
-                          DEAD MONEY
+                          Dead Money
                           <SortIndicator column="deadMoney" />
                         </div>
                       </th>
