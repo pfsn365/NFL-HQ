@@ -325,6 +325,20 @@ img {
   .pfsn-footer {
     margin-left: 256px;
     width: calc(100% - 256px);
+    transition: margin-left 0.3s, width 0.3s;
+  }
+
+  body.sidebar-collapsed .pfsn-footer {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Ticker adjustment when sidebar collapses */
+@media (min-width: 1024px) {
+  body.sidebar-collapsed .fixed.lg\:left-64 {
+    left: 0 !important;
+    transition: left 0.3s;
   }
 }
 

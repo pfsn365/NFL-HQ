@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { getAllTeams } from '@/data/teams';
-import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
@@ -433,24 +432,10 @@ function SchedulePageInner() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Desktop sidebar */}
-      <div className="hidden lg:block">
-        <div className="fixed top-0 left-0 w-64 h-screen z-10">
-          <NFLTeamsSidebar />
-        </div>
-      </div>
-
-      {/* Mobile sidebar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
-        <NFLTeamsSidebar isMobile={true} />
-      </div>
-
-      {/* Main content */}
-      <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
+      <main id="main-content" className="pt-[57px] lg:pt-0">
         {/* Header */}
         <header
-          className="text-white shadow-lg pt-[57px] lg:pt-0"
+          className="text-white shadow-lg"
           style={{
             background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
@@ -1291,7 +1276,6 @@ function SchedulePageInner() {
           )}
         </div>
       </main>
-    </div>
   );
 }
 

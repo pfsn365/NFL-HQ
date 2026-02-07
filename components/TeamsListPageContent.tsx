@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { teams } from '@/data/teams';
-import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getApiPath } from '@/utils/api';
 
 interface ScheduleGame {
@@ -174,22 +173,10 @@ export default function TeamsListPageContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar - Desktop */}
-      <aside className="hidden lg:block w-64 fixed left-0 top-0 bottom-0 z-10">
-        <NFLTeamsSidebar />
-      </aside>
-
-      {/* Mobile Sidebar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
-        <NFLTeamsSidebar isMobile={true} />
-      </div>
-
-      {/* Main Content */}
-      <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
+      <main id="main-content" className="pt-[57px] lg:pt-0">
           {/* Header */}
           <header
-            className="text-white shadow-lg pt-[57px] lg:pt-0"
+            className="text-white shadow-lg"
             style={{
               background: 'linear-gradient(180deg, #0050A0 0%, #003A75 100%)',
               boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
@@ -235,6 +222,5 @@ export default function TeamsListPageContent() {
             </div>
           </div>
         </main>
-    </div>
   );
 }

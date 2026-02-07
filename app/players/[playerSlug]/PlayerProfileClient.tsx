@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
-import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import { getAllTeams } from '@/data/teams';
@@ -396,28 +395,11 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
     return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
   };
 
-  // Sidebar component for reuse
-  const SidebarLayout = ({ children }: { children: React.ReactNode }) => (
-    <div className="flex min-h-screen bg-gray-50">
-      <div className="hidden lg:block">
-        <div className="fixed top-0 left-0 w-64 h-screen z-10">
-          <NFLTeamsSidebar />
-        </div>
-      </div>
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-20">
-        <NFLTeamsSidebar isMobile={true} />
-      </div>
-      <main id="main-content" className="flex-1 lg:ml-64 min-w-0">
-        {children}
-      </main>
-    </div>
-  );
-
   // Loading state
   if (loading) {
     return (
-      <SidebarLayout>
-        <div className="bg-gray-400 text-white pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[57px] lg:pt-0">
+        <div className="bg-gray-400 text-white">
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col lg:flex-row items-center justify-between">
               <div className="flex items-center space-x-6 mb-6 lg:mb-0">
@@ -434,15 +416,15 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
         <div className="container mx-auto px-4 py-6">
           <SkeletonLoader className="h-64 w-full rounded-lg" />
         </div>
-      </SidebarLayout>
+      </main>
     );
   }
 
   // Error state
   if (error || !player) {
     return (
-      <SidebarLayout>
-        <div className="bg-gray-600 text-white pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[57px] lg:pt-0">
+        <div className="bg-gray-600 text-white">
           <div className="container mx-auto px-4 py-8">
             <Link href="/players" className="text-white/80 hover:text-white mb-4 inline-flex items-center gap-1">
               ← Back to Players
@@ -467,7 +449,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
             </Link>
           </div>
         </div>
-      </SidebarLayout>
+      </main>
     );
   }
 
@@ -504,7 +486,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   };
 
   return (
-    <SidebarLayout>
+    <main id="main-content" className="pt-[57px] lg:pt-0">
       {/* JSON-LD Structured Data */}
       <Script
         id="player-jsonld"
@@ -514,7 +496,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
 
       {/* Hero Section with Team Primary Color */}
       <div
-        className="text-white pt-[57px] lg:pt-3 lg:pb-3"
+        className="text-white lg:pt-3 lg:pb-3"
         style={{ backgroundColor: player.team?.primaryColor || '#0050A0' }}
       >
         <div className="container mx-auto px-4 py-3 lg:py-3">
@@ -902,6 +884,6 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
           </div>
         )}
       </div>
-    </SidebarLayout>
+    </main>
   );
 }
