@@ -252,7 +252,7 @@ export default function HomePageContent() {
                 <img
                   src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
                   alt="Super Bowl LX"
-                  className="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 object-contain"
+                  className={`object-contain ${countdown ? 'w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28' : 'w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40'}`}
                 />
                 {countdown && (
                   <div className="mt-2 flex items-center gap-1 sm:gap-2 text-white">

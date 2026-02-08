@@ -10,9 +10,58 @@ import RostersDepthChartsTab from '@/components/super-bowl/RostersDepthChartsTab
 import PathToSuperBowlTab from '@/components/super-bowl/PathToSuperBowlTab';
 import { getApiPath } from '@/utils/api';
 
+// Live Score Component - fetches Super Bowl score from ESPN
+function LiveScore() {
+  const [score, setScore] = useState<{ away: string; home: string; detail: string; isLive: boolean } | null>(null);
+
+  useEffect(() => {
+    const fetchScore = async () => {
+      try {
+        const res = await fetch(getApiPath('nfl/espn-scoreboard?date=2026-02-08'));
+        const data = await res.json();
+        // Find the Super Bowl game (NE vs SEA)
+        const sbGame = data.games?.find((g: { away_team?: { abbr?: string }; home_team?: { abbr?: string }; playoff_round?: string }) =>
+          g.playoff_round?.toLowerCase().includes('super bowl') ||
+          (g.away_team?.abbr === 'NE' && g.home_team?.abbr === 'SEA') ||
+          (g.away_team?.abbr === 'SEA' && g.home_team?.abbr === 'NE')
+        );
+        if (sbGame) {
+          setScore({
+            away: sbGame.away_team.score ?? '0',
+            home: sbGame.home_team.score ?? '0',
+            detail: sbGame.status_detail,
+            isLive: sbGame.is_live,
+          });
+        }
+      } catch {
+        // Silently fail - will just show nothing
+      }
+    };
+
+    fetchScore();
+    const interval = setInterval(fetchScore, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!score) return null;
+
+  return (
+    <div className="text-center">
+      <div className="text-white font-bold text-3xl sm:text-4xl lg:text-5xl tabular-nums">
+        {score.away} - {score.home}
+      </div>
+      <div className="text-white text-xs sm:text-sm lg:text-base font-semibold uppercase tracking-wider mt-1 sm:mt-2">
+        {score.isLive && <span className="inline-block w-2 h-2 bg-red-500 rounded-full mr-1.5 animate-pulse align-middle" />}
+        {score.detail}
+      </div>
+    </div>
+  );
+}
+
 // Countdown Timer Component
 function CountdownTimer({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -24,6 +73,8 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
         });
+      } else {
+        setExpired(true);
       }
     };
 
@@ -31,6 +82,10 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
     const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
   }, [targetDate]);
+
+  if (expired) {
+    return <LiveScore />;
+  }
 
   return (
     <div className="text-center">
