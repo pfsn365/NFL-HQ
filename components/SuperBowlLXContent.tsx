@@ -307,6 +307,10 @@ export default function SuperBowlLXContent() {
                       alt="New England Patriots"
                       className="w-16 h-16 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
                     />
+                    {/* Score */}
+                    <div className="mt-1 sm:mt-2">
+                      <span className="text-white font-bold text-2xl sm:text-5xl lg:text-6xl">13</span>
+                    </div>
                     {/* Record Badge */}
                     <div className="mt-1 sm:mt-2 bg-white/20 backdrop-blur-sm rounded-full px-1.5 sm:px-4 py-0.5 sm:py-1">
                       <span className="text-white font-bold text-[10px] sm:text-xl">14-3</span>
@@ -314,9 +318,12 @@ export default function SuperBowlLXContent() {
                     </div>
                   </div>
 
-                  {/* Countdown Timer Center */}
+                  {/* Final Indicator Center */}
                   <div className="flex flex-col items-center justify-center flex-shrink min-w-0">
-                    <CountdownTimer targetDate="2026-02-08T18:30:00-05:00" />
+                    <div className="text-white text-xs sm:text-sm lg:text-base font-semibold uppercase tracking-wider mb-1">Super Bowl LX</div>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 sm:px-6 py-1.5 sm:py-3">
+                      <span className="text-white font-bold text-sm sm:text-2xl lg:text-3xl tracking-wide">FINAL</span>
+                    </div>
                   </div>
 
                   {/* Seahawks Side */}
@@ -326,6 +333,10 @@ export default function SuperBowlLXContent() {
                       alt="Seattle Seahawks"
                       className="w-16 h-16 sm:w-36 sm:h-36 lg:w-44 lg:h-44 object-contain drop-shadow-lg"
                     />
+                    {/* Score */}
+                    <div className="mt-1 sm:mt-2">
+                      <span className="text-white font-bold text-2xl sm:text-5xl lg:text-6xl">29</span>
+                    </div>
                     {/* Record Badge */}
                     <div className="mt-1 sm:mt-2 bg-white/20 backdrop-blur-sm rounded-full px-1.5 sm:px-4 py-0.5 sm:py-1">
                       <span className="text-white font-bold text-[10px] sm:text-xl">14-3</span>

@@ -140,11 +140,11 @@ const initialPlayoffData: { [key: string]: Matchup } = {
   // Super Bowl
   'superbowl': {
     id: 'superbowl',
-    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots' },
-    team2: { seed: 1, name: 'Seahawks', teamId: 'seattle-seahawks' },
+    team1: { seed: 2, name: 'Patriots', teamId: 'new-england-patriots', score: 13 },
+    team2: { seed: 1, name: 'Seahawks', teamId: 'seattle-seahawks', score: 29, isWinner: true },
     round: 'Super Bowl LX',
     date: 'Sun, Feb 8',
-    completed: false,
+    completed: true,
   },
 };
 
