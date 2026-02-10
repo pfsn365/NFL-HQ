@@ -26,10 +26,13 @@ interface ScheduleTabProps {
   team: TeamData;
 }
 
+const AVAILABLE_SEASONS = [2025, 2024, 2023, 2022, 2021, 2020];
+
 export default function ScheduleTab({ team }: ScheduleTabProps) {
   const [scheduleData, setScheduleData] = useState<ScheduleGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSeason, setSelectedSeason] = useState(2025);
 
   // Helper function to get team by abbreviation or name
   const getTeamByAbbreviation = (abbr: string): TeamData | null => {
@@ -73,7 +76,7 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(getApiPath(`nfl/teams/api/schedule/${team.id}`));
+      const response = await fetch(getApiPath(`nfl/teams/api/schedule/${team.id}?season=${selectedSeason}`));
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -95,7 +98,7 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
     } finally {
       setLoading(false);
     }
-  }, [team.id]);
+  }, [team.id, selectedSeason]);
 
   useEffect(() => {
     fetchSchedule();
@@ -260,6 +263,22 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Schedule</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '260px' }}></div>
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="season-select" className="text-sm font-medium text-gray-700">Season:</label>
+          <select
+            id="season-select"
+            value={selectedSeason}
+            onChange={(e) => setSelectedSeason(parseInt(e.target.value, 10))}
+            className="px-3 py-2 min-h-[44px] border border-gray-300 rounded-lg text-sm font-medium text-gray-900 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1"
+            style={{ '--tw-ring-color': team.primaryColor } as React.CSSProperties}
+          >
+            {AVAILABLE_SEASONS.map((season) => (
+              <option key={season} value={season}>
+                {season}-{String(season + 1).slice(2)}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

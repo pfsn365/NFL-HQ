@@ -886,9 +886,23 @@ export const superBowlHistory: SuperBowlGame[] = [
     loserScore: 22,
     mvp: { player: 'Jalen Hurts', position: 'QB', team: 'Philadelphia', highlights: '17-of-22, 293 total yards, 3 total TDs' },
   },
+  {
+    number: 'LX',
+    arabicNumber: 60,
+    date: 'Feb. 8, 2026',
+    venue: "Levi's Stadium",
+    city: 'Santa Clara, CA',
+    winner: 'Seattle',
+    winnerTeamId: 'seattle-seahawks',
+    winnerScore: 29,
+    loser: 'New England',
+    loserTeamId: 'new-england-patriots',
+    loserScore: 13,
+    mvp: { player: 'Kenneth Walker III', position: 'RB', team: 'Seattle', highlights: '27 carries, 135 yards, 2 catches for 26 yards' },
+  },
 ];
 
-// Super Bowl LX information (upcoming)
+// Super Bowl LX information
 export const superBowlLX = {
   number: 'LX',
   arabicNumber: 60,
@@ -947,7 +961,7 @@ export const superBowlRecords = {
     { player: 'Patrick Mahomes', count: 3, games: ['LIV', 'LVII', 'LVIII'] },
   ],
   mostWins: [
-    { team: 'New England Patriots', wins: 6, appearances: 11 },
+    { team: 'New England Patriots', wins: 6, appearances: 12 },
     { team: 'Pittsburgh Steelers', wins: 6, appearances: 8 },
     { team: 'San Francisco 49ers', wins: 5, appearances: 8 },
     { team: 'Dallas Cowboys', wins: 5, appearances: 8 },
@@ -959,7 +973,7 @@ export const superBowlRecords = {
     { team: 'Washington Commanders', wins: 3, appearances: 5 },
   ],
   mostLosses: [
-    { team: 'New England Patriots', losses: 5 },
+    { team: 'New England Patriots', losses: 6 },
     { team: 'Denver Broncos', losses: 5 },
     { team: 'Buffalo Bills', losses: 4 },
     { team: 'Minnesota Vikings', losses: 4 },

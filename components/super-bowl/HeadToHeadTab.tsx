@@ -15,6 +15,7 @@ interface GameResult {
 }
 
 const headToHeadGames: GameResult[] = [
+  { date: '02/08/2026', visitor: 'Seattle Seahawks', visitorScore: 29, home: 'New England Patriots', homeScore: 13, result: 'L', isSuperBowl: true, superBowlName: 'Super Bowl LX' },
   { date: '09/15/2024', visitor: 'Seattle Seahawks', visitorScore: 23, home: 'New England Patriots', homeScore: 20, result: 'L', isOvertime: true },
   { date: '09/20/2020', visitor: 'New England Patriots', visitorScore: 30, home: 'Seattle Seahawks', homeScore: 35, result: 'L' },
   { date: '11/13/2016', visitor: 'Seattle Seahawks', visitorScore: 31, home: 'New England Patriots', homeScore: 24, result: 'L' },
@@ -46,7 +47,7 @@ const patriotsStats = {
   pointsPerGame: 22.5,
   pointsAllowedPerGame: 20.4,
   playoffApps: 29,
-  finalsApps: 11,
+  finalsApps: 12,
   championships: 6,
 };
 
@@ -59,8 +60,8 @@ const seahawksStats = {
   pointsPerGame: 21.8,
   pointsAllowedPerGame: 21.1,
   playoffApps: 21,
-  finalsApps: 3,
-  championships: 1,
+  finalsApps: 4,
+  championships: 2,
 };
 
 export default function HeadToHeadTab() {

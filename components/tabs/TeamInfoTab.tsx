@@ -5,6 +5,7 @@ import { TeamData } from '@/data/teams';
 import { TeamInfoData } from '@/data/teamInfo';
 import { HallOfFamer } from '@/data/hallOfFame';
 import { getContrastTextColor } from '@/utils/colorHelpers';
+import { getApiPath } from '@/utils/api';
 
 interface TeamInfoTabProps {
   team: TeamData;
@@ -39,7 +40,7 @@ export default function TeamInfoTab({ team }: TeamInfoTabProps) {
 
     async function fetchTeamInfo() {
       try {
-        const response = await fetch(`/api/nfl/team-info/${team.id}`);
+        const response = await fetch(getApiPath(`api/nfl/team-info/${team.id}`));
         if (!response.ok) throw new Error('Failed to fetch');
 
         const data = await response.json();

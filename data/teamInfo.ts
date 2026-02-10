@@ -147,7 +147,7 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlAppearances: ['1966 (I)', '1967 (II)', '1996 (XXXI)', '2010 (XLV)'],
     conferenceChampionships: 11,
     divisionTitles: 22,
-    playoffAppearances: 36,
+    playoffAppearances: 37,
     retiredNumbers: [
       { number: '3', name: 'Tony Canadeo', position: 'Running Back', years: '1941-1944, 1946-1952' },
       { number: '4', name: 'Brett Favre', position: 'Quarterback', years: '1992-2007' },
@@ -165,9 +165,9 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     ],
     achievements: [
       { title: 'Super Bowl Championships', description: 'I, II, XXXI, XLV', count: 4 },
-      { title: 'NFL Championships', description: '13 total championships (pre-Super Bowl era)', count: 13 },
       { title: 'NFC Championships', description: 'Most recent: 2010', count: 5 },
-      { title: 'Division Titles', description: 'Most recent: 2021', count: 22 }
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 22 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 37 }
     ]
   },
 
@@ -180,10 +180,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     conference: 'AFC',
     division: 'AFC East',
     superbowlWins: 6,
-    superbowlAppearances: ['1985 (XX)', '1996 (XXXI)', '2001 (XXXVI)', '2003 (XXXVIII)', '2004 (XXXIX)', '2007 (XLII)', '2011 (XLVI)', '2014 (XLIX)', '2016 (LI)', '2017 (LII)', '2018 (LIII)'],
-    conferenceChampionships: 13,
-    divisionTitles: 22,
-    playoffAppearances: 31,
+    superbowlAppearances: ['1985 (XX)', '1996 (XXXI)', '2001 (XXXVI)', '2003 (XXXVIII)', '2004 (XXXIX)', '2007 (XLII)', '2011 (XLVI)', '2014 (XLIX)', '2016 (LI)', '2017 (LII)', '2018 (LIII)', '2025 (LX)'],
+    conferenceChampionships: 14,
+    divisionTitles: 23,
+    playoffAppearances: 32,
     retiredNumbers: [
       { number: '12', name: 'Tom Brady', position: 'Quarterback', years: '2000-2019' },
       { number: '20', name: 'Gino Cappelletti', position: 'Wide Receiver/Kicker', years: '1960-1970' },
@@ -204,9 +204,9 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     ],
     achievements: [
       { title: 'Super Bowl Championships', description: 'XXXVI, XXXVIII, XXXIX, XLIX, LI, LIII', count: 6 },
-      { title: 'AFC Championships', description: 'Most recent: 2018', count: 13 },
-      { title: 'Division Titles', description: 'Most recent: 2019', count: 22 },
-      { title: 'Playoff Appearances', description: 'Most recent: 2021', count: 31 }
+      { title: 'AFC Championships', description: 'Most recent: 2025', count: 14 },
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 23 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 32 }
     ]
   },
 
@@ -236,8 +236,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Mercedes-Benz Stadium', years: '2017–present', description: 'State-of-the-art retractable roof stadium • Hosted Super Bowl LIII', isCurrent: true }
     ],
     achievements: [
-      { title: 'Super Bowl Appearances', description: 'XXXIII (1998), LI (2016)', count: 2 },
-      { title: 'NFC Championships', description: '1998, 2016', count: 2 },
+      { title: 'Super Bowl Championships', description: 'None (0-2 in Super Bowls)', count: 0 },
+      { title: 'NFC Championships', description: 'Most recent: 2016', count: 2 },
       { title: 'Division Titles', description: 'Most recent: 2016', count: 6 },
       { title: 'Playoff Appearances', description: 'Most recent: 2017', count: 14 }
     ]
@@ -286,7 +286,7 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlAppearances: ['1990 (XXV)', '1991 (XXVI)', '1992 (XXVII)', '1993 (XXVIII)'],
     conferenceChampionships: 4,
     divisionTitles: 12,
-    playoffAppearances: 22,
+    playoffAppearances: 23,
     retiredNumbers: [
       { number: '12', name: 'Jim Kelly', position: 'Quarterback', years: '1986-1996' },
       { number: '34', name: 'Thurman Thomas', position: 'Running Back', years: '1988-1999' },
@@ -301,10 +301,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Highmark Stadium', years: '2023–present', description: 'Current naming rights • New stadium planned for 2026', isCurrent: true }
     ],
     achievements: [
-      { title: 'AFL Championships', description: '1964, 1965 (pre-Super Bowl)', count: 2 },
-      { title: 'AFC Championships', description: '4 consecutive (1990-1993)', count: 4 },
+      { title: 'Super Bowl Championships', description: 'None (0-4 in Super Bowls)', count: 0 },
+      { title: 'AFC Championships', description: 'Most recent: 1993', count: 4 },
       { title: 'Division Titles', description: 'Most recent: 2023', count: 12 },
-      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 22 }
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 23 }
     ]
   },
 
@@ -319,8 +319,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlWins: 0,
     superbowlAppearances: ['2003 (XXXVIII)', '2015 (50)'],
     conferenceChampionships: 2,
-    divisionTitles: 6,
-    playoffAppearances: 8,
+    divisionTitles: 7,
+    playoffAppearances: 9,
     retiredNumbers: [
       { number: '51', name: 'Sam Mills', position: 'Linebacker', years: '1995-1997' },
       { number: '89', name: 'Steve Smith Sr.', position: 'Wide Receiver', years: '2001-2013' }
@@ -330,10 +330,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Bank of America Stadium', years: '1996–present', description: 'Panthers permanent home in uptown Charlotte', isCurrent: true }
     ],
     achievements: [
-      { title: 'Super Bowl Appearances', description: 'XXXVIII (2003), 50 (2015)', count: 2 },
-      { title: 'NFC Championships', description: '2003, 2015', count: 2 },
-      { title: 'Division Titles', description: 'Most recent: 2015', count: 6 },
-      { title: 'Playoff Appearances', description: 'Most recent: 2017', count: 8 }
+      { title: 'Super Bowl Championships', description: 'None (0-2 in Super Bowls)', count: 0 },
+      { title: 'NFC Championships', description: 'Most recent: 2015', count: 2 },
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 7 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 9 }
     ]
   },
 
@@ -348,8 +348,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlWins: 1,
     superbowlAppearances: ['1985 (XX)', '2006 (XLI)'],
     conferenceChampionships: 4,
-    divisionTitles: 19,
-    playoffAppearances: 28,
+    divisionTitles: 20,
+    playoffAppearances: 29,
     retiredNumbers: [
       { number: '3', name: 'Bronko Nagurski', position: 'Fullback', years: '1930-1937, 1943' },
       { number: '5', name: 'George McAfee', position: 'Halfback', years: '1940-1941, 1945-1950' },
@@ -372,10 +372,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Soldier Field', years: '1971–present', description: 'Oldest NFL stadium • The oldest stadium in both the NFL and MLS', isCurrent: true }
     ],
     achievements: [
-      { title: 'NFL Championships', description: '9 total championships (8 pre-Super Bowl)', count: 9 },
       { title: 'Super Bowl Championships', description: 'XX (1985)', count: 1 },
       { title: 'NFC Championships', description: 'Most recent: 2006', count: 4 },
-      { title: 'Division Titles', description: 'Most recent: 2018', count: 19 }
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 20 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 29 }
     ]
   },
 
@@ -401,8 +401,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Paul Brown Stadium/Paycor Stadium', years: '2000–present', description: 'Named after founder Paul Brown', isCurrent: true }
     ],
     achievements: [
-      { title: 'Super Bowl Appearances', description: 'XVI (1981), XXIII (1988), LVI (2021)', count: 3 },
-      { title: 'AFC Championships', description: '1981, 1988, 2021', count: 3 },
+      { title: 'Super Bowl Championships', description: 'None (0-3 in Super Bowls)', count: 0 },
+      { title: 'AFC Championships', description: 'Most recent: 2021', count: 3 },
       { title: 'Division Titles', description: 'Most recent: 2022', count: 10 },
       { title: 'Playoff Appearances', description: 'Most recent: 2022', count: 16 }
     ]
@@ -433,10 +433,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Huntington Bank Field', years: '1999–present', description: 'Built after franchise returned from Baltimore', isCurrent: true }
     ],
     achievements: [
-      { title: 'AAFC Championships', description: '4 consecutive (1946-1949)', count: 4 },
-      { title: 'NFL Championships', description: '1950, 1954, 1955, 1964', count: 4 },
+      { title: 'Super Bowl Championships', description: 'None', count: 0 },
       { title: 'AFC Championships', description: 'Never reached Super Bowl', count: 0 },
-      { title: 'Division Titles', description: 'Most recent: 2020', count: 12 }
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 12 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 30 }
     ]
   },
 
@@ -451,8 +451,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlWins: 3,
     superbowlAppearances: ['1977 (XII)', '1986 (XXI)', '1987 (XXII)', '1989 (XXIV)', '1997 (XXXII)', '1998 (XXXIII)', '2013 (XLVIII)', '2015 (50)'],
     conferenceChampionships: 8,
-    divisionTitles: 15,
-    playoffAppearances: 22,
+    divisionTitles: 16,
+    playoffAppearances: 23,
     retiredNumbers: [
       { number: '7', name: 'John Elway', position: 'Quarterback', years: '1983-1998' },
       { number: '18', name: 'Peyton Manning', position: 'Quarterback', years: '2012-2015' },
@@ -465,8 +465,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     achievements: [
       { title: 'Super Bowl Championships', description: 'XXXII (1997), XXXIII (1998), 50 (2015)', count: 3 },
       { title: 'AFC Championships', description: 'Most recent: 2015', count: 8 },
-      { title: 'Division Titles', description: 'Most recent: 2015', count: 15 },
-      { title: 'Playoff Appearances', description: 'Most recent: 2015', count: 22 }
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 16 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 23 }
     ]
   },
 
@@ -499,8 +499,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Ford Field', years: '2002–present', description: 'Downtown Detroit domed stadium', isCurrent: true }
     ],
     achievements: [
-      { title: 'NFL Championships', description: '1935, 1952, 1953, 1957 (pre-Super Bowl)', count: 4 },
-      { title: 'NFC Championships', description: 'Never won (reached conference championship in 1991)', count: 0 },
+      { title: 'Super Bowl Championships', description: 'None', count: 0 },
+      { title: 'NFC Championships', description: 'None', count: 0 },
       { title: 'Division Titles', description: 'Most recent: 2023', count: 4 },
       { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 18 }
     ]
@@ -518,16 +518,16 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlAppearances: [],
     conferenceChampionships: 0,
     divisionTitles: 8,
-    playoffAppearances: 8,
+    playoffAppearances: 9,
     retiredNumbers: [],
     stadiumHistory: [
       { name: 'NRG Stadium', years: '2002–present', description: 'First NFL stadium with retractable roof', isCurrent: true }
     ],
     achievements: [
+      { title: 'Super Bowl Championships', description: 'None', count: 0 },
+      { title: 'AFC Championships', description: 'None', count: 0 },
       { title: 'Division Titles', description: 'Most recent: 2024', count: 8 },
-      { title: 'Playoff Appearances', description: 'Most recent: 2024', count: 8 },
-      { title: 'Playoff Wins', description: 'Wild Card victories', count: 6 },
-      { title: 'Conference Championships', description: 'Never reached', count: 0 }
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 9 }
     ]
   },
 
@@ -561,9 +561,9 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     ],
     achievements: [
       { title: 'Super Bowl Championships', description: 'V (1970), XLI (2006)', count: 2 },
-      { title: 'NFL Championships', description: '1958, 1959, 1968 (Baltimore era)', count: 3 },
       { title: 'AFC Championships', description: 'Most recent: 2009', count: 4 },
-      { title: 'Division Titles', description: 'Most recent: 2014', count: 16 }
+      { title: 'Division Titles', description: 'Most recent: 2014', count: 16 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 27 }
     ]
   },
 
@@ -578,17 +578,17 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlWins: 0,
     superbowlAppearances: [],
     conferenceChampionships: 0,
-    divisionTitles: 2,
-    playoffAppearances: 8,
+    divisionTitles: 3,
+    playoffAppearances: 9,
     retiredNumbers: [],
     stadiumHistory: [
       { name: 'Jacksonville Municipal Stadium/EverBank Stadium', years: '1995–present', description: 'Home since inaugural season • Hosted Super Bowl XXXIX', isCurrent: true }
     ],
     achievements: [
-      { title: 'AFC Championship Games', description: '1996, 1999, 2017', count: 3 },
-      { title: 'Division Titles', description: '1998, 1999', count: 2 },
-      { title: 'Playoff Appearances', description: 'Most recent: 2022', count: 8 },
-      { title: 'Playoff Wins', description: 'Including 2017 divisional round', count: 8 }
+      { title: 'Super Bowl Championships', description: 'None', count: 0 },
+      { title: 'AFC Championships', description: 'Most recent: 2017', count: 3 },
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 3 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 9 }
     ]
   },
 
@@ -639,7 +639,7 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlAppearances: ['1994 (XXIX)'],
     conferenceChampionships: 1,
     divisionTitles: 15,
-    playoffAppearances: 21,
+    playoffAppearances: 22,
     retiredNumbers: [
       { number: '14', name: 'Dan Fouts', position: 'Quarterback', years: '1973-1987' },
       { number: '19', name: 'Johnny Unitas', position: 'Quarterback', years: '1973' },
@@ -654,10 +654,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'SoFi Stadium', years: '2020–present', description: 'Shared with Los Angeles Rams', isCurrent: true }
     ],
     achievements: [
-      { title: 'AFL Championship', description: '1963', count: 1 },
-      { title: 'Super Bowl Appearances', description: 'XXIX (1994)', count: 1 },
-      { title: 'AFC Championships', description: '1994', count: 1 },
-      { title: 'Division Titles', description: 'Most recent: 2009', count: 15 }
+      { title: 'Super Bowl Championships', description: 'None (0-1 in Super Bowls)', count: 0 },
+      { title: 'AFC Championships', description: 'Most recent: 1994', count: 1 },
+      { title: 'Division Titles', description: 'Most recent: 2009', count: 15 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 22 }
     ]
   },
 
@@ -673,7 +673,7 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlAppearances: ['1979 (XIV)', '1999 (XXXIV)', '2001 (XXXVI)', '2018 (LIII)', '2021 (LVI)'],
     conferenceChampionships: 5,
     divisionTitles: 19,
-    playoffAppearances: 30,
+    playoffAppearances: 31,
     retiredNumbers: [
       { number: '7', name: 'Bob Waterfield', position: 'Quarterback', years: '1945-1952' },
       { number: '28', name: 'Marshall Faulk', position: 'Running Back', years: '1999-2005' },
@@ -692,9 +692,9 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     ],
     achievements: [
       { title: 'Super Bowl Championships', description: 'XXXIV (1999), LVI (2021)', count: 2 },
-      { title: 'NFL Championships', description: '1945, 1951 (pre-Super Bowl)', count: 2 },
       { title: 'NFC Championships', description: 'Most recent: 2021', count: 5 },
-      { title: 'Division Titles', description: 'Most recent: 2021', count: 19 }
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 19 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 31 }
     ]
   },
 
@@ -721,10 +721,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Joe Robbie Stadium/Hard Rock Stadium', years: '1987–present', description: 'Multiple naming rights changes over the years', isCurrent: true }
     ],
     achievements: [
-      { title: 'Perfect Season', description: '17-0 in 1972 (only undefeated season in NFL history)', count: 1 },
       { title: 'Super Bowl Championships', description: 'VII (1972), VIII (1973)', count: 2 },
       { title: 'AFC Championships', description: 'Most recent: 1984', count: 5 },
-      { title: 'Division Titles', description: 'Most recent: 2008', count: 13 }
+      { title: 'Division Titles', description: 'Most recent: 2008', count: 13 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 24 }
     ]
   },
 
@@ -756,10 +756,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'U.S. Bank Stadium', years: '2016–present', description: 'State-of-the-art facility • Features the Gjallarhorn', isCurrent: true }
     ],
     achievements: [
-      { title: 'NFL Championship', description: '1969 (pre-Super Bowl merger)', count: 1 },
-      { title: 'Super Bowl Appearances', description: 'IV, VIII, IX, XI (0-4 record)', count: 4 },
+      { title: 'Super Bowl Championships', description: 'None (0-4 in Super Bowls)', count: 0 },
       { title: 'NFC Championships', description: 'Most recent: 1976', count: 4 },
-      { title: 'Division Titles', description: 'Most recent: 2017', count: 20 }
+      { title: 'Division Titles', description: 'Most recent: 2017', count: 20 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2024', count: 31 }
     ]
   },
 
@@ -824,10 +824,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'MetLife Stadium', years: '2010–present', description: 'Largest NFL stadium • Shared with New York Jets', isCurrent: true }
     ],
     achievements: [
-      { title: 'NFL Championships', description: '8 total: 1927, 1934, 1938, 1956, XXI, XXV, XLII, XLVI', count: 8 },
       { title: 'Super Bowl Championships', description: 'XXI (1986), XXV (1990), XLII (2007), XLVI (2011)', count: 4 },
       { title: 'NFC Championships', description: 'Most recent: 2011', count: 8 },
-      { title: 'Division Titles', description: 'Most recent: 2011', count: 16 }
+      { title: 'Division Titles', description: 'Most recent: 2011', count: 16 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2022', count: 33 }
     ]
   },
 
@@ -858,10 +858,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'MetLife Stadium', years: '2010–present', description: 'First jointly-built NFL stadium • Shared with Giants', isCurrent: true }
     ],
     achievements: [
-      { title: 'Super Bowl Championships', description: 'III (1968) - Joe Namath guarantee', count: 1 },
-      { title: 'AFL Championship', description: '1968', count: 1 },
-      { title: 'AFC Championships', description: '1998, 2009, 2010', count: 3 },
-      { title: 'Division Titles', description: 'Most recent: 2002', count: 4 }
+      { title: 'Super Bowl Championships', description: 'III (1968)', count: 1 },
+      { title: 'AFC Championships', description: 'Most recent: 2010', count: 3 },
+      { title: 'Division Titles', description: 'Most recent: 2002', count: 4 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2023', count: 16 }
     ]
   },
 
@@ -876,8 +876,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlWins: 2,
     superbowlAppearances: ['1980 (XV)', '2004 (XXXIX)', '2017 (LII)', '2022 (LVII)', '2024 (LIX)'],
     conferenceChampionships: 5,
-    divisionTitles: 16,
-    playoffAppearances: 31,
+    divisionTitles: 17,
+    playoffAppearances: 32,
     retiredNumbers: [
       { number: '5', name: 'Donovan McNabb', position: 'Quarterback', years: '1999-2009' },
       { number: '15', name: 'Steve Van Buren', position: 'Running Back', years: '1944-1951' },
@@ -898,9 +898,9 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     ],
     achievements: [
       { title: 'Super Bowl Championships', description: 'LII (2017), LIX (2024)', count: 2 },
-      { title: 'NFL Championships', description: '1948, 1949, 1960 (pre-Super Bowl)', count: 3 },
       { title: 'NFC Championships', description: 'Most recent: 2024', count: 5 },
-      { title: 'Division Titles', description: 'Most recent: 2024', count: 16 }
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 17 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 32 }
     ]
   },
 
@@ -915,8 +915,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlWins: 6,
     superbowlAppearances: ['1974 (IX)', '1975 (X)', '1978 (XIII)', '1979 (XIV)', '1995 (XXX)', '2005 (XL)', '2008 (XLIII)', '2010 (XLV)'],
     conferenceChampionships: 8,
-    divisionTitles: 25,
-    playoffAppearances: 33,
+    divisionTitles: 26,
+    playoffAppearances: 34,
     retiredNumbers: [
       { number: '70', name: 'Ernie Stautner', position: 'Defensive Tackle', years: '1950-1963' }
     ],
@@ -930,8 +930,8 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     achievements: [
       { title: 'Super Bowl Championships', description: 'IX, X, XIII, XIV, XL, XLIII (most in NFL)', count: 6 },
       { title: 'AFC Championships', description: 'Most recent: 2010', count: 8 },
-      { title: 'Division Titles', description: 'Most recent: 2020', count: 25 },
-      { title: 'Playoff Wins', description: 'Most in NFL history', count: 36 }
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 26 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 34 }
     ]
   },
 
@@ -947,7 +947,7 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     superbowlAppearances: ['1981 (XVI)', '1984 (XIX)', '1988 (XXIII)', '1989 (XXIV)', '1994 (XXIX)', '2012 (XLVII)', '2019 (LIV)'],
     conferenceChampionships: 8,
     divisionTitles: 22,
-    playoffAppearances: 30,
+    playoffAppearances: 31,
     retiredNumbers: [
       { number: '8', name: 'Steve Young', position: 'Quarterback', years: '1987-1999' },
       { number: '12', name: 'John Brodie', position: 'Quarterback', years: '1957-1973' },
@@ -971,7 +971,7 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { title: 'Super Bowl Championships', description: 'XVI, XIX, XXIII, XXIV, XXIX (5 total)', count: 5 },
       { title: 'NFC Championships', description: 'Most recent: 2019', count: 8 },
       { title: 'Division Titles', description: 'Most recent: 2023', count: 22 },
-      { title: 'Hall of Fame Players', description: 'Montana, Rice, Young, Lott, and more', count: 30 }
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 31 }
     ]
   },
 
@@ -983,11 +983,11 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     owner: 'Jody Allen',
     conference: 'NFC',
     division: 'NFC West',
-    superbowlWins: 1,
-    superbowlAppearances: ['2005 (XL)', '2013 (XLVIII)', '2014 (XLIX)'],
-    conferenceChampionships: 3,
-    divisionTitles: 11,
-    playoffAppearances: 20,
+    superbowlWins: 2,
+    superbowlAppearances: ['2005 (XL)', '2013 (XLVIII)', '2014 (XLIX)', '2025 (LX)'],
+    conferenceChampionships: 4,
+    divisionTitles: 12,
+    playoffAppearances: 21,
     retiredNumbers: [
       { number: '12', name: '12th Man', position: 'Fans', years: '1976-present' },
       { number: '45', name: 'Kenny Easley', position: 'Safety', years: '1981-1987' },
@@ -1001,10 +1001,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Seahawks Stadium/Lumen Field', years: '2002–present', description: 'Home of the 12th Man • Loudest stadium in NFL', isCurrent: true }
     ],
     achievements: [
-      { title: 'Super Bowl Championships', description: 'XLVIII (2013) - Legion of Boom era', count: 1 },
-      { title: 'NFC Championships', description: 'Most recent: 2014', count: 3 },
-      { title: 'Division Titles', description: 'Most recent: 2020', count: 11 },
-      { title: '12th Man', description: 'Loudest crowd noise records', count: 1 }
+      { title: 'Super Bowl Championships', description: 'XLVIII (2013), LX (2025)', count: 2 },
+      { title: 'NFC Championships', description: 'Most recent: 2025', count: 4 },
+      { title: 'Division Titles', description: 'Most recent: 2025', count: 12 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2025', count: 21 }
     ]
   },
 
@@ -1073,10 +1073,10 @@ export const teamInfoData: Record<string, TeamInfoData> = {
       { name: 'Adelphia Coliseum/Nissan Stadium', years: '1999–present', description: 'Permanent Nashville home • Music City Miracle', isCurrent: true }
     ],
     achievements: [
-      { title: 'AFL Championships', description: '1960, 1961 (Houston Oilers)', count: 2 },
-      { title: 'Super Bowl Appearances', description: 'XXXIV (1999) - One yard short', count: 1 },
-      { title: 'AFC Championships', description: '1999', count: 1 },
-      { title: 'Division Titles', description: 'Most recent: 2021', count: 8 }
+      { title: 'Super Bowl Championships', description: 'None (0-1 in Super Bowls)', count: 0 },
+      { title: 'AFC Championships', description: 'Most recent: 1999', count: 1 },
+      { title: 'Division Titles', description: 'Most recent: 2021', count: 8 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2021', count: 22 }
     ]
   },
 
@@ -1112,9 +1112,9 @@ export const teamInfoData: Record<string, TeamInfoData> = {
     ],
     achievements: [
       { title: 'Super Bowl Championships', description: 'XVII (1982), XXII (1987), XXVI (1991)', count: 3 },
-      { title: 'NFL Championships', description: '1937, 1942 (pre-Super Bowl)', count: 2 },
       { title: 'NFC Championships', description: 'Most recent: 1991', count: 5 },
-      { title: 'Division Titles', description: 'Most recent: 2020', count: 14 }
+      { title: 'Division Titles', description: 'Most recent: 2020', count: 14 },
+      { title: 'Playoff Appearances', description: 'Most recent: 2024', count: 25 }
     ]
   }
 

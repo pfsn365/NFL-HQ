@@ -461,10 +461,6 @@ export default function NFLPlayoffBracket() {
         </button>
       </div>
 
-      <div className="bg-[#0050A0]/10 border-b border-[#0050A0]/30 px-4 py-2">
-        <p className="text-sm text-[#003A75]">Click on a team to pick them as the winner. Your picks will advance through the bracket.</p>
-      </div>
-
       <div className="px-4 pt-2 pb-4 overflow-x-auto">
         {/* Desktop Bracket View */}
         <div className="hidden lg:block">

@@ -91,6 +91,9 @@ export async function GET(
 ) {
   try {
     const { teamId } = await params;
+    const { searchParams } = new URL(request.url);
+    const season = parseInt(searchParams.get('season') || '2025', 10);
+    const currentSeason = 2025;
 
     // Get Sportskeeda team ID
     const sportsKeedaTeamId = teamIdMap[teamId];
@@ -104,7 +107,7 @@ export async function GET(
 
     // Fetch data from Sportskeeda API
     const response = await fetch(
-      `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/2025?team=${sportsKeedaTeamId}`,
+      `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/${season}?team=${sportsKeedaTeamId}`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
@@ -126,9 +129,11 @@ export async function GET(
       );
     }
 
-    // Transform the data to our format - exclude postseason games since we get those from ESPN
+    // Transform the data to our format
+    // For current season, exclude postseason games since we get those from ESPN
+    // For past seasons, include postseason games from Sportskeeda
     const transformedSchedule = data.schedule
-      .filter(game => game.event_type !== 2) // Exclude SportsKeeda postseason games
+      .filter(game => season !== currentSeason || game.event_type !== 2)
       .map(game => {
       // Find the target team and opponent
       const targetTeam = game.teams.find(team => team.team_id === sportsKeedaTeamId);
@@ -155,8 +160,8 @@ export async function GET(
         result = targetTeam.is_winner ? 'W' : 'L';
       }
 
-      // Manual overrides for ALL preseason week 4 games that API missed
-      if (game.event_type === 0 && game.week === 4) {
+      // Manual overrides for ALL preseason week 4 games that API missed (2025 season only)
+      if (season === currentSeason && game.event_type === 0 && game.week === 4) {
         const gameResults = getPreseasonWeek4Results(sportsKeedaTeamId, opponent.team_id);
         if (gameResults) {
           result = gameResults.result;
@@ -183,8 +188,9 @@ export async function GET(
     // Add bye weeks for regular season
     const scheduleWithByeWeeks = addByeWeeks(transformedSchedule);
 
-    // Fetch playoff games from ESPN for this team
+    // Fetch playoff games from ESPN for this team (current season only)
     let playoffGames: any[] = [];
+    if (season === currentSeason) {
     try {
       const espnPlayoffGames = await fetchPlayoffGames();
 
@@ -235,6 +241,7 @@ export async function GET(
     } catch (error) {
       console.error('Error fetching ESPN playoff games for team:', error);
       // Continue without playoff games if ESPN fails
+    }
     }
 
     // Combine schedule with playoff games
