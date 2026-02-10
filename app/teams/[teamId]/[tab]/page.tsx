@@ -18,7 +18,7 @@ const validTabs = [
   'schedule',
   'stats',
   'injury-report',
-  'news'
+  'record-by-year'
 ];
 
 export async function generateStaticParams() {
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: PageProps) {
     'overview': 'Overview',
     'team-info': 'Team Info',
     'team-needs': 'Team Needs',
-    'draft-picks': 'Draft Picks',
+    'draft-picks': 'NFL Draft History',
     'transactions': 'Transactions',
     'salary-cap': 'Salary Cap',
     'roster': 'Roster',
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: PageProps) {
     'schedule': 'Schedule',
     'stats': 'Stats',
     'injury-report': 'Injury Report',
-    'news': 'News'
+    'record-by-year': 'Record By Year'
   };
 
   const tabTitle = tabTitles[tab] || tab;

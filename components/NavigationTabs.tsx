@@ -55,7 +55,6 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
   // Memoize tabs to prevent unnecessary re-renders
   const tabs = useMemo(() => [
     { id: 'overview', label: 'Overview' },
-    { id: 'news', label: 'News' },
     { id: 'schedule', label: 'Schedule' },
     { id: 'roster', label: 'Roster' },
     { id: 'depth-chart', label: 'Depth Chart' },
@@ -63,7 +62,8 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
     { id: 'stats', label: 'Stats' },
     { id: 'team-needs', label: 'Team Needs' },
     { id: 'transactions', label: 'Transactions' },
-    { id: 'draft-picks', label: 'Draft Picks' },
+    { id: 'record-by-year', label: 'Record By Year' },
+    { id: 'draft-picks', label: 'NFL Draft History' },
     { id: 'salary-cap', label: 'Salary Cap' },
     { id: 'team-info', label: 'Team Info' },
   ], []);
