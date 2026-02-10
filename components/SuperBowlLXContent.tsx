@@ -222,7 +222,7 @@ export default function SuperBowlLXContent() {
   };
 
   return (
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
         <header
           className="text-white shadow-lg"
@@ -244,7 +244,7 @@ export default function SuperBowlLXContent() {
               <img
                 src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
                 alt="Super Bowl LX Logo"
-                className="h-16 sm:h-20 lg:h-24 xl:h-28 w-auto object-contain"
+                className="h-10 sm:h-20 lg:h-24 xl:h-28 w-auto object-contain"
               />
             </div>
           </div>

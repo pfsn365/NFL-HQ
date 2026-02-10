@@ -11,12 +11,6 @@ export default function HomePageContent() {
   const allTeams = getAllTeams();
 
   // Top 5 standings - fetch from API
-  const [topStandings, setTopStandings] = useState<Array<{ teamId: string; teamName: string; wins: number; losses: number; ties?: number; winPct: number }>>([
-    { teamId: 'kansas-city-chiefs', teamName: 'Kansas City Chiefs', wins: 15, losses: 1, winPct: 0.938 },
-    { teamId: 'detroit-lions', teamName: 'Detroit Lions', wins: 13, losses: 3, winPct: 0.813 },
-    { teamId: 'philadelphia-eagles', teamName: 'Philadelphia Eagles', wins: 12, losses: 4, winPct: 0.750 }
-  ]);
-
   // Team records map for upcoming games
   const [teamRecords, setTeamRecords] = useState<Record<string, string>>({});
 
@@ -71,15 +65,6 @@ export default function HomePageContent() {
             // Build records map for all teams
             recordsMap[team.teamId] = ties > 0 ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
           }
-        }
-
-        // Sort by win percentage and take top 3
-        const top3 = allTeamsData
-          .sort((a, b) => b.winPct - a.winPct)
-          .slice(0, 3);
-
-        if (top3.length > 0) {
-          setTopStandings(top3);
         }
 
         // Set team records map
@@ -206,7 +191,7 @@ export default function HomePageContent() {
   }, []);
 
   return (
-    <main id="main-content" className="pt-[57px] lg:pt-0">
+    <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
         <header
           className="text-white shadow-lg"
@@ -455,49 +440,26 @@ export default function HomePageContent() {
             </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* NFL Standings Card with Preview */}
+            {/* NFL Team Pages Card with Preview */}
             <Link
-              href="/standings"
+              href="/teams"
               className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                  NFL Standings
+                  NFL Team Pages
                 </h3>
               </div>
-              <p className="text-gray-600 text-base mb-4">
-                Current season standings and conference rankings
+              <p className="text-gray-600 text-sm mb-4">
+                Rosters, schedules, stats, and info for all 32 NFL teams
               </p>
 
-              {/* Top 3 Teams Preview */}
-              <div className="space-y-2 bg-gray-50 rounded-lg p-3 flex-grow">
-                {topStandings.map((team, idx) => {
-                  const teamInfo = allTeams.find(t => t.id === team.teamId);
-                  return (
-                    <div key={team.teamId} className="flex items-center justify-between text-base">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-gray-600 font-semibold w-4">{idx + 1}</span>
-                        {teamInfo && (
-                          <>
-                            <img
-                              src={teamInfo.logoUrl}
-                              alt={teamInfo.abbreviation}
-                              className="w-5 h-5 flex-shrink-0"
-                            />
-                            <span className="font-medium text-gray-900 truncate">{teamInfo.abbreviation}</span>
-                          </>
-                        )}
-                      </div>
-                      <span className="font-bold text-gray-900 ml-2">
-                        {team.ties && team.ties > 0 ? `${team.wins}-${team.losses}-${team.ties}` : `${team.wins}-${team.losses}`}
-                      </span>
-                    </div>
-                  );
-                })}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
+                <p className="text-base font-semibold text-gray-700">All 32 Teams</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">View Full Standings</span>
+                <span className="text-sm font-medium">View All Teams</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -582,26 +544,26 @@ export default function HomePageContent() {
               </div>
             </Link>
 
-            {/* Injury Report Card */}
+            {/* NFL Player Pages Card */}
             <Link
-              href="/injuries"
+              href="/players"
               className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
             >
               <div className="flex items-center gap-3 mb-4">
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                  NFL Injury Report
+                  NFL Player Pages
                 </h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">
-                Real-time injury updates and player status across all teams
+                Search and browse player profiles, stats, and career info
               </p>
 
               <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">Live Injury Updates</p>
+                <p className="text-base font-semibold text-gray-700">Player Profiles & Stats</p>
               </div>
 
               <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">View Injury Report</span>
+                <span className="text-sm font-medium">Browse Players</span>
                 <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

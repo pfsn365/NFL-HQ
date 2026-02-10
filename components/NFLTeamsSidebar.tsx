@@ -9,8 +9,8 @@ interface NFLTeamsSidebarProps {
 
 const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  // On mobile, start with menus collapsed for easier navigation; on desktop, expand them
-  const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(!isMobile);
+  // NFL Tools starts expanded on both mobile and desktop
+  const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
   const [isImpactRankingsExpanded, setIsImpactRankingsExpanded] = useState(false);
   const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(!isMobile);
   const [isSuperBowlLXExpanded, setIsSuperBowlLXExpanded] = useState(false);
