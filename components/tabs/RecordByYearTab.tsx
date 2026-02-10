@@ -247,19 +247,16 @@ export default function RecordByYearTab({ team }: RecordByYearTabProps) {
         <div className="text-center p-4 rounded-lg border" style={{ borderColor: team.primaryColor + '40' }}>
           <div className="text-2xl sm:text-3xl font-bold text-gray-900">{franchiseStats.winningSeasons}</div>
           <div className="text-xs sm:text-sm text-gray-500 font-medium">Winning Seasons</div>
-          <div className="text-xs text-gray-400">of {records.length} seasons</div>
         </div>
         <div className="text-center p-4 rounded-lg border" style={{ borderColor: team.primaryColor + '40' }}>
           <div className="text-2xl sm:text-3xl font-bold text-gray-900">
             {franchiseStats.playoffWins}-{franchiseStats.playoffLosses}
           </div>
           <div className="text-xs sm:text-sm text-gray-500 font-medium">Postseason Record</div>
-          <div className="text-xs text-gray-400">{franchiseStats.playoffAppearances} appearances</div>
         </div>
         <div className="text-center p-4 rounded-lg border" style={{ borderColor: team.primaryColor + '40' }}>
           <div className="text-2xl sm:text-3xl font-bold text-gray-900">{franchiseStats.playoffAppearances}</div>
           <div className="text-xs sm:text-sm text-gray-500 font-medium">Playoff Appearances</div>
-          <div className="text-xs text-gray-400">of {records.length} seasons</div>
         </div>
       </div>
 
