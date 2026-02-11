@@ -259,8 +259,8 @@ export default function HomePageContent() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
-        {/* Sticky Pill Navigation */}
-        <div className="sticky top-[48px] lg:top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+        {/* Sticky Pill Navigation — mobile only */}
+        <div className="sticky top-[48px] z-10 bg-white border-b border-gray-200 shadow-sm lg:hidden">
           <div className="container mx-auto px-4 relative">
             {/* Left fade indicator */}
             {canScrollLeft && (
