@@ -69,6 +69,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
     { title: 'World Cup Simulator', url: 'https://www.profootballnetwork.com/fifa-world-cup-simulator/' },
     { title: 'MLB Playoff Predictor', url: 'https://www.profootballnetwork.com/mlb-playoff-predictor/' },
     { title: 'Tennis Simulator', url: 'https://www.profootballnetwork.com/tennis-simulator/' },
+    { title: 'NASCAR Predictor', url: 'https://www.profootballnetwork.com/nascar-predictor/' },
   ];
 
   const impactRankings = [

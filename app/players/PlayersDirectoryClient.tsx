@@ -166,7 +166,7 @@ export default function PlayersDirectoryClient() {
   const totalPages = pagination?.totalPages || 1;
 
   return (
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
         <header
           className="text-white shadow-lg"
@@ -253,9 +253,9 @@ export default function PlayersDirectoryClient() {
             {/* Loading State */}
             {loading && (
               <div className="p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="flex overflow-x-auto scrollbar-hide gap-4 -mx-4 px-4 snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:mx-0 sm:px-0 sm:overflow-visible sm:pb-0 sm:snap-none">
                   {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-4">
+                    <div key={i} className="min-w-[160px] w-[45vw] flex-shrink-0 snap-start sm:min-w-0 sm:w-auto sm:flex-shrink bg-gray-50 rounded-lg p-4">
                       <SkeletonLoader className="w-16 h-16 rounded-full mx-auto mb-3" />
                       <SkeletonLoader className="h-5 w-32 mx-auto mb-2" />
                       <SkeletonLoader className="h-4 w-24 mx-auto" />
@@ -283,12 +283,12 @@ export default function PlayersDirectoryClient() {
                   </div>
                 ) : (
                   <div className="p-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className="flex overflow-x-auto scrollbar-hide gap-4 -mx-4 px-4 snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:mx-0 sm:px-0 sm:overflow-visible sm:pb-0 sm:snap-none">
                       {players.map((player) => (
                         <Link
                           key={`${player.teamId}-${player.slug}`}
                           href={`/players/${player.slug}`}
-                          className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 hover:shadow-md transition-all"
+                          className="min-w-[160px] w-[45vw] flex-shrink-0 snap-start sm:min-w-0 sm:w-auto sm:flex-shrink bg-gray-50 rounded-lg p-4 hover:bg-gray-100 hover:shadow-md transition-all"
                         >
                           {/* Headshot */}
                           <div className="flex justify-center mb-3">

@@ -197,7 +197,7 @@ export default function ArticlesClient() {
   const totalPages = Math.ceil(articles.length / itemsPerPage);
 
   return (
-    <main id="main-content" className="pt-[57px] lg:pt-0">
+    <main id="main-content" className="pt-[48px] lg:pt-0">
       {/* Header */}
       <header
         className="text-white shadow-lg"
@@ -249,9 +249,9 @@ export default function ArticlesClient() {
             {/* Loading State */}
             {loading && (
               <div className="p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="flex overflow-x-auto scrollbar-hide gap-4 -mx-6 px-6 snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:mx-0 sm:px-0 sm:overflow-visible sm:pb-0 sm:snap-none">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg overflow-hidden">
+                    <div key={i} className="min-w-[280px] w-[85vw] flex-shrink-0 snap-start sm:min-w-0 sm:w-auto sm:flex-shrink bg-gray-50 rounded-lg overflow-hidden">
                       <SkeletonLoader className="w-full aspect-video" />
                       <div className="p-4">
                         <SkeletonLoader className="h-6 w-3/4 mb-2" />
@@ -295,14 +295,14 @@ export default function ArticlesClient() {
                   </div>
                 ) : (
                   <div className="p-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex overflow-x-auto scrollbar-hide gap-4 -mx-6 px-6 snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:mx-0 sm:px-0 sm:overflow-visible sm:pb-0 sm:snap-none">
                       {paginatedArticles.map((article, index) => (
                         <a
                           key={`${article.link}-${index}`}
                           href={article.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border border-gray-100"
+                          className="min-w-[280px] w-[85vw] flex-shrink-0 snap-start sm:min-w-0 sm:w-auto sm:flex-shrink block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border border-gray-100"
                         >
                           {/* Featured Image */}
                           {article.featuredImage && !imageErrors.has(article.link) ? (

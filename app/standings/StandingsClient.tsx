@@ -616,7 +616,7 @@ export default function StandingsClient() {
   );
 
   return (
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
         <header
           className="text-white shadow-lg"
@@ -659,7 +659,7 @@ export default function StandingsClient() {
           )}
 
           {/* Conference Filter */}
-          <div className="mb-6">
+          <div className="sticky top-[48px] lg:top-0 z-10 bg-gray-50/95 backdrop-blur-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-3 border-b border-gray-200 shadow-sm">
             <div className="inline-flex flex-wrap sm:flex-nowrap rounded-lg border border-gray-300 bg-white p-1 gap-1 sm:gap-0">
               <button
                 onClick={() => setConferenceView('all')}

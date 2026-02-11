@@ -148,7 +148,7 @@ export default function TransactionsClient() {
   };
 
   return (
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
         <header
           className="text-white shadow-lg"

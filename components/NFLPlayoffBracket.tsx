@@ -501,7 +501,7 @@ export default function NFLPlayoffBracket() {
               <div className="mt-3 text-center">
                 <div className={`inline-block rounded-lg px-4 py-2 ${champion ? 'bg-yellow-100 border border-yellow-300' : 'bg-gray-100 border border-gray-200'}`}>
                   <span className={`font-semibold text-sm ${champion ? 'text-yellow-800' : 'text-gray-500'}`}>
-                    {userPicks['superbowl'] && !finalMatchup.completed ? 'Your Winner' : 'Champion'}
+                    {userPicks['superbowl'] && !finalMatchup.completed ? 'Your Winner' : 'Super Bowl Champion'}
                   </span>
                   {champion ? (
                     <div className="flex items-center justify-center gap-2 mt-1">

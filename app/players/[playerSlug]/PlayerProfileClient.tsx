@@ -398,7 +398,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   // Loading state
   if (loading) {
     return (
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         <div className="bg-gray-400 text-white">
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col lg:flex-row items-center justify-between">
@@ -423,7 +423,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   // Error state
   if (error || !player) {
     return (
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         <div className="bg-gray-600 text-white">
           <div className="container mx-auto px-4 py-8">
             <Link href="/players" className="text-white/80 hover:text-white mb-4 inline-flex items-center gap-1">
@@ -486,7 +486,7 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
   };
 
   return (
-    <main id="main-content" className="pt-[57px] lg:pt-0">
+    <main id="main-content" className="pt-[48px] lg:pt-0">
       {/* JSON-LD Structured Data */}
       <Script
         id="player-jsonld"

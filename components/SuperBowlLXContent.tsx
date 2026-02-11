@@ -251,7 +251,7 @@ export default function SuperBowlLXContent() {
         </header>
 
         {/* Tab Navigation */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-white border-b border-gray-200 sticky top-[48px] lg:top-0 z-10 shadow-sm">
           <div className="container mx-auto px-4 xl:px-8">
             <nav className="flex space-x-1 sm:space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
               {[

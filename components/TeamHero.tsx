@@ -21,7 +21,7 @@ export default function TeamHero({ team, liveStandings }: TeamHeroProps) {
   const textColor = getContrastTextColor(team.primaryColor);
 
   return (
-    <div style={{ backgroundColor: team.primaryColor, color: textColor }} className="pt-[57px] lg:pt-0">
+    <div style={{ backgroundColor: team.primaryColor, color: textColor }} className="pt-[48px] lg:pt-0">
       <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex items-center space-x-3 sm:space-x-6">

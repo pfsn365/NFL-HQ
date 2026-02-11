@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
-import { getPositionColor } from '@/utils/colorHelpers';
-import { getTeamInfoById } from '@/utils/teamHelpers';
 
 interface StatLeader {
   playerId: number;
@@ -254,7 +252,7 @@ export default function StatsPageContent() {
 
   return (
     <>
-      <main id="main-content" className="pt-[57px] lg:pt-0">
+      <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
         <header
           className="text-white shadow-lg"
@@ -278,26 +276,28 @@ export default function StatsPageContent() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Category Tabs */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Select Category</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        {/* Sticky Category Pills */}
+        <div className="sticky top-[48px] lg:top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+          <div className="container mx-auto px-4">
+            <nav className="flex gap-2 overflow-x-auto scrollbar-hide py-2.5">
               {STAT_CATEGORIES.map((category) => (
                 <button
                   key={category.key}
                   onClick={() => setActiveCategory(category.key)}
-                  className={`px-4 py-3 rounded-lg font-semibold text-sm transition-all border-2 ${
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
                     activeCategory === category.key
-                      ? 'bg-[#0050A0] border-[#0050A0] text-white shadow-md'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-[#0050A0] hover:text-[#0050A0]'
+                      ? 'bg-[#0050A0] text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   {category.abbr}
                 </button>
               ))}
-            </div>
+            </nav>
           </div>
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
           {/* Stats Table */}
           {loading ? (

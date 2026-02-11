@@ -3,20 +3,109 @@
 import Link from 'next/link';
 import { getAllTeams } from '@/data/teams';
 import NFLPlayoffBracket from '@/components/NFLPlayoffBracket';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getApiPath } from '@/utils/api';
-
 
 export default function HomePageContent() {
   const allTeams = getAllTeams();
 
-  // Top 5 standings - fetch from API
-  // Team records map for upcoming games
-  const [teamRecords, setTeamRecords] = useState<Record<string, string>>({});
-
   // Super Bowl countdown
   const SUPER_BOWL_DATE = new Date('2026-02-08T23:30:00Z'); // 6:30 PM ET
   const [countdown, setCountdown] = useState<{ days: number; hours: number; minutes: number } | null>(null);
+
+  // Pill nav state & refs
+  const SECTIONS = [
+    { id: 'super-bowl', label: 'Super Bowl' },
+    { id: 'playoffs', label: 'Playoffs' },
+    { id: 'stat-leaders', label: 'Stat Leaders' },
+    { id: 'tools', label: 'Tools' },
+    { id: 'articles', label: 'Articles' },
+  ] as const;
+
+  const [activeSection, setActiveSection] = useState<string>('super-bowl');
+  const pillNavRef = useRef<HTMLElement>(null);
+  const activePillRef = useRef<HTMLButtonElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Scroll indicator logic for pill nav
+  const updatePillScrollIndicators = useCallback(() => {
+    if (pillNavRef.current) {
+      const nav = pillNavRef.current;
+      setCanScrollLeft(nav.scrollLeft > 5);
+      setCanScrollRight(nav.scrollLeft < nav.scrollWidth - nav.clientWidth - 5);
+    }
+  }, []);
+
+  // Initialize and update pill scroll indicators
+  useEffect(() => {
+    const nav = pillNavRef.current;
+    if (!nav) return;
+    updatePillScrollIndicators();
+    nav.addEventListener('scroll', updatePillScrollIndicators, { passive: true });
+    window.addEventListener('resize', updatePillScrollIndicators, { passive: true });
+    return () => {
+      nav.removeEventListener('scroll', updatePillScrollIndicators);
+      window.removeEventListener('resize', updatePillScrollIndicators);
+    };
+  }, [updatePillScrollIndicators]);
+
+  // Auto-scroll active pill into view
+  useEffect(() => {
+    if (activePillRef.current && pillNavRef.current) {
+      const pill = activePillRef.current;
+      const nav = pillNavRef.current;
+      requestAnimationFrame(() => {
+        const pillRect = pill.getBoundingClientRect();
+        const navRect = nav.getBoundingClientRect();
+        const pillLeft = pillRect.left - navRect.left + nav.scrollLeft;
+        const pillRight = pillLeft + pillRect.width;
+        const navWidth = nav.clientWidth;
+        if (pillLeft < nav.scrollLeft) {
+          nav.scrollTo({ left: pillLeft - 20, behavior: 'auto' });
+        } else if (pillRight > nav.scrollLeft + navWidth) {
+          nav.scrollTo({ left: pillRight - navWidth + 20, behavior: 'auto' });
+        }
+      });
+    }
+  }, [activeSection]);
+
+  // IntersectionObserver scroll-spy
+  useEffect(() => {
+    const sectionIds = SECTIONS.map(s => s.id);
+    const elements = sectionIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the most-visible intersecting entry
+        let bestEntry: IntersectionObserverEntry | null = null;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+              bestEntry = entry;
+            }
+          }
+        }
+        if (bestEntry) {
+          setActiveSection(bestEntry.target.id);
+        }
+      },
+      { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
+    );
+
+    elements.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Pill click handler
+  const handlePillClick = useCallback((sectionId: string) => {
+    setActiveSection(sectionId);
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   useEffect(() => {
     const getCountdown = () => {
@@ -32,51 +121,6 @@ export default function HomePageContent() {
     const timer = setInterval(() => setCountdown(getCountdown()), 60000);
     return () => clearInterval(timer);
   }, []);
-
-  // Fetch live standings
-  useEffect(() => {
-    async function fetchTopStandings() {
-      try {
-        const response = await fetch(getApiPath('nfl/teams/api/standings?season=2025'));
-
-        if (!response.ok) return;
-
-        const data = await response.json();
-
-        // Collect all teams from the standings API response
-        const allTeamsData: Array<{ teamId: string; teamName: string; wins: number; losses: number; ties?: number; winPct: number }> = [];
-        const recordsMap: Record<string, string> = {};
-
-        if (data.standings && Array.isArray(data.standings)) {
-          for (const team of data.standings) {
-            const wins = team.record?.wins || 0;
-            const losses = team.record?.losses || 0;
-            const ties = team.record?.ties || 0;
-
-            allTeamsData.push({
-              teamId: team.teamId,
-              teamName: team.fullName,
-              wins,
-              losses,
-              ties,
-              winPct: team.winPercentage || 0
-            });
-
-            // Build records map for all teams
-            recordsMap[team.teamId] = ties > 0 ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
-          }
-        }
-
-        // Set team records map
-        setTeamRecords(recordsMap);
-      } catch (err) {
-        console.error('Error fetching homepage standings:', err);
-      }
-    }
-
-    fetchTopStandings();
-  }, []);
-
 
   // Stat leaders - NFL stats
   interface StatLeader {
@@ -215,8 +259,44 @@ export default function HomePageContent() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
+        {/* Sticky Pill Navigation */}
+        <div className="sticky top-[48px] lg:top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+          <div className="container mx-auto px-4 relative">
+            {/* Left fade indicator */}
+            {canScrollLeft && (
+              <div
+                className="absolute left-0 top-0 bottom-0 w-12 pointer-events-none z-10"
+                style={{ background: 'linear-gradient(to right, rgb(255,255,255) 0%, rgba(255,255,255,0) 100%)' }}
+              />
+            )}
+            {/* Right fade indicator */}
+            {canScrollRight && (
+              <div
+                className="absolute right-0 top-0 bottom-0 w-24 pointer-events-none z-10"
+                style={{ background: 'linear-gradient(to left, rgb(255,255,255) 0%, rgb(255,255,255) 30%, rgba(255,255,255,0) 100%)' }}
+              />
+            )}
+            <nav ref={pillNavRef} className="flex gap-2 overflow-x-auto scrollbar-hide py-2.5">
+              {SECTIONS.map((section) => (
+                <button
+                  key={section.id}
+                  ref={activeSection === section.id ? activePillRef : null}
+                  onClick={() => handlePillClick(section.id)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                    activeSection === section.id
+                      ? 'bg-[#0050A0] text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {section.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
         {/* Super Bowl LX Banner */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <div id="super-bowl" className="container mx-auto px-4 sm:px-6 lg:px-8 pt-3 mb-6" style={{ scrollMarginTop: '100px' }}>
           <Link
             href="/super-bowl-lx"
             className="group block bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl border-2 border-[#D4AF37] shadow-lg p-4 sm:p-6 hover:shadow-2xl hover:shadow-[#D4AF37]/20 hover:scale-[1.02] hover:border-[#FFD700] transition-all duration-300 cursor-pointer relative overflow-hidden"
@@ -277,15 +357,18 @@ export default function HomePageContent() {
         </div>
 
         {/* NFL Playoff Bracket */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div id="playoffs" className="container mx-auto px-4 sm:px-6 lg:px-8 mb-8" style={{ scrollMarginTop: '100px' }}>
           <NFLPlayoffBracket />
         </div>
 
         {/* Stat Leaders Section */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+        <section id="stat-leaders" className="bg-white border-t border-gray-200 py-8 sm:py-10 lg:py-12" style={{ scrollMarginTop: '100px' }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Stat Leaders</h2>
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Stat Leaders</h2>
+                <div className="w-12 h-1 bg-[#0050A0] rounded-full mt-2"></div>
+              </div>
               <Link
                 href="/stats"
                 className="text-[#0050A0] hover:text-[#003A75] font-semibold text-sm transition-colors"
@@ -428,186 +511,162 @@ export default function HomePageContent() {
               </div>
             )}
           </div>
-        </div>
+        </section>
 
         {/* Features Grid */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+        <section id="tools" className="bg-gray-50 border-t border-gray-200 py-8 sm:py-10 lg:py-12" style={{ scrollMarginTop: '100px' }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-8">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                 Interactive Tools & Features
               </h2>
+              <div className="w-12 h-1 bg-[#0050A0] rounded-full mt-2"></div>
             </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* NFL Team Pages Card with Preview */}
-            <Link
-              href="/teams"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                  NFL Team Pages
-                </h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Rosters, schedules, stats, and info for all 32 NFL teams
-              </p>
-
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">All 32 Teams</p>
-              </div>
-
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">View All Teams</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-
-            {/* Free Agency Tracker Card */}
-            <Link
-              href="/free-agency-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+            {/* Hero Tier — 2 large cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Free Agency Tracker Card — Hero */}
+              <Link
+                href="/free-agency-tracker"
+                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-emerald-500 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
+              >
+                <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-2">
                   Free Agency Tracker
                 </h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Track NFL free agents, signings, and available players
-              </p>
+                <p className="text-gray-600 text-sm mb-5">
+                  Track NFL free agents, signings, and available players
+                </p>
 
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">Free Agent Hub</p>
-              </div>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
+                  <p className="text-lg font-semibold text-gray-700">Free Agent Hub</p>
+                </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">View Free Agents</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
+                <div className="mt-5 flex items-center text-[#0050A0]">
+                  <span className="text-sm font-medium group-hover:underline">View Free Agents</span>
+                  <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
 
-            {/* Power Rankings Builder Card */}
-            <Link
-              href="/power-rankings-builder"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+              {/* Power Rankings Builder Card — Hero */}
+              <Link
+                href="/power-rankings-builder"
+                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-cyan-500 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
+              >
+                <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-2">
                   Power Rankings Builder
                 </h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Create and customize your own NFL team power rankings
-              </p>
+                <p className="text-gray-600 text-sm mb-5">
+                  Create and customize your own NFL team power rankings
+                </p>
 
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">Drag & Drop Rankings</p>
-              </div>
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
+                  <p className="text-lg font-semibold text-gray-700">Drag & Drop Rankings</p>
+                </div>
 
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">Start Building</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
+                <div className="mt-5 flex items-center text-[#0050A0]">
+                  <span className="text-sm font-medium group-hover:underline">Start Building</span>
+                  <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            </div>
 
-            {/* Salary Cap Tracker Card */}
-            <Link
-              href="/salary-cap-tracker"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+            {/* Standard Tier — 4 compact cards */}
+            <div className="flex overflow-x-auto scrollbar-hide gap-3 -mx-4 px-4 snap-x snap-mandatory pb-2 md:grid md:grid-cols-4 md:gap-4 md:mx-0 md:px-0 md:overflow-visible md:pb-0 md:snap-none">
+              {/* NFL Team Pages */}
+              <Link
+                href="/teams"
+                className="min-w-[160px] w-[45vw] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink group relative bg-white rounded-xl p-4 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col"
+              >
+                <h3 className="text-base font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-1">
+                  NFL Team Pages
+                </h3>
+                <p className="text-gray-500 text-xs mb-3 line-clamp-2">
+                  Rosters, schedules, stats & info for all 32 teams
+                </p>
+                <div className="mt-auto flex items-center text-[#0050A0]">
+                  <span className="text-xs font-medium group-hover:underline">View Teams</span>
+                  <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+
+              {/* Salary Cap Tracker */}
+              <Link
+                href="/salary-cap-tracker"
+                className="min-w-[160px] w-[45vw] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink group relative bg-white rounded-xl p-4 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col"
+              >
+                <h3 className="text-base font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-1">
                   Salary Cap Tracker
                 </h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Track NFL team salary cap situations and contracts
-              </p>
+                <p className="text-gray-500 text-xs mb-3 line-clamp-2">
+                  Track team salary cap situations & contracts
+                </p>
+                <div className="mt-auto flex items-center text-[#0050A0]">
+                  <span className="text-xs font-medium group-hover:underline">View Salaries</span>
+                  <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
 
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">Cap Space Tracker</p>
-              </div>
-
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">View Salaries</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-
-            {/* NFL Player Pages Card */}
-            <Link
-              href="/players"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+              {/* NFL Player Pages */}
+              <Link
+                href="/players"
+                className="min-w-[160px] w-[45vw] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink group relative bg-white rounded-xl p-4 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col"
+              >
+                <h3 className="text-base font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-1">
                   NFL Player Pages
                 </h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Search and browse player profiles, stats, and career info
-              </p>
+                <p className="text-gray-500 text-xs mb-3 line-clamp-2">
+                  Search player profiles, stats & career info
+                </p>
+                <div className="mt-auto flex items-center text-[#0050A0]">
+                  <span className="text-xs font-medium group-hover:underline">Browse Players</span>
+                  <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
 
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">Player Profiles & Stats</p>
-              </div>
-
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">Browse Players</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-
-            {/* Transactions Card */}
-            <Link
-              href="/transactions"
-              className="group relative bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-[#0050A0] hover:bg-white hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+              {/* NFL Transactions */}
+              <Link
+                href="/transactions"
+                className="min-w-[160px] w-[45vw] flex-shrink-0 snap-start md:min-w-0 md:w-auto md:flex-shrink group relative bg-white rounded-xl p-4 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col"
+              >
+                <h3 className="text-base font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-1">
                   NFL Transactions
                 </h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                Latest trades, signings, and roster moves across the league
-              </p>
-
-              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 text-center flex-grow flex flex-col justify-center">
-                <p className="text-base font-semibold text-gray-700">Recent Moves</p>
-              </div>
-
-              <div className="mt-4 flex items-center text-[#0050A0] opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium">View Transactions</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
+                <p className="text-gray-500 text-xs mb-3 line-clamp-2">
+                  Latest trades, signings & roster moves
+                </p>
+                <div className="mt-auto flex items-center text-[#0050A0]">
+                  <span className="text-xs font-medium group-hover:underline">View Transactions</span>
+                  <svg className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            </div>
           </div>
-          </div>
+        </section>
 
-          {/* Latest NFL Articles Section */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+        {/* Latest NFL Articles Section */}
+        <section id="articles" className="bg-white border-t border-gray-200 py-8 sm:py-10 lg:py-12" style={{ scrollMarginTop: '100px' }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Latest NFL Articles</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Latest NFL Articles</h2>
+              <div className="w-12 h-1 bg-[#0050A0] rounded-full mt-2"></div>
             </div>
 
             {articlesLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="flex overflow-x-auto scrollbar-hide gap-4 -mx-4 px-4 snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:mx-0 sm:px-0 sm:overflow-visible sm:pb-0 sm:snap-none">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-gray-50 rounded-lg overflow-hidden animate-pulse">
+                  <div key={i} className="min-w-[280px] w-[85vw] flex-shrink-0 snap-start sm:min-w-0 sm:w-auto sm:flex-shrink bg-gray-50 rounded-lg overflow-hidden animate-pulse">
                     <div className="w-full aspect-video bg-gray-200"></div>
                     <div className="p-4">
                       <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -618,14 +677,14 @@ export default function HomePageContent() {
                 ))}
               </div>
             ) : latestArticles.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="flex overflow-x-auto scrollbar-hide gap-4 -mx-4 px-4 snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:mx-0 sm:px-0 sm:overflow-visible sm:pb-0 sm:snap-none">
                 {latestArticles.map((article, index) => (
                   <a
                     key={`${article.link}-${index}`}
                     href={article.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                    className="min-w-[280px] w-[85vw] flex-shrink-0 snap-start sm:min-w-0 sm:w-auto sm:flex-shrink group bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                   >
                     {article.featuredImage ? (
                       <div className="w-full aspect-video overflow-hidden bg-gray-200">
@@ -678,8 +737,7 @@ export default function HomePageContent() {
               </Link>
             </div>
           </div>
-
-        </div>
+        </section>
     </main>
   );
 }
