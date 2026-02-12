@@ -110,7 +110,7 @@ export async function GET(
       `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/${season}?team=${sportsKeedaTeamId}`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+          'User-Agent': 'PFN-Internal-NON-Blocking',
         },
         next: { revalidate: 86400 } // Cache for 24 hours
       }
@@ -147,7 +147,7 @@ export async function GET(
       const isHome = targetTeam.location_type === 'home';
 
       // Determine result if game is completed
-      let result: 'W' | 'L' | null = null;
+      let result: 'W' | 'L' | 'T' | null = null;
       let score: { home: number; away: number } | undefined;
 
       if (game.status === 'Final' && typeof targetTeam.score === 'number' && typeof opponent.score === 'number') {
@@ -157,7 +157,11 @@ export async function GET(
           score = { home: opponent.score, away: targetTeam.score };
         }
 
-        result = targetTeam.is_winner ? 'W' : 'L';
+        if (targetTeam.score === opponent.score) {
+          result = 'T';
+        } else {
+          result = targetTeam.is_winner ? 'W' : 'L';
+        }
       }
 
       // Manual overrides for ALL preseason week 4 games that API missed (2025 season only)

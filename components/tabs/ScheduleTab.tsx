@@ -16,7 +16,7 @@ interface ScheduleGame {
   time: string;
   tv: string;
   venue: string;
-  result?: 'W' | 'L' | null;
+  result?: 'W' | 'L' | 'T' | null;
   score?: { home: number; away: number };
   overallRecord?: string;
   eventType?: string;
@@ -154,6 +154,8 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
             <span className={`inline-flex px-1 py-0.5 sm:px-1.5 text-xs font-semibold rounded-full ${
               game.result === 'W'
                 ? 'bg-green-100 text-green-800'
+                : game.result === 'T'
+                ? 'bg-yellow-100 text-yellow-800'
                 : 'bg-red-100 text-red-800'
             }`}>
               {game.result}

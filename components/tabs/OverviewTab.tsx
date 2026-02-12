@@ -335,7 +335,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
             wins,
             losses,
             ties,
-            winPercentage: wins + losses + ties > 0 ? wins / (wins + losses + ties) : 0
+            winPercentage: wins + losses + ties > 0 ? (wins + ties * 0.5) / (wins + losses + ties) : 0
           };
         } catch (err) {
           // Re-throw AbortError to be handled by outer catch
@@ -589,6 +589,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                     <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Team</th>
                     <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 text-center">W</th>
                     <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 text-center">L</th>
+                    <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 text-center">T</th>
                     <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 text-center">Pct</th>
                   </tr>
                 </thead>
@@ -610,6 +611,9 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                             <div className="h-4 bg-gray-200 rounded animate-pulse w-6 mx-auto"></div>
                           </td>
                           <td className="py-2 text-center">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-6 mx-auto"></div>
+                          </td>
+                          <td className="py-2 text-center">
                             <div className="h-4 bg-gray-200 rounded animate-pulse w-12 mx-auto"></div>
                           </td>
                         </tr>
@@ -617,7 +621,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                     </>
                   ) : standingsError ? (
                     <tr>
-                      <td colSpan={4} className="text-center p-4 text-red-600 text-xs">
+                      <td colSpan={5} className="text-center p-4 text-red-600 text-xs">
                         {standingsError}
                       </td>
                     </tr>
@@ -643,6 +647,7 @@ export default function OverviewTab({ team, onTabChange, schedule: passedSchedul
                         </td>
                         <td className="py-2 text-center">{divisionTeam.wins}</td>
                         <td className="py-2 text-center">{divisionTeam.losses}</td>
+                        <td className="py-2 text-center">{divisionTeam.ties}</td>
                         <td className="py-2 text-center">{divisionTeam.winPercentage.toFixed(3)}</td>
                       </tr>
                     ))

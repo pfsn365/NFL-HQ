@@ -211,7 +211,7 @@ const calculateTeamRecord = (schedule: ScheduleGame[]): TeamRecord => {
     wins,
     losses,
     ties,
-    winPercentage: wins + losses + ties > 0 ? wins / (wins + losses + ties) : 0
+    winPercentage: wins + losses + ties > 0 ? (wins + ties * 0.5) / (wins + losses + ties) : 0
   };
 };
 

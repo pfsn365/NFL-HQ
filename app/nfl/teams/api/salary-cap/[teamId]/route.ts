@@ -197,12 +197,12 @@ export async function GET(
 
     try {
       response = await fetch(
-        `https://statics.sportskeeda.com/assets/sheets/static/nfl/team/subpage/salary-cap/${teamAbbr}.json`,
+        `https://statics.sportskeeda.com/assets/sheets/static/nfl/team/subpage/salary-cap/${teamAbbr}.json?v=2`,
         {
           headers: {
             'User-Agent': 'PFN-Internal-NON-Blocking',
           },
-          next: { revalidate: 86400 } // Cache for 24 hours
+          next: { revalidate: 3600 } // Cache for 1 hour
         }
       );
 
