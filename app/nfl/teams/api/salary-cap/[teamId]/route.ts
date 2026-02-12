@@ -39,7 +39,7 @@ interface SalaryCapPlayer {
   guaranteed: string;
 }
 
-interface SportsKeedaSalaryCapResponse {
+interface SportsKeedaStructuredResponse {
   salary_cap_for_team: SalaryCapTeamData;
   salary_cap_for_players: SalaryCapPlayer[];
 }
@@ -59,81 +59,14 @@ interface TransformedPlayer {
   tradeSaving: number;
 }
 
-interface TransformedSalaryCapData {
-  teamSummary: {
-    capSpace: number;
-    salaryCap: number;
-    activeCapSpend: number;
-    deadMoney: number;
-  };
-  players: TransformedPlayer[];
-}
-
-// Map team IDs to PFSN display names
-const teamIdToPFSNName: Record<string, string> = {
-  'san-francisco-49ers': 'San Francisco 49ers',
-  'seattle-seahawks': 'Seattle Seahawks',
-};
-
-// Function to scrape salary cap data from PFSN as fallback
-async function scrapePFSNSalaryCapData(teamId: string): Promise<{
+interface TeamSummary {
   capSpace: number;
   salaryCap: number;
   activeCapSpend: number;
   deadMoney: number;
-} | null> {
-  try {
-    const pfsnTeamName = teamIdToPFSNName[teamId];
-    if (!pfsnTeamName) {
-      return null;
-    }
-
-    const response = await fetch(
-      'https://www.profootballnetwork.com/nfl-salary-cap-space-by-team',
-      {
-        headers: {
-          'User-Agent': 'PFN-Internal-NON-Blocking',
-        },
-        next: { revalidate: 86400 } // Cache for 24 hours
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`PFSN fetch error: ${response.status}`);
-    }
-
-    const html = await response.text();
-
-    // Parse the HTML to find the team's row
-    // Format: <tr data-team=San Francisco 49ers data-cap-space=$37,135,702 data-salary-cap=$315,417,966 data-active-cap=$256,418,523 data-dead-money=$21,863,741>
-    const teamRowMatch = html.match(
-      new RegExp(`<tr data-team=${pfsnTeamName}[^>]*data-cap-space=\\$([0-9,]+)[^>]*data-salary-cap=\\$([0-9,]+)[^>]*data-active-cap=\\$([0-9,]+)[^>]*data-dead-money=\\$([0-9,]+)`, 'i')
-    );
-
-    if (!teamRowMatch) {
-      console.error(`Could not find salary cap data for ${pfsnTeamName} in PFSN HTML`);
-      return null;
-    }
-
-    // Parse the captured values
-    const capSpace = parseFloat(teamRowMatch[1].replace(/,/g, ''));
-    const salaryCap = parseFloat(teamRowMatch[2].replace(/,/g, ''));
-    const activeCapSpend = parseFloat(teamRowMatch[3].replace(/,/g, ''));
-    const deadMoney = parseFloat(teamRowMatch[4].replace(/,/g, ''));
-
-    return {
-      capSpace,
-      salaryCap,
-      activeCapSpend,
-      deadMoney,
-    };
-  } catch (error) {
-    console.error(`Error scraping PFSN data for ${teamId}:`, error);
-    return null;
-  }
 }
 
-// Team ID to Sportskeeda abbreviation mapping - same as draft picks
+// Team ID to Sportskeeda abbreviation mapping
 const teamIdMap: Record<string, string> = {
   'arizona-cardinals': 'ari',
   'atlanta-falcons': 'atl',
@@ -171,7 +104,102 @@ const teamIdMap: Record<string, string> = {
 
 // Helper function to parse currency strings
 function parseCurrency(value: string): number {
-  return parseFloat(value.replace(/[,$]/g, '')); // Keep as full dollar amounts
+  if (!value) return 0;
+  // Handle negative values in parentheses like (1,234)
+  const cleaned = value.replace(/[$,\s]/g, '').replace(/\((.+)\)/, '-$1');
+  return parseFloat(cleaned) || 0;
+}
+
+// Fetch team summary from the bulk all-teams endpoint
+async function fetchTeamSummaryFromBulk(teamId: string): Promise<TeamSummary | null> {
+  try {
+    const response = await fetch(
+      'https://statics.sportskeeda.com/assets/sheets/tools/salary-caps/salaryCaps.json?v=2',
+      {
+        headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
+        next: { revalidate: 3600 },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const sheet = data.collections?.find((c: { sheetName: string }) => c.sheetName === 'salary_caps');
+    if (!sheet?.data) return null;
+
+    // Find the team row by slug (column 2)
+    const teamRow = sheet.data.slice(1).find((row: string[]) => row[2] === teamId);
+    if (!teamRow) return null;
+
+    return {
+      capSpace: parseCurrency(teamRow[3]),
+      salaryCap: parseCurrency(teamRow[4]),
+      activeCapSpend: parseCurrency(teamRow[5]),
+      deadMoney: parseCurrency(teamRow[6]),
+    };
+  } catch (error) {
+    console.error('Error fetching bulk salary cap data:', error);
+    return null;
+  }
+}
+
+// Parse array format response into players
+// Array columns: [0]=Player, [1]=Slug, [2]=Cap Number, [3]=Base Salary, [4]=Signing Bonus,
+// [5]=Option Bonus, [6]=Roster Bonus, [7]=Per-Game Bonus, [8]=Workout Bonus, [9]=Other Bonus,
+// [10]=Guaranteed, [11]=Cut Pre Dead Money, [12]=Cut Pre Cap Saving,
+// [13]=Cut Post Dead Money, [14]=Cut Post Cap Saving,
+// [15]=Trade Pre Dead Money, [16]=Trade Pre Cap Saving,
+// [17]=Trade Post Dead Money, [18]=Trade Post Cap Saving,
+// [19]=Restructure Cap Saving, [20]=Extension Cap Saving
+function parseArrayFormat(data: string[][]): TransformedPlayer[] {
+  // Skip header rows (row 0 is display headers, row 1 is column headers)
+  // Player data starts at row 2
+  return data.slice(2)
+    .filter(row => row[0] && row[0].trim() !== '' && row[2] && row[2].trim() !== '')
+    .map(row => ({
+      name: row[0],
+      slug: row[1] || '',
+      capHit: parseCurrency(row[2]),
+      baseSalary: parseCurrency(row[3]),
+      signingBonus: parseCurrency(row[4]),
+      guaranteed: parseCurrency(row[10]),
+      restructureCapSaving: parseCurrency(row[19]),
+      extensionCapSaving: parseCurrency(row[20]),
+      cutDeadMoney: parseCurrency(row[13]),
+      cutSaving: parseCurrency(row[14]),
+      tradeDeadMoney: parseCurrency(row[17]),
+      tradeSaving: parseCurrency(row[18]),
+    }));
+}
+
+// Parse structured format response into players
+function parseStructuredFormat(data: SportsKeedaStructuredResponse): {
+  teamSummary: TeamSummary;
+  players: TransformedPlayer[];
+} {
+  const teamSummary = {
+    capSpace: parseCurrency(data.salary_cap_for_team.cap_space),
+    salaryCap: parseCurrency(data.salary_cap_for_team.salary_cap_current_year),
+    activeCapSpend: parseCurrency(data.salary_cap_for_team.active_cap_spend),
+    deadMoney: parseCurrency(data.salary_cap_for_team.dead_money),
+  };
+
+  const players: TransformedPlayer[] = data.salary_cap_for_players.map(player => ({
+    name: player.player_name,
+    slug: player.player_slug,
+    capHit: parseCurrency(player.cap_number),
+    baseSalary: parseCurrency(player.base_salary),
+    signingBonus: parseCurrency(player.signing_bonus),
+    guaranteed: parseCurrency(player.guaranteed),
+    restructureCapSaving: parseCurrency(player.restructure_cap_saving),
+    extensionCapSaving: parseCurrency(player.extension_cap_saving),
+    cutDeadMoney: parseCurrency(player.cut_post.dead_money),
+    cutSaving: parseCurrency(player.cut_post.cap_saving),
+    tradeDeadMoney: parseCurrency(player.trade_post.dead_money),
+    tradeSaving: parseCurrency(player.trade_post.cap_saving),
+  }));
+
+  return { teamSummary, players };
 }
 
 export async function GET(
@@ -191,100 +219,51 @@ export async function GET(
       );
     }
 
-    // Try Sportskeeda API first
-    let useFallback = false;
-    let response: Response | null = null;
-
-    try {
-      response = await fetch(
-        `https://statics.sportskeeda.com/assets/sheets/static/nfl/team/subpage/salary-cap/${teamAbbr}.json?v=2`,
-        {
-          headers: {
-            'User-Agent': 'PFN-Internal-NON-Blocking',
-          },
-          next: { revalidate: 3600 } // Cache for 1 hour
-        }
-      );
-
-      if (!response.ok) {
-        useFallback = true;
+    // Fetch from Sportskeeda individual team endpoint
+    const response = await fetch(
+      `https://statics.sportskeeda.com/assets/sheets/static/nfl/team/subpage/salary-cap/${teamAbbr}.json?v=2`,
+      {
+        headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
+        next: { revalidate: 3600 },
       }
-    } catch (error) {
-      console.error(`Sportskeeda API error for ${teamId}:`, error);
-      useFallback = true;
+    );
+
+    if (!response.ok) {
+      throw new Error(`Sportskeeda API error: ${response.status}`);
     }
 
-    // If Sportskeeda fails, try PFSN scraper for specific teams
-    if (useFallback && teamIdToPFSNName[teamId]) {
-      const pfsnData = await scrapePFSNSalaryCapData(teamId);
+    const rawData = await response.json();
 
-      if (pfsnData) {
-        return NextResponse.json({
-          teamId,
-          salaryCapData: {
-            teamSummary: pfsnData,
-            players: [], // No player-level data from PFSN
-          },
-          totalPlayers: 0,
-          lastUpdated: new Date().toISOString(),
-          season: 2025,
-          source: 'pfsn', // Indicate this is from PFSN
-        });
+    let teamSummary: TeamSummary;
+    let players: TransformedPlayer[];
+
+    if (Array.isArray(rawData)) {
+      // Array format - parse players from array, get summary from bulk endpoint
+      players = parseArrayFormat(rawData);
+
+      const bulkSummary = await fetchTeamSummaryFromBulk(teamId);
+      if (!bulkSummary) {
+        throw new Error('Failed to fetch team summary from bulk endpoint');
       }
+      teamSummary = bulkSummary;
+    } else if (rawData.salary_cap_for_team && rawData.salary_cap_for_players) {
+      // Structured format - parse both from the same response
+      const parsed = parseStructuredFormat(rawData);
+      teamSummary = parsed.teamSummary;
+      players = parsed.players;
+    } else {
+      throw new Error('Unrecognized salary cap data format');
     }
-
-    // If we got here and useFallback is true or response is null, we couldn't get data
-    if (useFallback || !response) {
-      throw new Error(`Failed to fetch salary cap data from all sources`);
-    }
-
-    const data: SportsKeedaSalaryCapResponse = await response.json();
-
-    if (!data.salary_cap_for_team || !data.salary_cap_for_players) {
-      return NextResponse.json(
-        { error: 'No salary cap data found' },
-        { status: 404 }
-      );
-    }
-
-    // Transform team summary data
-    const teamSummary = {
-      capSpace: parseCurrency(data.salary_cap_for_team.cap_space),
-      salaryCap: parseCurrency(data.salary_cap_for_team.salary_cap_current_year),
-      activeCapSpend: parseCurrency(data.salary_cap_for_team.active_cap_spend),
-      deadMoney: parseCurrency(data.salary_cap_for_team.dead_money)
-    };
-
-    // Transform player data
-    const players: TransformedPlayer[] = data.salary_cap_for_players.map(player => ({
-      name: player.player_name,
-      slug: player.player_slug,
-      capHit: parseCurrency(player.cap_number),
-      baseSalary: parseCurrency(player.base_salary),
-      signingBonus: parseCurrency(player.signing_bonus),
-      guaranteed: parseCurrency(player.guaranteed),
-      restructureCapSaving: parseCurrency(player.restructure_cap_saving),
-      extensionCapSaving: parseCurrency(player.extension_cap_saving),
-      cutDeadMoney: parseCurrency(player.cut_post.dead_money),
-      cutSaving: parseCurrency(player.cut_post.cap_saving),
-      tradeDeadMoney: parseCurrency(player.trade_post.dead_money),
-      tradeSaving: parseCurrency(player.trade_post.cap_saving)
-    }));
 
     // Sort players by cap hit (descending)
     players.sort((a, b) => b.capHit - a.capHit);
 
-    const transformedData: TransformedSalaryCapData = {
-      teamSummary,
-      players
-    };
-
     return NextResponse.json({
       teamId,
-      salaryCapData: transformedData,
+      salaryCapData: { teamSummary, players },
       totalPlayers: players.length,
       lastUpdated: new Date().toISOString(),
-      season: 2025
+      season: 2025,
     });
 
   } catch (error) {
