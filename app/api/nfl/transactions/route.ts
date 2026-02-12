@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
       'https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/2025',
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+          'User-Agent': 'PFN-Internal-NON-Blocking',
         },
         next: { revalidate: 10800 } // Cache for 3 hours
       }
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
           `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/2025?months=${monthCodes}`,
           {
             headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+              'User-Agent': 'PFN-Internal-NON-Blocking',
             },
             next: { revalidate: 10800 }
           }

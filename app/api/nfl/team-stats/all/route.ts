@@ -49,7 +49,7 @@ async function fetchTeamPPG(teamId: string, teamSlug: string): Promise<TeamPPG> 
       `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/team/${teamSlug}/stats?season=2025&event=regular`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+          'User-Agent': 'PFN-Internal-NON-Blocking',
         },
         next: { revalidate: 86400 } // Cache for 24 hours
       }

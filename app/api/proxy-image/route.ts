@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     // Fetch the image from the external URL
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; NBA-Hub/1.0)',
+        'User-Agent': 'PFN-Internal-NON-Blocking',
       },
     });
 

@@ -135,7 +135,7 @@ async function fetchAllPlayers(): Promise<PlayerWithTeam[]> {
       const response = await fetch(
         `https://api.sportskeeda.com/v1/taxonomy/${sportsKeedaSlug}?include=squad`,
         {
-          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)' },
+          headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
           next: { revalidate: 86400 }
         }
       );

@@ -169,7 +169,7 @@ export async function GET(
       `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+          'User-Agent': 'PFN-Internal-NON-Blocking',
         },
         next: { revalidate: 10800 } // Cache for 3 hours
       }
@@ -201,7 +201,7 @@ export async function GET(
           `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}?months=${monthCodes}`,
           {
             headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+              'User-Agent': 'PFN-Internal-NON-Blocking',
             },
             next: { revalidate: 10800 }
           }

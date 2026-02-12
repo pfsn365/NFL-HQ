@@ -32,7 +32,7 @@ export async function GET() {
       'https://statics.sportskeeda.com/assets/sheets/tools/salary-caps/salaryCaps.json',
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)',
+          'User-Agent': 'PFN-Internal-NON-Blocking',
         },
         next: { revalidate: 3600 } // Cache for 1 hour
       }

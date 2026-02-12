@@ -198,7 +198,7 @@ async function fetchTeamSeasonData(teamId: string) {
   const scheduleResponse = await fetch(
     `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/schedule/2025?team=${sportsKeedaTeamId}`,
     {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NFL-HQ/1.0)' },
+      headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
       next: { revalidate: 7200 }, // Cache for 2 hours
     }
   );
@@ -372,6 +372,7 @@ async function fetchStandingsData(): Promise<{
 
   try {
     const response = await fetch('https://statics.sportskeeda.com/assets/sheets/tools/draft-order/draft_order.json', {
+      headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
       next: { revalidate: 7200 }, // Cache for 2 hours
       signal: AbortSignal.timeout(10000),
     });

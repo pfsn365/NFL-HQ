@@ -92,7 +92,7 @@ async function scrapePFSNSalaryCapData(teamId: string): Promise<{
       'https://www.profootballnetwork.com/nfl-salary-cap-space-by-team',
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+          'User-Agent': 'PFN-Internal-NON-Blocking',
         },
         next: { revalidate: 86400 } // Cache for 24 hours
       }
@@ -200,7 +200,7 @@ export async function GET(
         `https://statics.sportskeeda.com/assets/sheets/static/nfl/team/subpage/salary-cap/${teamAbbr}.json`,
         {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
+            'User-Agent': 'PFN-Internal-NON-Blocking',
           },
           next: { revalidate: 86400 } // Cache for 24 hours
         }
