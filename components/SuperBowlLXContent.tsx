@@ -231,7 +231,7 @@ export default function SuperBowlLXContent() {
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
           }}
         >
-          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
@@ -244,7 +244,7 @@ export default function SuperBowlLXContent() {
               <img
                 src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
                 alt="Super Bowl LX Logo"
-                className="h-10 sm:h-20 lg:h-24 xl:h-28 w-auto object-contain"
+                className="h-10 sm:h-20 lg:h-24 xl:h-28 w-auto object-contain -mt-2 sm:-mt-4 lg:-mt-6"
               />
             </div>
           </div>

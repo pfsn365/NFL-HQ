@@ -7,7 +7,9 @@ import CanonicalURL from '@/components/CanonicalURL';
 import StructuredData from '@/components/StructuredData';
 import { WebVitals } from '@/components/WebVitals';
 import VideoPlayerScript from '@/components/VideoPlayerScript';
-import NFLScoreTicker from '@/components/NFLScoreTicker';
+// Offseason: uncomment when NFL season resumes
+// import NFLScoreTicker from '@/components/NFLScoreTicker';
+import FreeAgencyTicker from '@/components/FreeAgencyTicker';
 import Footer from '@/components/Footer';
 import SidebarLayout from '@/components/SidebarLayout';
 
@@ -124,7 +126,9 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <NFLScoreTicker />
+        {/* Offseason: uncomment when NFL season resumes */}
+        {/* <NFLScoreTicker /> */}
+        <FreeAgencyTicker />
         <CanonicalURL />
         <StructuredData />
         <WebVitals />

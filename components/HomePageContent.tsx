@@ -1,28 +1,30 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { getAllTeams } from '@/data/teams';
-import NFLPlayoffBracket from '@/components/NFLPlayoffBracket';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getApiPath } from '@/utils/api';
+import { getPositionColor } from '@/utils/colorHelpers';
+import { transformFreeAgentData, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
 export default function HomePageContent() {
+  const router = useRouter();
   const allTeams = getAllTeams();
 
-  // Super Bowl countdown
-  const SUPER_BOWL_DATE = new Date('2026-02-08T23:30:00Z'); // 6:30 PM ET
-  const [countdown, setCountdown] = useState<{ days: number; hours: number; minutes: number } | null>(null);
+  // Free agents state
+  const [topFreeAgents, setTopFreeAgents] = useState<FreeAgent[]>([]);
+  const [freeAgentsLoading, setFreeAgentsLoading] = useState(true);
 
   // Pill nav state & refs
   const SECTIONS = [
-    { id: 'super-bowl', label: 'Super Bowl' },
-    { id: 'playoffs', label: 'Playoffs' },
+    { id: 'free-agency', label: 'Free Agency' },
     { id: 'stat-leaders', label: 'Stat Leaders' },
     { id: 'tools', label: 'Tools' },
     { id: 'articles', label: 'Articles' },
   ] as const;
 
-  const [activeSection, setActiveSection] = useState<string>('super-bowl');
+  const [activeSection, setActiveSection] = useState<string>('free-agency');
   const pillNavRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLButtonElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -107,19 +109,25 @@ export default function HomePageContent() {
     }
   }, []);
 
+  // Fetch top free agents
   useEffect(() => {
-    const getCountdown = () => {
-      const now = new Date();
-      const diff = SUPER_BOWL_DATE.getTime() - now.getTime();
-      if (diff <= 0) return null;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return { days, hours, minutes };
-    };
-    setCountdown(getCountdown());
-    const timer = setInterval(() => setCountdown(getCountdown()), 60000);
-    return () => clearInterval(timer);
+    async function fetchTopFreeAgents() {
+      try {
+        const response = await fetch(getApiPath('api/free-agents'));
+        if (!response.ok) throw new Error('Failed to fetch');
+        const data = await response.json();
+        const transformed = transformFreeAgentData(data.output as RawFreeAgentData[]);
+        const top = transformed
+          .sort((a, b) => a.rank - b.rank)
+          .slice(0, 10);
+        setTopFreeAgents(top);
+      } catch (err) {
+        console.error('Error fetching free agents:', err);
+      } finally {
+        setFreeAgentsLoading(false);
+      }
+    }
+    fetchTopFreeAgents();
   }, []);
 
   // Stat leaders - NFL stats
@@ -244,7 +252,7 @@ export default function HomePageContent() {
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
           }}
         >
-          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-5 sm:pb-6 md:pb-7 lg:pb-8">
+          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
             <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
               NFL HQ
             </h1>
@@ -295,70 +303,135 @@ export default function HomePageContent() {
           </div>
         </div>
 
-        {/* Super Bowl LX Banner */}
-        <div id="super-bowl" className="container mx-auto px-4 sm:px-6 lg:px-8 pt-3 mb-6" style={{ scrollMarginTop: '100px' }}>
-          <Link
-            href="/super-bowl-lx"
-            className="group block bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] rounded-xl border-2 border-[#D4AF37] shadow-lg p-4 sm:p-6 hover:shadow-2xl hover:shadow-[#D4AF37]/20 hover:scale-[1.02] hover:border-[#FFD700] transition-all duration-300 cursor-pointer relative overflow-hidden"
-          >
-            {/* Shimmer effect on hover */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+        {/* Top Free Agents */}
+        <div id="free-agency" className="container mx-auto px-4 sm:px-6 lg:px-8 pt-3 mb-8" style={{ scrollMarginTop: '100px' }}>
+          {/* Animated gradient border wrapper */}
+          <div className="relative rounded-xl p-[2px] overflow-hidden fa-glow-border">
+            <div className="rounded-xl overflow-hidden bg-white">
+              {/* Dark header with shine effect */}
+              <div className="relative overflow-hidden bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] px-5 sm:px-6 py-4 sm:py-5">
+                <div className="absolute inset-0 fa-shine-effect" />
+                <h2 className="relative text-xl sm:text-2xl font-extrabold text-white">NFL Free Agency Tracker</h2>
+              </div>
 
-            <div className="relative flex items-center justify-between w-full px-2 sm:px-6 lg:px-12">
-              {/* Patriots logo - left */}
-              <img
-                src="/nfl-hq/new-england-patriots.png"
-                alt="New England Patriots"
-                className="w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 object-contain group-hover:scale-110 transition-transform duration-300"
-              />
-
-              {/* Center content - SB logo, countdown, CTA */}
-              <div className="flex flex-col items-center">
-                <img
-                  src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                  alt="Super Bowl LX"
-                  className={`object-contain ${countdown ? 'w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28' : 'w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40'}`}
-                />
-                {countdown && (
-                  <div className="mt-2 flex items-center gap-1 sm:gap-2 text-white">
-                    <div className="text-center">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold">{countdown.days}</div>
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider opacity-75">Days</div>
-                    </div>
-                    <span className="text-lg sm:text-xl font-bold opacity-50">:</span>
-                    <div className="text-center">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold">{countdown.hours}</div>
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider opacity-75">Hrs</div>
-                    </div>
-                    <span className="text-lg sm:text-xl font-bold opacity-50">:</span>
-                    <div className="text-center">
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold">{countdown.minutes}</div>
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider opacity-75">Min</div>
-                    </div>
+              {/* Table */}
+              {freeAgentsLoading ? (
+                <div className="bg-white p-4">
+                  <div className="animate-pulse space-y-3">
+                    {[...Array(10)].map((_, i) => (
+                      <div key={i} className="h-10 bg-gray-200 rounded"></div>
+                    ))}
                   </div>
-                )}
-                {/* CTA text */}
-                <div className="mt-2 flex items-center gap-2 text-[#D4AF37] group-hover:text-[#FFD700] transition-colors">
-                  <span className="text-sm sm:text-base font-semibold">View Super Bowl LX Coverage</span>
+                </div>
+              ) : topFreeAgents.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">Rank</th>
+                        <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-600">Name</th>
+                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">Pos</th>
+                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">2025 Team</th>
+                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600 hidden sm:table-cell">Age</th>
+                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {topFreeAgents.map((agent, index) => {
+                        const teamInfo = allTeams.find(t => t.id === agent.teamId);
+                        const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
+
+                        return (
+                          <tr key={`${agent.rank}-${agent.name}`} onClick={() => router.push('/free-agency-tracker')} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50 transition-colors cursor-pointer group`}>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
+                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0050A0] text-white text-xs font-bold">{agent.rank}</span>
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                              {agent.name}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
+                              <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
+                                {agent.position}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
+                              {teamInfo ? (
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-5 h-5" />
+                                  <span className="text-gray-700">{teamInfo.abbreviation}</span>
+                                </div>
+                              ) : (
+                                <span className="text-gray-500">{agent.current2025Team || '—'}</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-700 text-center hidden sm:table-cell">
+                              {agent.age}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
+                              {isUnsigned ? (
+                                <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                                  Unsigned
+                                </span>
+                              ) : (
+                                <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
+                                  Signed
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 bg-white">
+                  <p>Free agent data unavailable</p>
+                </div>
+              )}
+
+              {/* CTA footer */}
+              <Link
+                href="/free-agency-tracker"
+                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-[#002244] via-[#0050A0] to-[#002244] px-6 py-4 text-white font-bold text-sm hover:brightness-125 transition-all"
+              >
+                <span className="fa-cta-pulse inline-flex items-center gap-2">
+                  View All Free Agents
                   <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </div>
-              </div>
-
-              {/* Seahawks logo - right */}
-              <img
-                src="/nfl-hq/seattle-seahawks-sb.png"
-                alt="Seattle Seahawks"
-                className="w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 object-contain group-hover:scale-110 transition-transform duration-300"
-              />
+                </span>
+              </Link>
             </div>
-          </Link>
-        </div>
+          </div>
 
-        {/* NFL Playoff Bracket */}
-        <div id="playoffs" className="container mx-auto px-4 sm:px-6 lg:px-8 mb-8" style={{ scrollMarginTop: '100px' }}>
-          <NFLPlayoffBracket />
+          <style jsx>{`
+            .fa-glow-border {
+              background: linear-gradient(135deg, #002244, #0050A0, #0078D4, #0050A0, #002244);
+              background-size: 400% 400%;
+              animation: fa-border-glow 6s ease infinite;
+            }
+            @keyframes fa-border-glow {
+              0%, 100% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+            }
+            .fa-shine-effect {
+              background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.08) 55%, transparent 60%);
+              background-size: 250% 100%;
+              animation: fa-shine 4s ease-in-out infinite;
+            }
+            @keyframes fa-shine {
+              0% { background-position: 200% 0; }
+              100% { background-position: -50% 0; }
+            }
+            .fa-cta-pulse {
+              animation: fa-pulse 2s ease-in-out infinite;
+            }
+            @keyframes fa-pulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.8; }
+            }
+          `}</style>
         </div>
 
         {/* Stat Leaders Section */}
@@ -525,24 +598,24 @@ export default function HomePageContent() {
 
             {/* Hero Tier — 2 large cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Free Agency Tracker Card — Hero */}
+              {/* Player Rankings Builder Card — Hero */}
               <Link
-                href="/free-agency-tracker"
-                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-emerald-500 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
+                href="/player-rankings-builder"
+                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-orange-500 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
               >
                 <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-2">
-                  Free Agency Tracker
+                  Player Rankings Builder
                 </h3>
                 <p className="text-gray-600 text-sm mb-5">
-                  Track NFL free agents, signings, and available players
+                  Rank and compare NFL players by position
                 </p>
 
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
-                  <p className="text-lg font-semibold text-gray-700">Free Agent Hub</p>
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
+                  <p className="text-lg font-semibold text-gray-700">Drag & Drop Player Rankings</p>
                 </div>
 
                 <div className="mt-5 flex items-center text-[#0050A0]">
-                  <span className="text-sm font-medium group-hover:underline">View Free Agents</span>
+                  <span className="text-sm font-medium group-hover:underline">Start Ranking</span>
                   <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>

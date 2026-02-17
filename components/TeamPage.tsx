@@ -57,7 +57,7 @@ interface TeamHeroSectionProps {
 function TeamHeroSection({ team, liveRecord, liveDivisionRank, teamStats }: TeamHeroSectionProps) {
   return (
     <div style={{ backgroundColor: team.primaryColor }} className="text-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-8 pb-2 sm:pb-3 md:pb-4 lg:pb-5">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="flex items-center space-x-6 mb-6 lg:mb-0">
             <div className="w-24 h-24 lg:w-32 lg:h-32 bg-white rounded-full flex items-center justify-center shadow-lg p-2">
