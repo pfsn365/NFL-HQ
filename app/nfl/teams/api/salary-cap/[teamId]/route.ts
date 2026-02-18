@@ -264,6 +264,10 @@ export async function GET(
       totalPlayers: players.length,
       lastUpdated: new Date().toISOString(),
       season: 2025,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+      },
     });
 
   } catch (error) {

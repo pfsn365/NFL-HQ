@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import PlayerImage from '@/components/PlayerImage';
 import Pagination from '@/components/Pagination';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -220,11 +221,11 @@ export default function FreeAgencyTrackerClient() {
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
           }}
         >
-          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
-            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
+          <div className="container mx-auto px-4 pt-4 sm:pt-7 md:pt-8 lg:pt-10 pb-4 sm:pb-5 md:pb-6 lg:pb-7">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-1 sm:mb-2">
               NFL Free Agency Tracker
             </h1>
-            <p className="text-lg opacity-90 font-medium">
+            <p className="text-sm sm:text-lg opacity-90 font-medium">
               Track free agents, signings, and player availability across the league
             </p>
           </div>
@@ -435,8 +436,9 @@ export default function FreeAgencyTrackerClient() {
                               <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                 <Link
                                   href={`/players/${generatePlayerSlug(agent.name)}`}
-                                  className="text-[#0050A0] hover:underline"
+                                  className="flex items-center gap-2 text-[#0050A0] hover:underline"
                                 >
+                                  <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="sm" />
                                   {agent.name}
                                 </Link>
                               </td>
@@ -469,7 +471,7 @@ export default function FreeAgencyTrackerClient() {
                                     href={getPositionImpactUrl(agent.position)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`hover:opacity-80 transition-opacity ${agent.pfsn2025Impact >= 80 ? 'text-green-600' : agent.pfsn2025Impact >= 70 ? 'text-blue-600' : 'text-gray-700'}`}
+                                    className="hover:opacity-80 transition-opacity text-blue-600"
                                   >
                                     {agent.pfsn2025Impact.toFixed(1)}
                                   </a>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import HistoryTab from '@/components/super-bowl/HistoryTab';
 import HeadToHeadTab from '@/components/super-bowl/HeadToHeadTab';
@@ -13,33 +13,40 @@ import { getApiPath } from '@/utils/api';
 // Live Score Component - fetches Super Bowl score from ESPN
 function LiveScore() {
   const [score, setScore] = useState<{ away: string; home: string; detail: string; isLive: boolean } | null>(null);
+  const isFinalRef = useRef(false);
 
   useEffect(() => {
     const fetchScore = async () => {
       try {
         const res = await fetch(getApiPath('nfl/espn-scoreboard?date=2026-02-08'));
         const data = await res.json();
-        // Find the Super Bowl game (NE vs SEA)
         const sbGame = data.games?.find((g: { away_team?: { abbr?: string }; home_team?: { abbr?: string }; playoff_round?: string }) =>
           g.playoff_round?.toLowerCase().includes('super bowl') ||
           (g.away_team?.abbr === 'NE' && g.home_team?.abbr === 'SEA') ||
           (g.away_team?.abbr === 'SEA' && g.home_team?.abbr === 'NE')
         );
         if (sbGame) {
+          const detail = sbGame.status_detail || '';
+          if (detail.toLowerCase().includes('final')) {
+            isFinalRef.current = true;
+          }
           setScore({
             away: sbGame.away_team.score ?? '0',
             home: sbGame.home_team.score ?? '0',
-            detail: sbGame.status_detail,
+            detail,
             isLive: sbGame.is_live,
           });
         }
       } catch {
-        // Silently fail - will just show nothing
+        // Silently fail
       }
     };
 
     fetchScore();
-    const interval = setInterval(fetchScore, 30000); // Refresh every 30s
+    const interval = setInterval(() => {
+      if (isFinalRef.current) return;
+      fetchScore();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -231,13 +238,13 @@ export default function SuperBowlLXContent() {
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
           }}
         >
-          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
+          <div className="container mx-auto px-4 pt-4 sm:pt-7 md:pt-8 lg:pt-10 pb-4 sm:pb-5 md:pb-6 lg:pb-7">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
+                <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-1 sm:mb-2">
                   Super Bowl HQ
                 </h1>
-                <p className="text-lg opacity-90 font-medium">
+                <p className="text-sm sm:text-lg opacity-90 font-medium">
                   Super Bowl LX coverage and information
                 </p>
               </div>

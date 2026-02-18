@@ -321,42 +321,26 @@ function SchedulePageInner() {
           setGames(data.schedule || []);
 
         } else if (viewMode === 'weekly') {
-          // Fetch week range
           const weekRange = getWeekRange(selectedDate);
-          const gamesMap: Record<string, Game[]> = {};
+          const start = weekRange.days[0];
+          const end = weekRange.days[weekRange.days.length - 1];
+          const response = await fetch(getApiPath(`api/nfl/schedule/by-range?start=${start}&end=${end}`));
 
-          await Promise.all(
-            weekRange.days.map(async (day) => {
-              const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
-              if (response.ok) {
-                const data = await response.json();
-                gamesMap[day] = data.schedule || [];
-              } else {
-                gamesMap[day] = [];
-              }
-            })
-          );
+          if (!response.ok) throw new Error('Failed to fetch schedule');
 
-          setWeeklyGames(gamesMap);
+          const data = await response.json();
+          setWeeklyGames(data.schedule || {});
 
         } else if (viewMode === 'monthly') {
-          // Fetch entire month
           const monthDays = getMonthDays(selectedDate);
-          const gamesMap: Record<string, Game[]> = {};
+          const start = monthDays[0];
+          const end = monthDays[monthDays.length - 1];
+          const response = await fetch(getApiPath(`api/nfl/schedule/by-range?start=${start}&end=${end}`));
 
-          await Promise.all(
-            monthDays.map(async (day) => {
-              const response = await fetch(getApiPath(`api/nfl/schedule/by-date?season=2025&date=${day}`));
-              if (response.ok) {
-                const data = await response.json();
-                gamesMap[day] = data.schedule || [];
-              } else {
-                gamesMap[day] = [];
-              }
-            })
-          );
+          if (!response.ok) throw new Error('Failed to fetch schedule');
 
-          setMonthlyGames(gamesMap);
+          const data = await response.json();
+          setMonthlyGames(data.schedule || {});
         }
       } catch (err) {
         console.error(`Error fetching ${viewMode} schedule:`, err);
@@ -441,11 +425,11 @@ function SchedulePageInner() {
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
           }}
         >
-          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
-            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
+          <div className="container mx-auto px-4 pt-4 sm:pt-7 md:pt-8 lg:pt-10 pb-4 sm:pb-5 md:pb-6 lg:pb-7">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-1 sm:mb-2">
               NFL Schedule
             </h1>
-            <p className="text-lg opacity-90 font-medium">
+            <p className="text-sm sm:text-lg opacity-90 font-medium">
               View all NFL games, scores, and game details
             </p>
           </div>

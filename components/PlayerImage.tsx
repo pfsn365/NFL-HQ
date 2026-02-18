@@ -40,10 +40,8 @@ export default function PlayerImage({
 
   const handleError = () => {
     if (imageSource === 'pfn') {
-      // Try local ESPN image
       setImageSource('local');
     } else if (imageSource === 'local') {
-      // Fall back to initials
       setImageSource('fallback');
     }
   };

@@ -6,7 +6,8 @@ import { getAllTeams } from '@/data/teams';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getApiPath } from '@/utils/api';
 import { getPositionColor } from '@/utils/colorHelpers';
-import { transformFreeAgentData, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
+import PlayerImage from '@/components/PlayerImage';
+import { transformFreeAgentData, generatePlayerSlug, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
 export default function HomePageContent() {
   const router = useRouter();
@@ -119,7 +120,7 @@ export default function HomePageContent() {
         const transformed = transformFreeAgentData(data.output as RawFreeAgentData[]);
         const top = transformed
           .sort((a, b) => a.rank - b.rank)
-          .slice(0, 10);
+          .slice(0, 5);
         setTopFreeAgents(top);
       } catch (err) {
         console.error('Error fetching free agents:', err);
@@ -252,11 +253,11 @@ export default function HomePageContent() {
             boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
           }}
         >
-          <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
-            <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
+          <div className="container mx-auto px-4 pt-4 sm:pt-7 md:pt-8 lg:pt-10 pb-4 sm:pb-5 md:pb-6 lg:pb-7">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-1 sm:mb-2">
               NFL HQ
             </h1>
-            <p className="text-lg opacity-90 font-medium">
+            <p className="text-sm sm:text-lg opacity-90 font-medium">
               Your destination for NFL teams, stats, rankings, and interactive tools
             </p>
           </div>
@@ -328,54 +329,56 @@ export default function HomePageContent() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-100">
                       <tr>
-                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">Rank</th>
-                        <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-600">Name</th>
-                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">Pos</th>
-                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">2025 Team</th>
-                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600 hidden sm:table-cell">Age</th>
-                        <th className="py-2.5 px-3 text-center text-xs font-semibold text-gray-600">Status</th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Rank</th>
+                        <th className="py-3 px-3 sm:px-4 text-left text-sm font-semibold text-gray-600">Name</th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Pos</th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">2025 Team</th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">FA Type</th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">Age</th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Impact Grade</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
                       {topFreeAgents.map((agent, index) => {
                         const teamInfo = allTeams.find(t => t.id === agent.teamId);
-                        const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
 
                         return (
                           <tr key={`${agent.rank}-${agent.name}`} onClick={() => router.push('/free-agency-tracker')} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50 transition-colors cursor-pointer group`}>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
-                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0050A0] text-white text-xs font-bold">{agent.rank}</span>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
+                              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0050A0] text-white text-sm font-bold">{agent.rank}</span>
                             </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-sm font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                              {agent.name}
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                              <div className="flex items-center gap-2.5">
+                                <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="md" />
+                                {agent.name}
+                              </div>
                             </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
-                              <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
+                              <span className={`inline-block px-2.5 py-0.5 rounded text-sm font-semibold border ${getPositionColor(agent.position)}`}>
                                 {agent.position}
                               </span>
                             </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
                               {teamInfo ? (
-                                <div className="flex items-center justify-center gap-1.5">
-                                  <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-5 h-5" />
+                                <div className="flex items-center justify-center gap-2">
+                                  <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6" />
                                   <span className="text-gray-700">{teamInfo.abbreviation}</span>
                                 </div>
                               ) : (
                                 <span className="text-gray-500">{agent.current2025Team || '—'}</span>
                               )}
                             </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-700 text-center hidden sm:table-cell">
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-gray-700 text-center hidden sm:table-cell">
+                              {agent.faType}
+                            </td>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-gray-700 text-center hidden sm:table-cell">
                               {agent.age}
                             </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-center">
-                              {isUnsigned ? (
-                                <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
-                                  Unsigned
-                                </span>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base font-semibold text-center">
+                              {agent.pfsn2025Impact > 0 ? (
+                                <span className="text-blue-600">{agent.pfsn2025Impact.toFixed(1)}</span>
                               ) : (
-                                <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
-                                  Signed
-                                </span>
+                                <span className="text-gray-400">—</span>
                               )}
                             </td>
                           </tr>

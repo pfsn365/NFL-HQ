@@ -6,11 +6,9 @@ import { getApiPath } from '@/utils/api';
 import { getPositionColor } from '@/utils/colorHelpers';
 import { transformFreeAgentData, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
-// Module-level cache so data persists across navigations/remounts
 let cachedAgents: FreeAgent[] | null = null;
-// Track when the animation first started so scroll position persists across navigations
 let animationStartTime: number | null = null;
-const ANIMATION_DURATION = 40; // seconds, must match the CSS animation duration
+const ANIMATION_DURATION = 40;
 
 export default function FreeAgencyTicker() {
   const [agents, setAgents] = useState<FreeAgent[]>(cachedAgents ?? []);
@@ -93,8 +91,9 @@ export default function FreeAgencyTicker() {
         <div className="fixed top-[48px] lg:top-0 right-0 left-0 lg:left-64 bg-black text-white z-10 lg:z-40 overflow-hidden cursor-pointer hover:bg-gray-900 transition-colors">
           <div className="flex items-center h-10">
             {/* Fixed label */}
-            <div className="flex-shrink-0 bg-black text-white text-xs font-bold px-3 h-full flex items-center uppercase tracking-wider z-10 border-r border-white/50">
-              Top Free Agents
+            <div className="flex-shrink-0 bg-black text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 h-full flex items-center tracking-wider z-10 border-r border-white/50">
+              <span className="hidden sm:inline uppercase">Top Free Agents</span>
+              <span className="sm:hidden">TOP FAs</span>
             </div>
 
             {/* Scrolling container */}
@@ -121,7 +120,12 @@ export default function FreeAgencyTicker() {
 
           <style jsx>{`
             .ticker-scroll {
-              animation: ticker-marquee 40s linear infinite;
+              animation: ticker-marquee 20s linear infinite;
+            }
+            @media (min-width: 640px) {
+              .ticker-scroll {
+                animation-duration: 40s;
+              }
             }
             .ticker-scroll:hover {
               animation-play-state: paused;

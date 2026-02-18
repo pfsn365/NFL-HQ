@@ -1,6 +1,5 @@
 import { getAllTeams } from '@/data/teams';
 
-// TypeScript Interfaces
 export interface FreeAgent {
   rank: number;
   name: string;
@@ -88,13 +87,11 @@ export function transformFreeAgentData(rawData: RawFreeAgentData[]): FreeAgent[]
   return uniqueData.map((agent) => {
     const teamId = mapTeamNameToId(agent['2025 Team']);
 
-    // Parse position rank - handle formats like "WR1", "CB2", "EDGE1"
     let positionRank = 0;
     if (agent['Pos. Rank'] !== null && agent['Pos. Rank'] !== undefined && agent['Pos. Rank'] !== '') {
       if (typeof agent['Pos. Rank'] === 'number') {
         positionRank = agent['Pos. Rank'];
       } else {
-        // Extract numeric part from strings like "WR1", "EDGE1", "CB2"
         const numericPart = String(agent['Pos. Rank']).replace(/\D/g, '');
         const parsed = parseInt(numericPart);
         positionRank = isNaN(parsed) ? 0 : parsed;

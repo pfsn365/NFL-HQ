@@ -182,11 +182,11 @@ export default function TeamsListPageContent() {
               boxShadow: 'inset 0 -30px 40px -30px rgba(0,0,0,0.15), 0 4px 6px -1px rgba(0,0,0,0.1)'
             }}
           >
-            <div className="container mx-auto px-4 pt-6 sm:pt-7 md:pt-8 lg:pt-10 pb-0.5 sm:pb-1 md:pb-2 lg:pb-3">
-              <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">
+            <div className="container mx-auto px-4 pt-4 sm:pt-7 md:pt-8 lg:pt-10 pb-4 sm:pb-5 md:pb-6 lg:pb-7">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-1 sm:mb-2">
                 NFL Teams
               </h1>
-              <p className="text-lg opacity-90 font-medium">
+              <p className="text-sm sm:text-lg opacity-90 font-medium">
                 Select a team to view rosters, schedules, stats, and more
               </p>
             </div>
