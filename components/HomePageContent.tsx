@@ -330,8 +330,8 @@ export default function HomePageContent() {
                     <thead className="bg-gray-100">
                       <tr>
                         <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Rank</th>
-                        <th className="py-3 px-3 sm:px-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Pos</th>
+                        <th className="py-3 px-3 sm:px-4 text-left text-sm font-semibold text-gray-600 w-[40%] sm:w-auto">Name</th>
+                        <th className="py-3 px-1.5 sm:px-4 text-center text-sm font-semibold text-gray-600">Pos</th>
                         <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">2025 Team</th>
                         <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">FA Type</th>
                         <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">Age</th>
@@ -347,13 +347,13 @@ export default function HomePageContent() {
                             <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
                               <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0050A0] text-white text-sm font-bold">{agent.rank}</span>
                             </td>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                            <td className="px-3 sm:px-4 py-3 text-base font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
                               <div className="flex items-center gap-2.5">
                                 <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="md" />
-                                {agent.name}
+                                <span className="truncate">{agent.name}</span>
                               </div>
                             </td>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
+                            <td className="px-1.5 sm:px-4 py-3 whitespace-nowrap text-base text-center">
                               <span className={`inline-block px-2.5 py-0.5 rounded text-sm font-semibold border ${getPositionColor(agent.position)}`}>
                                 {agent.position}
                               </span>
