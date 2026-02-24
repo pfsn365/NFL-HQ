@@ -115,6 +115,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#0050A0" />
         <meta name="msapplication-TileColor" content="#0050A0" />
 
+        {/* Content tier signal for search engines */}
+        <meta property="article:content_tier" content="free" />
+
         {/* Performance and security */}
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
