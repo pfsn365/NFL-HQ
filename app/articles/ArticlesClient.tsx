@@ -222,7 +222,7 @@ export default function ArticlesClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Browse Articles</h2>
 
           {/* Category Tabs */}

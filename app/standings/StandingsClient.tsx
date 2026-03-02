@@ -489,7 +489,7 @@ export default function StandingsClient() {
       </div>
 
       {/* Desktop Table - Hidden on mobile */}
-      <div className="hidden md:block overflow-x-auto -mx-4 sm:mx-0">
+      <div className="hidden md:block table-scroll-container overflow-x-auto -mx-4 sm:mx-0">
         <table className="min-w-[900px] w-full bg-white rounded-lg overflow-hidden shadow-sm">
           <thead style={{ backgroundColor: '#0050A0' }}>
             <tr>
@@ -641,7 +641,7 @@ export default function StandingsClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           {/* Error State */}
           {error && !isLoading && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">

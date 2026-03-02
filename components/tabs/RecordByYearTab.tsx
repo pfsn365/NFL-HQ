@@ -293,16 +293,16 @@ export default function RecordByYearTab({ team }: RecordByYearTabProps) {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="table-scroll-container overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr style={{ backgroundColor: team.primaryColor, color: contrastText }}>
-              <th className="p-3 text-left font-semibold cursor-pointer select-none hover:opacity-80" onClick={() => handleSort('year')}>Year{sortIndicator('year')}</th>
-              <th className="p-3 text-left font-semibold">Record</th>
-              <th className="p-3 text-left font-semibold hidden sm:table-cell cursor-pointer select-none hover:opacity-80" onClick={() => handleSort('winPct')}>Win%{sortIndicator('winPct')}</th>
-              <th className="p-3 text-left font-semibold">Div. Finish</th>
-              <th className="p-3 text-left font-semibold">Playoffs</th>
-              <th className="p-3 text-left font-semibold hidden md:table-cell">Coach</th>
+              <th className="p-2 text-left font-semibold cursor-pointer select-none hover:opacity-80" onClick={() => handleSort('year')}>Year{sortIndicator('year')}</th>
+              <th className="p-2 text-left font-semibold">Record</th>
+              <th className="p-2 text-left font-semibold hidden sm:table-cell cursor-pointer select-none hover:opacity-80" onClick={() => handleSort('winPct')}>Win%{sortIndicator('winPct')}</th>
+              <th className="p-2 text-left font-semibold">Div. Finish</th>
+              <th className="p-2 text-left font-semibold">Playoffs</th>
+              <th className="p-2 text-left font-semibold hidden md:table-cell">Coach</th>
             </tr>
           </thead>
           <tbody>
@@ -321,11 +321,11 @@ export default function RecordByYearTab({ team }: RecordByYearTabProps) {
                   className={`${rowBg} border-b border-gray-100`}
                   style={sbWin ? { backgroundColor: '#FEF3C7' } : undefined}
                 >
-                  <td className="p-3 font-medium text-gray-900">{r.year}</td>
-                  <td className="p-3 text-gray-800">{record}</td>
-                  <td className="p-3 text-gray-700 hidden sm:table-cell">{winPct}</td>
-                  <td className="p-3 text-gray-700">{r.divisionFinish || '—'}</td>
-                  <td className="p-3">
+                  <td className="p-2 font-medium text-gray-900">{r.year}</td>
+                  <td className="p-2 text-gray-800">{record}</td>
+                  <td className="p-2 text-gray-700 hidden sm:table-cell">{winPct}</td>
+                  <td className="p-2 text-gray-700">{r.divisionFinish || '—'}</td>
+                  <td className="p-2">
                     {r.playoffs ? (
                       <span
                         className="inline-block px-2 py-0.5 rounded text-xs font-medium"
@@ -343,7 +343,7 @@ export default function RecordByYearTab({ team }: RecordByYearTabProps) {
                       <span className="text-gray-400">—</span>
                     )}
                   </td>
-                  <td className="p-3 hidden md:table-cell">
+                  <td className="p-2 hidden md:table-cell">
                     {r.coach ? (
                       <span className="relative inline-block">
                         <button

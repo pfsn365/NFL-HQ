@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter } from 'next/font/google';
 import "./globals.css";
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import RaptiveScript from '@/components/RaptiveScript';
@@ -12,6 +13,12 @@ import VideoPlayerScript from '@/components/VideoPlayerScript';
 import FreeAgencyTicker from '@/components/FreeAgencyTicker';
 import Footer from '@/components/Footer';
 import SidebarLayout from '@/components/SidebarLayout';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://profootballnetwork.com/nfl-hq'),
@@ -64,7 +71,7 @@ export const metadata: Metadata = {
     siteName: 'NFL HQ',
     images: [
       {
-        url: '/nfl-hq/og-image.png',
+        url: 'https://statico.profootballnetwork.com/wp-content/uploads/2026/03/02165035/NFL-HQ.png',
         width: 1200,
         height: 630,
         alt: 'NFL HQ - Complete NFL Coverage',
@@ -77,7 +84,7 @@ export const metadata: Metadata = {
     description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news.',
     creator: '@PFSN365',
     site: '@PFSN365',
-    images: ['/nfl-hq/og-image.png'],
+    images: ['https://statico.profootballnetwork.com/wp-content/uploads/2026/03/02165035/NFL-HQ.png'],
   },
   alternates: {
     canonical: 'https://profootballnetwork.com/nfl-hq',
@@ -90,7 +97,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-us">
+    <html lang="en-us" className={inter.variable}>
       <head>
         {/* Analytics and Ad Scripts */}
         <GoogleAnalytics />

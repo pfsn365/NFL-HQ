@@ -3,6 +3,7 @@
 import useSWR from 'swr';
 import Link from 'next/link';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { SWRErrorFallback } from '@/components/ErrorBoundary';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -81,15 +82,15 @@ const PositionTable = ({
   return (
     <div className="mb-8">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
-      <div className="overflow-x-auto">
+      <div className="table-scroll-container overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold w-16">Pos</th>
-              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">Starter</th>
-              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">2nd</th>
-              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">3rd</th>
-              <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">4th</th>
+              <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold w-16">Pos</th>
+              <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">Starter</th>
+              <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">2nd</th>
+              <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">3rd</th>
+              <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">4th</th>
             </tr>
           </thead>
           <tbody>
@@ -101,11 +102,11 @@ const PositionTable = ({
 
               return (
                 <tr key={position.abbreviation} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  <td className="p-3 font-medium text-gray-900">{position.abbreviation}</td>
-                  <td className="p-3">{renderPlayerCell(starter)}</td>
-                  <td className="p-3">{renderPlayerCell(second)}</td>
-                  <td className="p-3">{renderPlayerCell(third)}</td>
-                  <td className="p-3">{renderPlayerCell(fourth)}</td>
+                  <td className="p-2 font-medium text-gray-900">{position.abbreviation}</td>
+                  <td className="p-2">{renderPlayerCell(starter)}</td>
+                  <td className="p-2">{renderPlayerCell(second)}</td>
+                  <td className="p-2">{renderPlayerCell(third)}</td>
+                  <td className="p-2">{renderPlayerCell(fourth)}</td>
                 </tr>
               );
             })}
@@ -147,10 +148,7 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
     return (
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={800}>
         <TabHeader />
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading depth chart...</p>
-        </div>
+        <SkeletonLoader type="table" rows={12} />
       </LayoutStabilizer>
     );
   }

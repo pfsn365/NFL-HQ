@@ -199,7 +199,7 @@ export default function TeamsListPageContent() {
 
           {/* Teams by Division */}
           <div className="container mx-auto px-4 pt-4 pb-24">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 max-w-[1200px] mx-auto">
               {sortedDivisions.map((division) => {
                 const isNFC = division.startsWith('NFC');
                 return (

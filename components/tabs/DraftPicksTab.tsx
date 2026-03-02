@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getContrastTextColor } from '@/utils/colorHelpers';
@@ -195,10 +196,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{team.fullName} Draft Picks</h1>
           <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '280px' }}></div>
         </div>
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading draft picks...</p>
-        </div>
+        <SkeletonLoader type="table" rows={10} />
       </LayoutStabilizer>
     );
   }
@@ -292,7 +290,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
       </div>
 
       {/* Table with Year Headers */}
-      <div className="overflow-x-auto">
+      <div className="table-scroll-container overflow-x-auto">
         {sortedYears.length === 0 ? (
           <div className="text-center py-8 text-gray-600">
             No draft picks found matching your criteria.
@@ -312,12 +310,12 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
                     </tr>
                     {/* Column Headers Row */}
                     <tr className="bg-gray-100 border-b border-gray-200">
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Name</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Pos</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Round</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Rnd Pick</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600">Ovr Pick</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 hidden sm:table-cell">College</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600">Name</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600">Pos</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600">Round</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600">Rnd Pick</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600">Ovr Pick</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600 hidden sm:table-cell">College</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -330,7 +328,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
                       return (
                         <>
                           <tr key={`${pick.year}-${pick.round}-${pick.overallPick}-${index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td className="p-3">
+                            <td className="p-2">
                               {isFuturePick ? (
                                 <span className="font-medium text-gray-900">TBD</span>
                               ) : (
@@ -343,13 +341,13 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
                                 </Link>
                               )}
                             </td>
-                            <td className="p-3 text-gray-700">{pick.position}</td>
-                            <td className="p-3 text-gray-700">
+                            <td className="p-2 text-gray-700">{pick.position}</td>
+                            <td className="p-2 text-gray-700">
                               {pick.round}{tradeInfo && <span className="text-sm text-gray-600 italic">{tradeInfo}</span>}
                             </td>
-                            <td className="p-3 text-gray-700">{pick.roundPick === 0 ? 'TBD' : pick.roundPick}</td>
-                            <td className="p-3 text-gray-700">{pick.overallPick === 0 ? 'TBD' : pick.overallPick}</td>
-                            <td className="p-3 text-gray-700 hidden sm:table-cell">{pick.college}</td>
+                            <td className="p-2 text-gray-700">{pick.roundPick === 0 ? 'TBD' : pick.roundPick}</td>
+                            <td className="p-2 text-gray-700">{pick.overallPick === 0 ? 'TBD' : pick.overallPick}</td>
+                            <td className="p-2 text-gray-700 hidden sm:table-cell">{pick.college}</td>
                           </tr>
                           {pick.tradeNotes && (
                             <tr key={`${pick.year}-${pick.round}-${pick.overallPick}-${index}-notes`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>

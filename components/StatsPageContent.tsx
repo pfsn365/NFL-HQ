@@ -337,16 +337,16 @@ export default function StatsPageContent() {
                   <p className="text-gray-600 mb-2">No players found</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="table-scroll-container overflow-x-auto">
                   <table className="w-full min-w-[480px] sm:min-w-[560px] md:min-w-[640px]">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
                         <th scope="col" className="pl-3 sm:pl-4 md:pl-6 pr-2 py-3 text-left text-xs font-semibold text-gray-600 w-10 sm:w-12 md:w-16">Rank</th>
-                        <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600">Player</th>
-                        <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 sm:w-20 md:w-24">Position</th>
-                        <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-20 sm:w-24">Team</th>
-                        <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-gray-600 w-12 sm:w-16 md:w-20">GP</th>
-                        <th scope="col" className="py-3 px-3 sm:px-4 text-right text-xs font-semibold text-gray-600 w-16 sm:w-20 md:w-24">
+                        <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600">Player</th>
+                        <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16 sm:w-20 md:w-24">Position</th>
+                        <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-20 sm:w-24">Team</th>
+                        <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-gray-600 w-12 sm:w-16 md:w-20">GP</th>
+                        <th scope="col" className="py-2 px-2 sm:px-3 text-right text-xs font-semibold text-gray-600 w-16 sm:w-20 md:w-24">
                           {showPerGame ? `${activeCategoryInfo.abbr}/G` : activeCategoryInfo.abbr}
                         </th>
                       </tr>

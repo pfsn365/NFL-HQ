@@ -185,16 +185,16 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
         >
           <h3 className="text-lg font-bold text-white">{title}</h3>
         </div>
-        <div className="overflow-x-auto border border-t-0 border-gray-200 rounded-b-lg">
+        <div className="table-scroll-container overflow-x-auto border border-t-0 border-gray-200 rounded-b-lg">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16">Week</th>
-                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-20">Date</th>
-                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600">Opponent</th>
-                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden sm:table-cell">Time</th>
-                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden md:table-cell">TV</th>
-                <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-24">Result</th>
+                <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16">Week</th>
+                <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-20">Date</th>
+                <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600">Opponent</th>
+                <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16 hidden sm:table-cell">Time</th>
+                <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16 hidden md:table-cell">TV</th>
+                <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-24">Result</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -215,16 +215,16 @@ export default function ScheduleTab({ team }: ScheduleTabProps) {
       >
         <h3 className="text-lg font-bold text-white">{title}</h3>
       </div>
-      <div className="overflow-x-auto border border-t-0 border-gray-200 rounded-b-lg">
+      <div className="table-scroll-container overflow-x-auto border border-t-0 border-gray-200 rounded-b-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16">Week</th>
-              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-20">Date</th>
-              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600">Opponent</th>
-              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden sm:table-cell">Time</th>
-              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-16 hidden md:table-cell">TV</th>
-              <th scope="col" className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-gray-600 w-24">Result</th>
+              <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16">Week</th>
+              <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-20">Date</th>
+              <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600">Opponent</th>
+              <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16 hidden sm:table-cell">Time</th>
+              <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-16 hidden md:table-cell">TV</th>
+              <th scope="col" className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-gray-600 w-24">Result</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">

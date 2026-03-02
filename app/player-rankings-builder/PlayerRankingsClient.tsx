@@ -922,7 +922,7 @@ export default function PlayerRankingsClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           {loadingInitial ? (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
               <svg className="animate-spin w-12 h-12 mx-auto text-[#0050A0] mb-4" fill="none" viewBox="0 0 24 24">

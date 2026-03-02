@@ -7,6 +7,7 @@ import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getContrastTextColor } from '@/utils/colorHelpers';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { SWRErrorFallback } from '@/components/ErrorBoundary';
 import { fetcher, defaultSWROptions } from '@/lib/fetcher';
 import PlayerImage from '@/components/PlayerImage';
@@ -142,10 +143,7 @@ export default function RosterTab({ team }: RosterTabProps) {
     return (
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={800}>
         <TabHeader />
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading roster...</p>
-        </div>
+        <SkeletonLoader type="table" rows={15} />
       </LayoutStabilizer>
     );
   }
@@ -254,26 +252,26 @@ export default function RosterTab({ team }: RosterTabProps) {
                   </h3>
 
                   {/* Players Table */}
-                  <div className="overflow-x-auto">
+                  <div className="table-scroll-container overflow-x-auto">
                     <table className="min-w-full text-sm">
                       <thead>
                         <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-12">#</th>
-                          <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap min-w-[200px]">Name</th>
-                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-24">Impact</th>
-                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-24">Exp</th>
-                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Age</th>
-                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Ht</th>
-                          <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Wt</th>
-                          <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap min-w-[120px]">College</th>
+                          <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-12">#</th>
+                          <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap min-w-[200px]">Name</th>
+                          <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-24">Impact</th>
+                          <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-24">Exp</th>
+                          <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-16">Age</th>
+                          <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-16">Ht</th>
+                          <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-16">Wt</th>
+                          <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap min-w-[120px]">College</th>
                         </tr>
                       </thead>
                       <tbody>
                         {positionPlayers.map((player, index) => (
                           <tr key={`${player.jerseyNumber}-${player.name}`}
                               className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td className="px-3 py-3 font-semibold text-gray-900 whitespace-nowrap text-center">{player.jerseyNumber}</td>
-                            <td className="px-3 py-3">
+                            <td className="px-2 py-2 font-semibold text-gray-900 whitespace-nowrap text-center">{player.jerseyNumber}</td>
+                            <td className="px-2 py-2">
                               <div className="flex items-center space-x-3 min-w-[200px]">
                                 <PlayerImage
                                   slug={player.slug}
@@ -297,7 +295,7 @@ export default function RosterTab({ team }: RosterTabProps) {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-3 py-3 whitespace-nowrap text-center">
+                            <td className="px-2 py-2 whitespace-nowrap text-center">
                               {player.impactPlus > 0 ? (
                                 <a
                                   href={getPositionImpactUrl(player.position)}
@@ -311,11 +309,11 @@ export default function RosterTab({ team }: RosterTabProps) {
                                 <span className="text-gray-400">-</span>
                               )}
                             </td>
-                            <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center">{player.experience === 0 ? 'R' : player.experience}</td>
-                            <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center">{player.age}</td>
-                            <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center">{player.height}</td>
-                            <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center">{player.weight}</td>
-                            <td className="px-3 py-3 text-gray-700 whitespace-nowrap">{player.college}</td>
+                            <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center">{player.experience === 0 ? 'R' : player.experience}</td>
+                            <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center">{player.age}</td>
+                            <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center">{player.height}</td>
+                            <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center">{player.weight}</td>
+                            <td className="px-2 py-2 text-gray-700 whitespace-nowrap">{player.college}</td>
                           </tr>
                         ))}
                       </tbody>

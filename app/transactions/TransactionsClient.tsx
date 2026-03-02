@@ -173,20 +173,20 @@ export default function TransactionsClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           {/* Filters and Last Updated */}
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
               {/* Team Filter */}
               <div>
-                <label htmlFor="team-filter" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Team:
+                <label htmlFor="team-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Team
                 </label>
                 <select
                   id="team-filter"
                   value={selectedTeam}
                   onChange={(e) => setSelectedTeam(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Teams</option>
                   {allTeams.map(team => (
@@ -199,14 +199,14 @@ export default function TransactionsClient() {
 
               {/* Month Filter */}
               <div>
-                <label htmlFor="month-filter" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Month:
+                <label htmlFor="month-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Month
                 </label>
                 <select
                   id="month-filter"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Months</option>
                   {availableMonths.map(month => (
@@ -219,14 +219,14 @@ export default function TransactionsClient() {
 
               {/* Position Filter */}
               <div>
-                <label htmlFor="position-filter" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Position:
+                <label htmlFor="position-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Position
                 </label>
                 <select
                   id="position-filter"
                   value={selectedPosition}
                   onChange={(e) => setSelectedPosition(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Positions</option>
                   {availablePositions.map(position => (
@@ -266,14 +266,14 @@ export default function TransactionsClient() {
                   </div>
 
                   {/* Transactions Table */}
-                  <div className="overflow-x-auto">
+                  <div className="table-scroll-container overflow-x-auto">
                     <table className="w-full min-w-[800px] table-fixed">
                       <thead className="bg-[#0050A0] text-white">
                         <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-sm sm:text-base font-bold w-44">TEAM</th>
-                          <th scope="col" className="px-6 py-3 text-left text-sm sm:text-base font-bold w-64">PLAYER</th>
-                          <th scope="col" className="px-6 py-3 text-left text-sm sm:text-base font-bold w-32">POS</th>
-                          <th scope="col" className="px-6 py-3 text-left text-sm sm:text-base font-bold">TRANSACTION</th>
+                          <th scope="col" className="px-3 py-2 text-left text-sm sm:text-base font-bold w-44">TEAM</th>
+                          <th scope="col" className="px-3 py-2 text-left text-sm sm:text-base font-bold w-64">PLAYER</th>
+                          <th scope="col" className="px-3 py-2 text-left text-sm sm:text-base font-bold w-32">POS</th>
+                          <th scope="col" className="px-3 py-2 text-left text-sm sm:text-base font-bold">TRANSACTION</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -287,7 +287,7 @@ export default function TransactionsClient() {
                               } hover:bg-blue-50 transition-colors`}
                             >
                               {/* Team */}
-                              <td className="px-6 py-3">
+                              <td className="px-3 py-2">
                                 {team ? (
                                   <Link
                                     href={`/teams/${team.id}`}
@@ -312,7 +312,7 @@ export default function TransactionsClient() {
                               </td>
 
                               {/* Player */}
-                              <td className="px-6 py-3">
+                              <td className="px-3 py-2">
                                 <Link
                                   href={`/players/${transaction.playerSlug}`}
                                   className="font-medium text-[#0050A0] hover:underline text-base"
@@ -322,14 +322,14 @@ export default function TransactionsClient() {
                               </td>
 
                               {/* Position */}
-                              <td className="px-6 py-3">
+                              <td className="px-3 py-2">
                                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(transaction.position)}`}>
                                   {transaction.position}
                                 </span>
                               </td>
 
                               {/* Transaction */}
-                              <td className="px-6 py-3">
+                              <td className="px-3 py-2">
                                 <div className="text-base text-gray-700">
                                   {transaction.transaction}
                                   {transaction.fromTeam && transaction.toTeam && (

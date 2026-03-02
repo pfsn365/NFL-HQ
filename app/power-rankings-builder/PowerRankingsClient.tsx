@@ -889,7 +889,7 @@ export default function PowerRankingsClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           {/* Instructions - shown immediately for better LCP */}
           <div className="bg-[#0050A0]/10 border border-[#0050A0]/30 rounded-lg p-4 mb-6">
             <p className="text-sm text-[#003A75]">

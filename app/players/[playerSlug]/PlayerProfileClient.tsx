@@ -672,15 +672,15 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0050A0]"></div>
               </div>
             ) : gameLogData && gameLogData.games.length > 0 ? (
-              <div className="overflow-x-auto">
+              <div className="table-scroll-container overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-200">
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Wk</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Opp</th>
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Result</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Wk</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Opp</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">Result</th>
                       {gameLogData.statLabels.slice(0, 8).map((label) => (
-                        <th key={label.name} className="text-center py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">
+                        <th key={label.name} className="text-center py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600 bg-gray-50 whitespace-nowrap">
                           {label.label}
                         </th>
                       ))}
@@ -794,12 +794,12 @@ export default function PlayerProfileClient({ playerSlug }: Props) {
                         {category.displayName}
                       </h3>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="table-scroll-container overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-gray-100 border-b border-gray-200">
                             {category.labels.map((label, index) => (
-                              <th key={index} className="text-center py-3 px-3 sm:px-4 text-xs font-semibold text-gray-600 whitespace-nowrap">
+                              <th key={index} className="text-center py-2 px-2 sm:px-3 text-xs font-semibold text-gray-600 whitespace-nowrap">
                                 {label}
                               </th>
                             ))}

@@ -191,14 +191,14 @@ export default function PlayersDirectoryClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Browse All Players</h2>
           {/* Filters */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {/* Search */}
               <div>
-                <label htmlFor="search" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="search" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                   Search Players
                 </label>
                 <input
@@ -207,20 +207,20 @@ export default function PlayersDirectoryClient() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name, team, or position..."
-                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm"
                 />
               </div>
 
               {/* Team Filter */}
               <div>
-                <label htmlFor="team" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="team" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                   Team
                 </label>
                 <select
                   id="team"
                   value={selectedTeam}
                   onChange={(e) => setSelectedTeam(e.target.value)}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0] cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Teams</option>
                   {allTeams.map((team) => (
@@ -231,14 +231,14 @@ export default function PlayersDirectoryClient() {
 
               {/* Position Filter */}
               <div>
-                <label htmlFor="position" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="position" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                   Position
                 </label>
                 <select
                   id="position"
                   value={selectedPosition}
                   onChange={(e) => setSelectedPosition(e.target.value)}
-                  className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0050A0] focus:border-[#0050A0] cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   {POSITIONS.map((pos) => (
                     <option key={pos.value} value={pos.value}>{pos.label}</option>

@@ -222,20 +222,20 @@ export default function InjuriesClient() {
         </div>
 
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           {/* Filters and Search */}
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Team Filter */}
               <div>
-                <label htmlFor="team-filter" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Team:
+                <label htmlFor="team-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Team
                 </label>
                 <select
                   id="team-filter"
                   value={selectedTeam}
                   onChange={e => setSelectedTeam(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Teams</option>
                   {allTeams.map(team => (
@@ -248,14 +248,14 @@ export default function InjuriesClient() {
 
               {/* Position Filter */}
               <div>
-                <label htmlFor="position-filter" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Position:
+                <label htmlFor="position-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Position
                 </label>
                 <select
                   id="position-filter"
                   value={selectedPosition}
                   onChange={e => setSelectedPosition(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Positions</option>
                   {positions.map(pos => (
@@ -268,14 +268,14 @@ export default function InjuriesClient() {
 
               {/* Status Filter */}
               <div>
-                <label htmlFor="status-filter" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Status:
+                <label htmlFor="status-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Status
                 </label>
                 <select
                   id="status-filter"
                   value={selectedStatus}
                   onChange={e => setSelectedStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                 >
                   <option value="all">All Statuses</option>
                   <option value="out">Out</option>
@@ -289,8 +289,8 @@ export default function InjuriesClient() {
 
               {/* Search */}
               <div>
-                <label htmlFor="search" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Search Player:
+                <label htmlFor="search" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Search Player
                 </label>
                 <input
                   id="search"
@@ -298,7 +298,7 @@ export default function InjuriesClient() {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Enter player name..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm"
                 />
               </div>
             </div>
@@ -324,17 +324,17 @@ export default function InjuriesClient() {
             </div>
           ) : selectedTeam === 'all' ? (
             /* Single table view for all teams */
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm">
               {/* Single table with all injuries */}
-              <div className="overflow-x-auto">
+              <div className="table-scroll-container table-scroll-lg overflow-x-auto rounded-lg">
                 <table className="w-full min-w-[700px]">
                   <thead className="bg-[#0050A0] text-white">
                     <tr>
-                      <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold">PLAYER</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-24">POS</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-32">TEAM</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold">INJURY</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-40">STATUS</th>
+                      <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold">PLAYER</th>
+                      <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold w-24">POS</th>
+                      <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold w-32">TEAM</th>
+                      <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold">INJURY</th>
+                      <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold w-40">STATUS</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -348,7 +348,7 @@ export default function InjuriesClient() {
                           } hover:bg-[#0050A0]/5 transition-colors`}
                         >
                           {/* Player */}
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <Link
                               href={`/players/${generatePlayerSlug(injury.player)}`}
                               className="font-semibold text-[#0050A0] hover:underline text-sm"
@@ -358,14 +358,14 @@ export default function InjuriesClient() {
                           </td>
 
                           {/* Position */}
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(injury.position)}`}>
                               {injury.position}
                             </span>
                           </td>
 
                           {/* Team */}
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             {teamInfo ? (
                               <Link
                                 href={`/teams/${teamInfo.id}/injury-report`}
@@ -388,12 +388,12 @@ export default function InjuriesClient() {
                           </td>
 
                           {/* Injury */}
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <span className="text-sm text-gray-700">{injury.injury}</span>
                           </td>
 
                           {/* Status */}
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <span
                               className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                                 injury.status
@@ -464,14 +464,14 @@ export default function InjuriesClient() {
                     </div>
 
                     {/* Injuries Table */}
-                    <div className="overflow-x-auto">
+                    <div className="table-scroll-container overflow-x-auto">
                       <table className="w-full min-w-[640px]">
                         <thead className="bg-[#0050A0] text-white">
                           <tr>
-                            <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold">PLAYER</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-24">POS</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold">INJURY</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs sm:text-sm font-bold w-40">STATUS</th>
+                            <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold">PLAYER</th>
+                            <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold w-24">POS</th>
+                            <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold">INJURY</th>
+                            <th scope="col" className="px-3 py-2 text-left text-xs sm:text-sm font-bold w-40">STATUS</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -483,7 +483,7 @@ export default function InjuriesClient() {
                               } hover:bg-[#0050A0]/5 transition-colors`}
                             >
                               {/* Player */}
-                              <td className="px-4 py-3">
+                              <td className="px-3 py-2">
                                 <Link
                                   href={`/players/${generatePlayerSlug(injury.player)}`}
                                   className="font-semibold text-[#0050A0] hover:underline text-sm"
@@ -493,19 +493,19 @@ export default function InjuriesClient() {
                               </td>
 
                               {/* Position */}
-                              <td className="px-4 py-3">
+                              <td className="px-3 py-2">
                                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(injury.position)}`}>
                                   {injury.position}
                                 </span>
                               </td>
 
                               {/* Injury */}
-                              <td className="px-4 py-3">
+                              <td className="px-3 py-2">
                                 <span className="text-sm text-gray-700">{injury.injury}</span>
                               </td>
 
                               {/* Status */}
-                              <td className="px-4 py-3">
+                              <td className="px-3 py-2">
                                 <span
                                   className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                                     injury.status

@@ -236,26 +236,26 @@ export default function RostersDepthChartsTab() {
               </h3>
 
               {/* Players Table */}
-              <div className="overflow-x-auto">
+              <div className="table-scroll-container overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead>
                     <tr style={{ backgroundColor: team.primaryColor }} className="text-white">
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-12">#</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap min-w-[200px]">Name</th>
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-24">Impact</th>
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-24">Exp</th>
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16">Age</th>
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16 hidden sm:table-cell">Ht</th>
-                      <th scope="col" className="text-center py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap w-16 hidden sm:table-cell">Wt</th>
-                      <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap min-w-[120px] hidden md:table-cell">College</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-12">#</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap min-w-[200px]">Name</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-24">Impact</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-24">Exp</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-16">Age</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-16 hidden sm:table-cell">Ht</th>
+                      <th scope="col" className="text-center py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap w-16 hidden sm:table-cell">Wt</th>
+                      <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap min-w-[120px] hidden md:table-cell">College</th>
                     </tr>
                   </thead>
                   <tbody>
                     {positionPlayers.map((player, index) => (
                       <tr key={`${player.jerseyNumber}-${player.name}`}
                           className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-3 py-3 font-semibold text-gray-900 whitespace-nowrap text-center">{player.jerseyNumber}</td>
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-2 font-semibold text-gray-900 whitespace-nowrap text-center">{player.jerseyNumber}</td>
+                        <td className="px-2 py-2">
                           <div className="flex items-center space-x-3 min-w-[200px]">
                             <img
                               src={`https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${player.slug}.png?w=80`}
@@ -298,7 +298,7 @@ export default function RostersDepthChartsTab() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-center">
+                        <td className="px-2 py-2 whitespace-nowrap text-center">
                           {player.impactPlus > 0 ? (
                             <a
                               href={getPositionImpactUrl(player.position)}
@@ -312,11 +312,11 @@ export default function RostersDepthChartsTab() {
                             <span className="text-gray-600">-</span>
                           )}
                         </td>
-                        <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center">{player.experience === 0 ? 'R' : player.experience}</td>
-                        <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center">{player.age}</td>
-                        <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center hidden sm:table-cell">{player.height}</td>
-                        <td className="px-3 py-3 text-gray-700 whitespace-nowrap text-center hidden sm:table-cell">{player.weight}</td>
-                        <td className="px-3 py-3 text-gray-700 whitespace-nowrap hidden md:table-cell">{player.college}</td>
+                        <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center">{player.experience === 0 ? 'R' : player.experience}</td>
+                        <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center">{player.age}</td>
+                        <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center hidden sm:table-cell">{player.height}</td>
+                        <td className="px-2 py-2 text-gray-700 whitespace-nowrap text-center hidden sm:table-cell">{player.weight}</td>
+                        <td className="px-2 py-2 text-gray-700 whitespace-nowrap hidden md:table-cell">{player.college}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -375,14 +375,14 @@ export default function RostersDepthChartsTab() {
     const PositionTable = ({ title, positions }: { title: string; positions: DepthChartPosition[] }) => (
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
-        <div className="overflow-x-auto">
+        <div className="table-scroll-container overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: team.primaryColor }} className="text-white">
-                <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold w-16">Pos</th>
-                <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">Starter</th>
-                <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">2nd</th>
-                <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold min-w-[220px]">3rd</th>
+                <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold w-16">Pos</th>
+                <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">Starter</th>
+                <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">2nd</th>
+                <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold min-w-[220px]">3rd</th>
               </tr>
             </thead>
             <tbody>
@@ -393,10 +393,10 @@ export default function RostersDepthChartsTab() {
 
                 return (
                   <tr key={position.abbreviation} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 font-medium text-gray-900">{position.abbreviation}</td>
-                    <td className="p-3">{renderPlayerCell(starter)}</td>
-                    <td className="p-3">{renderPlayerCell(second)}</td>
-                    <td className="p-3">{renderPlayerCell(third)}</td>
+                    <td className="p-2 font-medium text-gray-900">{position.abbreviation}</td>
+                    <td className="p-2">{renderPlayerCell(starter)}</td>
+                    <td className="p-2">{renderPlayerCell(second)}</td>
+                    <td className="p-2">{renderPlayerCell(third)}</td>
                   </tr>
                 );
               })}

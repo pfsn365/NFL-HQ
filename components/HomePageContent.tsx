@@ -325,17 +325,17 @@ export default function HomePageContent() {
                   </div>
                 </div>
               ) : topFreeAgents.length > 0 ? (
-                <div className="overflow-x-auto">
+                <div className="table-scroll-container overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-100">
                       <tr>
-                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Rank</th>
-                        <th className="py-3 px-3 sm:px-4 text-left text-sm font-semibold text-gray-600 w-[40%] sm:w-auto">Name</th>
+                        <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">Rank</th>
+                        <th className="py-2 px-2 sm:px-3 text-left text-sm font-semibold text-gray-600 w-[40%] sm:w-auto">Name</th>
                         <th className="py-3 px-1.5 sm:px-4 text-center text-sm font-semibold text-gray-600">Pos</th>
-                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">2025 Team</th>
-                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">FA Type</th>
-                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">Age</th>
-                        <th className="py-3 px-3 sm:px-4 text-center text-sm font-semibold text-gray-600">Impact Grade</th>
+                        <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">2025 Team</th>
+                        <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">Age</th>
+                        <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">Impact Grade</th>
+                        <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">Status</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
@@ -344,21 +344,21 @@ export default function HomePageContent() {
 
                         return (
                           <tr key={`${agent.rank}-${agent.name}`} onClick={() => router.push('/free-agency-tracker')} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50 transition-colors cursor-pointer group`}>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
+                            <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base text-center">
                               <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0050A0] text-white text-sm font-bold">{agent.rank}</span>
                             </td>
-                            <td className="px-3 sm:px-4 py-3 text-base font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
+                            <td className="px-3 sm:px-3 py-2 text-base font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
                               <div className="flex items-center gap-2.5">
                                 <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="md" />
                                 <span className="truncate">{agent.name}</span>
                               </div>
                             </td>
-                            <td className="px-1.5 sm:px-4 py-3 whitespace-nowrap text-base text-center">
+                            <td className="px-1.5 sm:px-3 py-2 whitespace-nowrap text-base text-center">
                               <span className={`inline-block px-2.5 py-0.5 rounded text-sm font-semibold border ${getPositionColor(agent.position)}`}>
                                 {agent.position}
                               </span>
                             </td>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-center">
+                            <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base text-center">
                               {teamInfo ? (
                                 <div className="flex items-center justify-center gap-2">
                                   <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6" />
@@ -368,17 +368,23 @@ export default function HomePageContent() {
                                 <span className="text-gray-500">{agent.current2025Team || '—'}</span>
                               )}
                             </td>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-gray-700 text-center hidden sm:table-cell">
-                              {agent.faType}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base text-gray-700 text-center hidden sm:table-cell">
+                            <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base text-gray-700 text-center hidden sm:table-cell">
                               {agent.age}
                             </td>
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-base font-semibold text-center">
+                            <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base font-semibold text-center">
                               {agent.pfsn2025Impact > 0 ? (
                                 <span className="text-blue-600">{agent.pfsn2025Impact.toFixed(1)}</span>
                               ) : (
                                 <span className="text-gray-400">—</span>
+                              )}
+                            </td>
+                            <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-sm text-center">
+                              {agent.faType === 'Franchise' ? (
+                                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">Tagged</span>
+                              ) : agent.signed2026Team && agent.signed2026Team.trim() !== '' ? (
+                                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700 border border-green-200">Signed</span>
+                              ) : (
+                                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Unsigned</span>
                               )}
                             </td>
                           </tr>

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { SWRErrorFallback } from '@/components/ErrorBoundary';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -204,10 +205,7 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
     return (
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <TabHeader />
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading transactions...</p>
-        </div>
+        <SkeletonLoader type="table" rows={10} />
       </LayoutStabilizer>
     );
   }
@@ -237,22 +235,22 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
             <h3 className="text-lg font-semibold text-gray-800 mb-4 pt-2">{monthKey}</h3>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div className="table-scroll-container overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
-                    <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold w-24">Date</th>
-                    <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold">Player</th>
-                    <th scope="col" className="py-3 px-3 sm:px-4 text-xs font-semibold w-20 text-center">Pos</th>
-                    <th scope="col" className="text-left py-3 px-3 sm:px-4 text-xs font-semibold">Transaction</th>
+                    <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold w-24">Date</th>
+                    <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold">Player</th>
+                    <th scope="col" className="py-2 px-2 sm:px-3 text-xs font-semibold w-20 text-center">Pos</th>
+                    <th scope="col" className="text-left py-2 px-2 sm:px-3 text-xs font-semibold">Transaction</th>
                   </tr>
                 </thead>
                 <tbody>
                   {groupedData[monthKey].map((transaction, index) => (
                     <tr key={`${transaction.date}-${transaction.player}-${index}`}
                         className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="p-3 text-gray-700">{transaction.date}</td>
-                      <td className="p-3">
+                      <td className="p-2 text-gray-700">{transaction.date}</td>
+                      <td className="p-2">
                         <Link
                           href={`/players/${generatePlayerSlug(transaction.player)}`}
                           className="font-medium hover:underline cursor-pointer"
@@ -261,8 +259,8 @@ export default function TransactionsTab({ team }: TransactionsTabProps) {
                           {transaction.player}
                         </Link>
                       </td>
-                      <td className="p-3 text-gray-700 text-center">{transaction.position}</td>
-                      <td className="p-3 text-gray-700">
+                      <td className="p-2 text-gray-700 text-center">{transaction.position}</td>
+                      <td className="p-2 text-gray-700">
                         {transaction.fromTeam === team.fullName && transaction.toTeam ?
                           transaction.transaction.includes('Practice squad addition') ? 'Practice Squad Departure' :
                           transaction.transaction.includes('signed') ? 'Released/Signed Elsewhere' :

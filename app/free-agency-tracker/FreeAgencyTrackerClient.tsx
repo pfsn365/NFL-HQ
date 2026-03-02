@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PlayerImage from '@/components/PlayerImage';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import Pagination from '@/components/Pagination';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -133,6 +134,28 @@ export default function FreeAgencyTrackerClient() {
     return Array.from(types).sort();
   }, [allFreeAgents]);
 
+  // Position counts for filter options
+  const positionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allFreeAgents.forEach(a => {
+      if (a.position) {
+        counts[a.position] = (counts[a.position] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [allFreeAgents]);
+
+  // Active filter count
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedTeam !== 'all') count++;
+    if (selectedPosition !== 'all') count++;
+    if (selectedFaType !== 'all') count++;
+    if (selectedSignedStatus !== 'all') count++;
+    if (searchQuery.trim() !== '') count++;
+    return count;
+  }, [selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
+
   // Filtering Logic
   const filteredFreeAgents = useMemo(() => {
     return allFreeAgents.filter(agent => {
@@ -145,7 +168,9 @@ export default function FreeAgencyTrackerClient() {
       if (selectedSignedStatus === 'unsigned') {
         matchesSignedStatus = !agent.signed2026Team || agent.signed2026Team.trim() === '';
       } else if (selectedSignedStatus === 'signed') {
-        matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '');
+        matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '') && agent.faType !== 'Franchise';
+      } else if (selectedSignedStatus === 'tagged') {
+        matchesSignedStatus = agent.faType === 'Franchise';
       }
 
       return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus && matchesSearch;
@@ -237,16 +262,10 @@ export default function FreeAgencyTrackerClient() {
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
           {loading ? (
             /* Loading State */
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="animate-pulse space-y-4">
-                {[...Array(20)].map((_, i) => (
-                  <div key={i} className="h-12 bg-gray-200 rounded"></div>
-                ))}
-              </div>
-            </div>
+            <SkeletonLoader type="table" rows={15} />
           ) : error ? (
             /* Error State */
             <div className="bg-red-50 border border-red-200 rounded-lg p-6">
@@ -270,15 +289,39 @@ export default function FreeAgencyTrackerClient() {
             <>
               {/* Filters */}
               <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-700">Filters</span>
+                    {activeFilterCount > 0 && (
+                      <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[#0050A0] rounded-full">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </div>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedTeam('all');
+                        setSelectedPosition('all');
+                        setSelectedFaType('all');
+                        setSelectedSignedStatus('all');
+                        setSearchQuery('');
+                      }}
+                      className="text-xs font-medium text-[#0050A0] hover:text-[#003A75] cursor-pointer"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
                   {/* Team Filter */}
                   <div>
-                    <label htmlFor="fa-team-filter" className="block text-sm font-semibold text-gray-700 mb-2">Team</label>
+                    <label htmlFor="fa-team-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Team</label>
                     <select
                       id="fa-team-filter"
                       value={selectedTeam}
                       onChange={e => setSelectedTeam(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                     >
                       <option value="all">All Teams</option>
                       {allTeams.map(team => (
@@ -289,28 +332,28 @@ export default function FreeAgencyTrackerClient() {
 
                   {/* Position Filter */}
                   <div>
-                    <label htmlFor="fa-position-filter" className="block text-sm font-semibold text-gray-700 mb-2">Position</label>
+                    <label htmlFor="fa-position-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Position</label>
                     <select
                       id="fa-position-filter"
                       value={selectedPosition}
                       onChange={e => setSelectedPosition(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                     >
                       <option value="all">All Positions</option>
                       {availablePositions.map(position => (
-                        <option key={position} value={position}>{position}</option>
+                        <option key={position} value={position}>{position} ({positionCounts[position] || 0})</option>
                       ))}
                     </select>
                   </div>
 
                   {/* FA Type Filter */}
                   <div>
-                    <label htmlFor="fa-type-filter" className="block text-sm font-semibold text-gray-700 mb-2">FA Type</label>
+                    <label htmlFor="fa-type-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">FA Type</label>
                     <select
                       id="fa-type-filter"
                       value={selectedFaType}
                       onChange={e => setSelectedFaType(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                     >
                       <option value="all">All Types</option>
                       {availableFaTypes.map(type => (
@@ -321,22 +364,23 @@ export default function FreeAgencyTrackerClient() {
 
                   {/* Signed Status Filter */}
                   <div>
-                    <label htmlFor="fa-status-filter" className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <label htmlFor="fa-status-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Status</label>
                     <select
                       id="fa-status-filter"
                       value={selectedSignedStatus}
                       onChange={e => setSelectedSignedStatus(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
                     >
                       <option value="all">All Status</option>
                       <option value="unsigned">Unsigned</option>
                       <option value="signed">Signed</option>
+                      <option value="tagged">Tagged</option>
                     </select>
                   </div>
 
                   {/* Player Search */}
                   <div>
-                    <label htmlFor="fa-search" className="block text-sm font-semibold text-gray-700 mb-2">Search</label>
+                    <label htmlFor="fa-search" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Search</label>
                     <div className="relative">
                       <input
                         id="fa-search"
@@ -365,59 +409,59 @@ export default function FreeAgencyTrackerClient() {
                   <p className="text-gray-600">No free agents found matching your filters.</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
+                <div className="bg-white rounded-lg shadow-sm">
+                  <div className="table-scroll-container table-scroll-lg overflow-x-auto rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200 table-sticky-col">
                       <thead style={{ backgroundColor: '#0050A0' }}>
                         <tr>
                           <th
-                            className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                            className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
                             onClick={() => handleSort('rank')}
                           >
                             Rank
                             <SortIndicator column="rank" />
                           </th>
                           <th
-                            className="py-3 px-3 sm:px-4 text-left text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                            className="py-2 px-2 sm:px-3 text-left text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
                             onClick={() => handleSort('name')}
                           >
                             Name
                             <SortIndicator column="name" />
                           </th>
-                          <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white">
+                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             Position
                           </th>
-                          <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white">
+                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             2025 Team
                           </th>
-                          <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white">
+                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             FA Type
                           </th>
                           <th
-                            className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                            className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
                             onClick={() => handleSort('age')}
                           >
                             Age
                             <SortIndicator column="age" />
                           </th>
                           <th
-                            className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                            className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
                             onClick={() => handleSort('pfsn2025Impact')}
                           >
                             Impact Grade
                             <SortIndicator column="pfsn2025Impact" />
                           </th>
-                          <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white">
+                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             2026 Team
                           </th>
                           <th
-                            className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                            className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
                             onClick={() => handleSort('positionRank')}
                           >
                             Pos Rank
                             <SortIndicator column="positionRank" />
                           </th>
-                          <th scope="col" className="py-3 px-3 sm:px-4 text-center text-xs font-semibold text-white">
+                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             Status
                           </th>
                         </tr>
@@ -426,14 +470,15 @@ export default function FreeAgencyTrackerClient() {
                         {paginatedFreeAgents.map((agent, index) => {
                           const teamInfo = getTeamInfo(mapTeamNameToId(agent.current2025Team));
                           const signed2026TeamInfo = getTeamInfo(mapTeamNameToId(agent.signed2026Team));
+                          const isTagged = agent.faType === 'Franchise';
                           const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
 
                           return (
                             <tr key={`${agent.rank}-${agent.name}`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center">
                                 {agent.rank}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm font-medium">
                                 <Link
                                   href={`/players/${generatePlayerSlug(agent.name)}`}
                                   className="flex items-center gap-2 text-[#0050A0] hover:underline"
@@ -442,12 +487,12 @@ export default function FreeAgencyTrackerClient() {
                                   {agent.name}
                                 </Link>
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-center">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
                                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
                                   {agent.position}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm">
                                 {teamInfo ? (
                                   <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
                                     <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -459,13 +504,13 @@ export default function FreeAgencyTrackerClient() {
                                   <span className="text-gray-400 block text-center">—</span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-center">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                                 {agent.faType}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-center">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                                 {agent.age}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-center">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm font-semibold text-center">
                                 {agent.pfsn2025Impact > 0 ? (
                                   <a
                                     href={getPositionImpactUrl(agent.position)}
@@ -479,7 +524,7 @@ export default function FreeAgencyTrackerClient() {
                                   <span className="text-gray-400">—</span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm">
                                 {signed2026TeamInfo ? (
                                   <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
                                     <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -491,11 +536,15 @@ export default function FreeAgencyTrackerClient() {
                                   <span className="text-gray-500 text-xs block text-center">{agent.signed2026Team}</span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-center">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                                 {agent.positionRank}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-center">
-                                {isUnsigned ? (
+                              <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
+                                {isTagged ? (
+                                  <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">
+                                    Tagged
+                                  </span>
+                                ) : isUnsigned ? (
                                   <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
                                     Unsigned
                                   </span>

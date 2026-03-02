@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { getContrastTextColor } from '@/utils/colorHelpers';
 
 // Helper function to generate PFSN URL
@@ -590,10 +591,7 @@ export default function StatsTab({ team }: StatsTabProps) {
 
       {/* Loading and Error States for Live Stats */}
       {loading && (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading live {viewType === 'team' ? 'team' : 'player'} stats...</p>
-        </div>
+        <SkeletonLoader type="table" rows={10} />
       )}
 
       {error && (
@@ -662,15 +660,15 @@ export default function StatsTab({ team }: StatsTabProps) {
       </div>
 
       {/* Stats Table */}
-      <div className="overflow-x-auto mb-8">
-        <table className={`w-full text-sm ${viewType === 'players' && sortColumn ? 'sort-animation' : ''}`} key={`${sortColumn}-${sortDirection}`}>
+      <div className="table-scroll-container table-scroll-md overflow-x-auto mb-8">
+        <table className={`w-full text-sm table-sticky-col ${viewType === 'players' && sortColumn ? 'sort-animation' : ''}`} key={`${sortColumn}-${sortDirection}`}>
           <thead>
             <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
               {Object.entries(currentHeaders).map(([key, header]) => (
                 <th
                   key={key}
                   onClick={viewType === 'players' && key !== 'player' ? () => handleSort(key) : undefined}
-                  className={`text-left py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap ${
+                  className={`text-left py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap ${
                     viewType === 'players' && key !== 'player' ? 'cursor-pointer hover:opacity-80 select-none' : ''
                   }`}
                 >
@@ -686,7 +684,7 @@ export default function StatsTab({ team }: StatsTabProps) {
                 {Object.keys(currentHeaders).map((key) => {
                   const value = (row as any)[key];
                   return (
-                    <td key={key} className="p-2 sm:p-3 whitespace-nowrap">
+                    <td key={key} className="p-2 whitespace-nowrap">
                       {(key === 'player' || key === 'name') && value && typeof value === 'string' ? (
                         <a
                           href={getPFSNUrl(value)}

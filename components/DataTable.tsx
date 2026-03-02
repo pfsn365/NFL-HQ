@@ -274,7 +274,7 @@ export function DataTable<T extends Record<string, unknown>>({
   }
 
   return (
-    <div className={`overflow-x-auto ${className}`}>
+    <div className={`table-scroll-container overflow-x-auto ${className}`}>
       <table
         className={`w-full text-sm ${tableClass}`}
         key={tableKey}
@@ -290,7 +290,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 <th
                   key={String(column.key)}
                   scope="col"
-                  className={`py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass} ${
+                  className={`py-2 px-2 sm:px-3 text-xs font-semibold whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass} ${
                     isSortable ? 'cursor-pointer hover:opacity-80 select-none' : ''
                   }`}
                   onClick={isSortable ? () => handleSort(String(column.key)) : undefined}
@@ -314,7 +314,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 return (
                   <td
                     key={String(column.key)}
-                    className={`p-3 whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass}`}
+                    className={`p-2 whitespace-nowrap ${getAlignClass(column.align)} ${column.width || ''} ${visibilityClass}`}
                   >
                     {renderCell(column, row, index)}
                   </td>

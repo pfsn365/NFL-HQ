@@ -28,7 +28,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-inter), 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   /* Performance optimizations */
   text-rendering: optimizeSpeed;
   -webkit-font-smoothing: antialiased;
@@ -44,6 +44,67 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* Tabular-nums for all table cells */
+td, th { font-variant-numeric: tabular-nums; }
+
+/* Sticky table header + scroll container */
+.table-scroll-container {
+  overflow: auto;
+  position: relative;
+}
+
+.table-scroll-container thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Sticky first-column utility */
+.table-sticky-col td:first-child,
+.table-sticky-col th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
+
+.table-sticky-col thead th:first-child {
+  z-index: 15;
+}
+
+.table-sticky-col tbody tr:nth-child(odd) td:first-child {
+  background-color: white;
+}
+
+.table-sticky-col tbody tr:nth-child(even) td:first-child {
+  background-color: #f9fafb;
+}
+
+.table-sticky-col td:first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -6px;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(to right, rgba(0,0,0,0.06), transparent);
+  pointer-events: none;
+}
+
+/* Height-constrained containers */
+.table-scroll-md {
+  max-height: 400px;
+}
+
+.table-scroll-lg {
+  max-height: 75vh;
+}
+
+@media (max-height: 700px) {
+  .table-scroll-lg {
+    max-height: 60vh;
   }
 }
 
@@ -346,7 +407,7 @@ img {
 }
 
 .pfsn-footer-container {
-  max-width: 1373px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 30px;
 }

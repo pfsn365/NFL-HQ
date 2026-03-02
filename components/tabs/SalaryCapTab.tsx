@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import LayoutStabilizer from '@/components/LayoutStabilizer';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import { SWRErrorFallback } from '@/components/ErrorBoundary';
 import { TeamData } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
@@ -126,10 +127,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
     return (
       <LayoutStabilizer className="bg-white rounded-lg shadow p-4 sm:p-6" minHeight={600}>
         <TabHeader />
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0050A0] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading salary cap data...</p>
-        </div>
+        <SkeletonLoader type="table" rows={12} />
       </LayoutStabilizer>
     );
   }
@@ -226,30 +224,30 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
               {showPotentialSavings ? '✓ ' : ''}Potential Savings
             </button>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm sort-animation" key={`${sortField}-${sortDirection}`}>
+          <div className="table-scroll-container table-scroll-lg overflow-x-auto">
+            <table className="min-w-full text-sm sort-animation table-sticky-col" key={`${sortField}-${sortDirection}`}>
               <thead>
                 <tr style={{ backgroundColor: team.primaryColor, color: getContrastTextColor(team.primaryColor) }}>
                   <th
-                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap min-w-[160px]"
+                    className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap min-w-[160px]"
                     onClick={() => handleSort('name')}
                   >
                     Player{getSortIcon('name')}
                   </th>
                   <th
-                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                    className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                     onClick={() => handleSort('capHit')}
                   >
                     Cap Hit{getSortIcon('capHit')}
                   </th>
                   <th
-                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                    className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                     onClick={() => handleSort('baseSalary')}
                   >
                     Base Salary{getSortIcon('baseSalary')}
                   </th>
                   <th
-                    className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                    className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                     onClick={() => handleSort('guaranteed')}
                   >
                     Guaranteed{getSortIcon('guaranteed')}
@@ -258,25 +256,25 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
                   {showPotentialSavings ? (
                     <>
                       <th
-                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                        className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('restructureCapSaving')}
                       >
                         Restructure{getSortIcon('restructureCapSaving')}
                       </th>
                       <th
-                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                        className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('extensionCapSaving')}
                       >
                         Extension{getSortIcon('extensionCapSaving')}
                       </th>
                       <th
-                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                        className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('cutSaving')}
                       >
                         Cut Savings{getSortIcon('cutSaving')}
                       </th>
                       <th
-                        className="text-left py-3 px-3 sm:px-4 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
+                        className="text-left py-2 px-2 sm:px-3 text-xs font-semibold cursor-pointer hover:opacity-80 select-none whitespace-nowrap"
                         onClick={() => handleSort('cutDeadMoney')}
                       >
                         Dead Money{getSortIcon('cutDeadMoney')}
@@ -288,7 +286,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
               <tbody>
                 {sortedData.map((player, index) => (
                   <tr key={player.name} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-2 whitespace-nowrap">
                       <Link
                         href={`/nfl-hq/players/${player.slug}`}
                         className="font-medium hover:underline cursor-pointer"
@@ -297,13 +295,13 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
                         {player.name}
                       </Link>
                     </td>
-                    <td className="p-3 text-gray-900 font-medium whitespace-nowrap">
+                    <td className="p-2 text-gray-900 font-medium whitespace-nowrap">
                       ${(player.capHit / 1000000).toFixed(1)}M
                     </td>
-                    <td className="p-3 text-gray-700 whitespace-nowrap">
+                    <td className="p-2 text-gray-700 whitespace-nowrap">
                       ${(player.baseSalary / 1000000).toFixed(1)}M
                     </td>
-                    <td className="p-3 text-gray-700 whitespace-nowrap">
+                    <td className="p-2 text-gray-700 whitespace-nowrap">
                       ${(player.guaranteed / 1000000).toFixed(1)}M
                     </td>
 
@@ -327,7 +325,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
                         }`}>
                           {player.cutSaving < 0 ? `-$${Math.abs(player.cutSaving / 1000000).toFixed(1)}M` : `$${(player.cutSaving / 1000000).toFixed(1)}M`}
                         </td>
-                        <td className="p-3 text-red-600 whitespace-nowrap font-medium">
+                        <td className="p-2 text-red-600 whitespace-nowrap font-medium">
                           ${(player.cutDeadMoney / 1000000).toFixed(1)}M
                         </td>
                       </>
