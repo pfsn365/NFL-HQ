@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 interface PlayerImageProps {
   slug: string;
@@ -17,6 +17,12 @@ const sizeClasses = {
   xl: 'w-28 h-28 lg:w-32 lg:h-32 text-3xl lg:text-4xl',
 };
 
+/** Strip common name suffixes (Sr, Jr, II, III, IV, V) from a slug */
+function stripSuffixFromSlug(slug: string): string | null {
+  const stripped = slug.replace(/-(sr|jr|ii|iii|iv|v)$/, '');
+  return stripped !== slug ? stripped : null;
+}
+
 export default function PlayerImage({
   slug,
   name,
@@ -24,7 +30,9 @@ export default function PlayerImage({
   teamColor = '#6B7280',
   className = '',
 }: PlayerImageProps) {
-  const [imageSource, setImageSource] = useState<'pfn' | 'local' | 'fallback'>('pfn');
+  const [imageSource, setImageSource] = useState<'pfn' | 'local' | 'pfn-no-suffix' | 'local-no-suffix' | 'fallback'>('pfn');
+
+  const strippedSlug = useMemo(() => stripSuffixFromSlug(slug), [slug]);
 
   const getInitials = (playerName: string) => {
     return playerName
@@ -35,13 +43,34 @@ export default function PlayerImage({
       .slice(0, 2);
   };
 
-  const pfnUrl = `https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${slug}.png?w=80`;
-  const localUrl = `/player-images/${slug}.png`;
+  const getImageUrl = () => {
+    switch (imageSource) {
+      case 'pfn':
+        return `https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${slug}.png?w=80`;
+      case 'local':
+        return `/player-images/${slug}.png`;
+      case 'pfn-no-suffix':
+        return `https://staticd.profootballnetwork.com/skm/assets/player-images/nfl/${strippedSlug}.png?w=80`;
+      case 'local-no-suffix':
+        return `/player-images/${strippedSlug}.png`;
+      default:
+        return '';
+    }
+  };
 
   const handleError = () => {
     if (imageSource === 'pfn') {
       setImageSource('local');
     } else if (imageSource === 'local') {
+      // Try without suffix if the slug has one
+      if (strippedSlug) {
+        setImageSource('pfn-no-suffix');
+      } else {
+        setImageSource('fallback');
+      }
+    } else if (imageSource === 'pfn-no-suffix') {
+      setImageSource('local-no-suffix');
+    } else {
       setImageSource('fallback');
     }
   };
@@ -63,7 +92,7 @@ export default function PlayerImage({
 
   return (
     <img
-      src={imageSource === 'pfn' ? pfnUrl : localUrl}
+      src={getImageUrl()}
       alt={name}
       className={`${sizeClass} rounded-full object-cover flex-shrink-0 ${className}`}
       onError={handleError}

@@ -145,14 +145,58 @@ function transformTransactionType(type: string): string {
   ).join(' ');
 }
 
+// Fetch all transactions for a single season (initial call + full months call)
+async function fetchSeason(season: number): Promise<SportsKeedaTransaction[]> {
+  const baseUrl = `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}`;
+
+  const initialResponse = await fetch(baseUrl, {
+    headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
+    next: { revalidate: 10800 },
+  });
+
+  if (!initialResponse.ok) {
+    console.error(`Sportskeeda ${season} API error: ${initialResponse.status}`);
+    return [];
+  }
+
+  let responseData: SportsKeedaResponse = await initialResponse.json();
+
+  if (responseData.months && Array.isArray(responseData.months) && responseData.months.length > 0) {
+    const monthCodes = responseData.months
+      .map((m: string | { month_of_transaction?: string }) => (typeof m === 'string' ? m : m.month_of_transaction))
+      .filter(Boolean)
+      .join(',');
+
+    if (monthCodes) {
+      const fullResponse = await fetch(`${baseUrl}?months=${monthCodes}`, {
+        headers: { 'User-Agent': 'PFN-Internal-NON-Blocking' },
+        next: { revalidate: 10800 },
+      });
+
+      if (fullResponse.ok) {
+        responseData = await fullResponse.json();
+      }
+    }
+  }
+
+  const transactions: SportsKeedaTransaction[] = [];
+  if (responseData?.data && Array.isArray(responseData.data)) {
+    responseData.data.forEach(monthData => {
+      if (monthData.transactions && Array.isArray(monthData.transactions)) {
+        transactions.push(...monthData.transactions);
+      }
+    });
+  }
+
+  return transactions;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const { teamId } = await params;
-    const searchParams = request.nextUrl.searchParams;
-    const season = searchParams.get('season') || '2025';
 
     // Get team name for filtering
     const teamName = teamIdMap[teamId];
@@ -164,75 +208,32 @@ export async function GET(
       );
     }
 
-    // Step 1: First call to get available months
-    const initialResponse = await fetch(
-      `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}`,
-      {
-        headers: {
-          'User-Agent': 'PFN-Internal-NON-Blocking',
-        },
-        next: { revalidate: 10800 } // Cache for 3 hours
-      }
-    );
+    // Fetch both seasons in parallel
+    const [txns2025, txns2026] = await Promise.all([
+      fetchSeason(2025),
+      fetchSeason(2026),
+    ]);
 
-    if (!initialResponse.ok) {
-      throw new Error(`Sportskeeda API error: ${initialResponse.status}`);
+    // Merge transactions, deduplicating by transaction_id (prefer 2026 copy)
+    const txMap = new Map<number, SportsKeedaTransaction>();
+    for (const tx of txns2025) {
+      txMap.set(tx.transaction_id, tx);
     }
-
-    const initialData: SportsKeedaResponse = await initialResponse.json();
-
-    // Step 2: Get all available months and fetch full data
-    let responseData: SportsKeedaResponse = initialData;
-
-    if (initialData.months && Array.isArray(initialData.months) && initialData.months.length > 0) {
-      // Build months parameter string (format: MMYYYY,MMYYYY,...)
-      const monthCodes = initialData.months
-        .map((m: string | { month_of_transaction?: string }) => {
-          // Handle both string format and object format
-          const monthStr = typeof m === 'string' ? m : m.month_of_transaction;
-          return monthStr;
-        })
-        .filter(Boolean)
-        .join(',');
-
-      if (monthCodes) {
-        // Fetch with all months
-        const fullResponse = await fetch(
-          `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/transactions/${season}?months=${monthCodes}`,
-          {
-            headers: {
-              'User-Agent': 'PFN-Internal-NON-Blocking',
-            },
-            next: { revalidate: 10800 }
-          }
-        );
-
-        if (fullResponse.ok) {
-          responseData = await fullResponse.json();
-        }
-      }
+    for (const tx of txns2026) {
+      txMap.set(tx.transaction_id, tx); // overwrites 2025 duplicates
     }
-
-    if (!responseData || !responseData.data || !Array.isArray(responseData.data)) {
-      return NextResponse.json(
-        { error: 'No transactions data found' },
-        { status: 404 }
-      );
-    }
-
-    // Flatten all transactions from all months
-    const allTransactions: SportsKeedaTransaction[] = [];
-    responseData.data.forEach(monthData => {
-      if (monthData.transactions && Array.isArray(monthData.transactions)) {
-        allTransactions.push(...monthData.transactions);
-      }
-    });
+    const allTransactions = Array.from(txMap.values());
 
     // Filter transactions for the specific team
     const teamTransactions = allTransactions.filter(transaction =>
       transaction.team.name === teamName ||
       transaction.old_team?.name === teamName ||
       transaction.new_team?.name === teamName
+    );
+
+    // Sort by full timestamp (most recent first) before transforming
+    teamTransactions.sort((a, b) =>
+      new Date(b.date_of_transaction).getTime() - new Date(a.date_of_transaction).getTime()
     );
 
     // Transform the data to our format
@@ -266,23 +267,12 @@ export async function GET(
       };
     });
 
-    // Sort by date (most recent first)
-    transformedTransactions.sort((a, b) => {
-      const [aMonth, aDay] = a.date.split('/').map(Number);
-      const [bMonth, bDay] = b.date.split('/').map(Number);
-
-      if (aMonth !== bMonth) {
-        return bMonth - aMonth;
-      }
-      return bDay - aDay;
-    });
-
     return NextResponse.json({
       teamId,
       transactions: transformedTransactions,
       totalTransactions: transformedTransactions.length,
       lastUpdated: new Date().toISOString(),
-      season: parseInt(season)
+      seasons: [2025, 2026],
     });
 
   } catch (error) {

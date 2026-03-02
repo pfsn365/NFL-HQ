@@ -36,6 +36,18 @@ export function generatePlayerSlug(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
+/** Generate a slug with common name suffixes stripped (Sr, Jr, II, III, etc.) */
+export function generatePlayerSlugWithoutSuffix(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\b(sr\.?|jr\.?|ii|iii|iv|v)\s*$/i, '')
+    .trim()
+    .replace(/[.\s]+/g, '-')
+    .replace(/[^\w-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 export function mapTeamNameToId(teamName: string): string | undefined {
   if (!teamName || teamName.trim() === '') return undefined;
 

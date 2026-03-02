@@ -7,37 +7,33 @@ import { getPositionColor } from '@/utils/colorHelpers';
 import { transformFreeAgentData, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
 let cachedAgents: FreeAgent[] | null = null;
-let animationStartTime: number | null = null;
-const ANIMATION_DURATION = 40;
 
 export default function FreeAgencyTicker() {
   const [agents, setAgents] = useState<FreeAgent[]>(cachedAgents ?? []);
   const [loading, setLoading] = useState(!cachedAgents);
+  const tickerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate animation delay once on mount so re-renders don't restart the animation
-  // Must be called before any early returns to satisfy Rules of Hooks
-  const animationDelayRef = useRef<number | null>(null);
-  if (animationDelayRef.current === null) {
-    if (!animationStartTime) {
-      animationStartTime = Date.now();
-    }
-    const elapsedSeconds = (Date.now() - animationStartTime) / 1000;
-    animationDelayRef.current = -(elapsedSeconds % ANIMATION_DURATION);
-  }
-
-  const fetchFreeAgents = useCallback(async () => {
+  const fetchFreeAgents = useCallback(async (isRefresh = false) => {
     try {
       const response = await fetch(getApiPath('api/free-agents'));
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       const transformed = transformFreeAgentData(data.output as RawFreeAgentData[]);
-      // Take top 25 unsigned free agents by rank
+      // Take top 25 free agents by rank (including signed players)
       const topAgents = transformed
-        .filter(a => !a.signed2026Team || a.signed2026Team.trim() === '')
         .sort((a, b) => a.rank - b.rank)
         .slice(0, 25);
       cachedAgents = topAgents;
-      setAgents(topAgents);
+      // Only update state if data actually changed to avoid restarting the animation
+      if (!isRefresh) {
+        setAgents(topAgents);
+      } else {
+        setAgents(prev => {
+          const prevKey = prev.map(a => `${a.rank}-${a.name}`).join(',');
+          const newKey = topAgents.map(a => `${a.rank}-${a.name}`).join(',');
+          return prevKey === newKey ? prev : topAgents;
+        });
+      }
     } catch (error) {
       console.error('Error fetching free agents:', error);
     } finally {
@@ -47,12 +43,23 @@ export default function FreeAgencyTicker() {
 
   useEffect(() => {
     if (!cachedAgents) {
-      fetchFreeAgents();
+      fetchFreeAgents(false);
     }
-    // Refresh data every hour to pick up new signings
-    const interval = setInterval(fetchFreeAgents, 60 * 60 * 1000);
+    // Refresh data every hour — pass isRefresh=true to avoid restarting animation
+    const interval = setInterval(() => fetchFreeAgents(true), 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchFreeAgents]);
+
+  // Dynamically set animation duration based on content width for consistent scroll speed
+  useEffect(() => {
+    if (tickerRef.current && agents.length > 0) {
+      const scrollWidth = tickerRef.current.scrollWidth;
+      // ~75px per second scroll speed — one copy is half the total width
+      const onePassWidth = scrollWidth / 2;
+      const duration = Math.max(20, onePassWidth / 75);
+      tickerRef.current.style.setProperty('--ticker-duration', `${duration}s`);
+    }
+  }, [agents]);
 
   if (loading) {
     return (
@@ -83,7 +90,6 @@ export default function FreeAgencyTicker() {
 
   // Duplicate the list for seamless looping
   const duplicatedAgents = [...agents, ...agents];
-  const animationDelay = animationDelayRef.current;
 
   return (
     <>
@@ -99,8 +105,8 @@ export default function FreeAgencyTicker() {
             {/* Scrolling container */}
             <div className="overflow-hidden flex-1">
               <div
-                className="ticker-scroll flex items-center"
-                style={{ animationDelay: `${animationDelay}s` }}
+                ref={tickerRef}
+                className="ticker-scroll flex items-center will-change-transform"
               >
                 {duplicatedAgents.map((agent, index) => (
                   <div
@@ -109,9 +115,19 @@ export default function FreeAgencyTicker() {
                   >
                     <span className="text-xs text-gray-400 font-mono">#{agent.rank}</span>
                     <span className="text-sm font-semibold whitespace-nowrap">{agent.name}</span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${getPositionColor(agent.position)}`}>
-                      {agent.position}
-                    </span>
+                    {agent.faType === 'Franchise' ? (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/90 text-white">
+                        TAGGED
+                      </span>
+                    ) : agent.signed2026Team && agent.signed2026Team.trim() !== '' ? (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-600/80 text-white">
+                        SIGNED
+                      </span>
+                    ) : (
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${getPositionColor(agent.position)}`}>
+                        {agent.position}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -120,12 +136,7 @@ export default function FreeAgencyTicker() {
 
           <style jsx>{`
             .ticker-scroll {
-              animation: ticker-marquee 20s linear infinite;
-            }
-            @media (min-width: 640px) {
-              .ticker-scroll {
-                animation-duration: 40s;
-              }
+              animation: ticker-marquee var(--ticker-duration, 60s) linear infinite;
             }
             .ticker-scroll:hover {
               animation-play-state: paused;

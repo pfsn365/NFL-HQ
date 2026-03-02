@@ -37,6 +37,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
 
   const nflTools = [
     { title: 'NFL Articles', url: '/articles', external: false },
+    { title: 'NFL Salary Cap Tracker', url: '/salary-cap-tracker', external: false },
     { title: 'NFL Ultimate GM Simulator', url: 'https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/', external: true },
     { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', external: true },
     { title: 'NFL Schedule', url: '/schedule', external: false },
@@ -49,7 +50,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
     { title: 'NFL Transactions', url: '/transactions', external: false },
     { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor', external: true },
     { title: 'NFL Offseason Manager', url: 'https://www.profootballnetwork.com/nfl-offseason-salary-cap-free-agency-manager', external: true },
-    { title: 'NFL Salary Cap Tracker', url: '/salary-cap-tracker', external: false },
     { title: 'NFL Player Pages', url: '/players', external: false },
     { title: 'NFL Player Guessing Game', url: 'https://www.profootballnetwork.com/nfl-player-guessing-game/', external: true },
     { title: 'NFL Connections', url: 'https://www.profootballnetwork.com/games/nfl-connections/', external: true },
@@ -172,6 +172,16 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                   <div className="text-xs">NFL Free Agency Tracker</div>
                 </Link>
                 <Link
+                  href="/team-needs"
+                  className={`block p-2 rounded text-sm transition-colors ${
+                    isActivePage('/team-needs')
+                      ? 'bg-[#0050A0] text-white'
+                      : 'text-white hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="text-xs">NFL Team Needs</div>
+                </Link>
+                <Link
                   href="/teams"
                   className={`block p-2 rounded text-sm transition-colors ${
                     isActivePage('/teams')
@@ -212,60 +222,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
               </div>
               {isNFLToolsExpanded && (
                 <div className="grid grid-cols-1 gap-1">
-                  {/* Super Bowl HQ */}
-                  <div>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
-                      className={`block p-2 rounded text-sm transition-colors cursor-pointer ${
-                        isSuperBowlLXPage
-                          ? 'bg-[#0050A0] text-white'
-                          : 'text-white hover:bg-gray-800'
-                      }`}
-                    >
-                      <div className="text-xs flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <img
-                            src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                            alt="Super Bowl LX"
-                            className="h-5 w-5 object-contain"
-                          />
-                          Super Bowl HQ
-                        </div>
-                        <svg
-                          className={`w-3 h-3 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                    {isSuperBowlLXExpanded && (
-                      <div className="ml-4 mt-1 space-y-1">
-                        {[
-                          { id: 'overview', label: 'Overview' },
-                          { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
-                          { id: 'rosters', label: 'Rosters & Depth Charts' },
-                          { id: 'injuries', label: 'Injury Report' },
-                          { id: 'stats', label: 'Stats Comparison' },
-                          { id: 'head-to-head', label: 'Head-to-Head' },
-                          { id: 'history', label: 'Super Bowl History' },
-                        ].map((tab) => (
-                          <Link
-                            key={tab.id}
-                            href={`/super-bowl-lx?tab=${tab.id}`}
-                            className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
-                          >
-                            <div className="text-xs">{tab.label}</div>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                   {nflTools.map((tool, index) => {
                     const isActive = !tool.external && isActivePage(tool.url);
                     const toolWithIcon = tool as typeof tool & { icon?: string };
@@ -275,6 +231,62 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
 
                     return (
                       <React.Fragment key={tool.title}>
+                        {/* Super Bowl HQ - rendered above Playoff Predictor */}
+                        {tool.title === 'NFL Playoff Predictor' && (
+                          <div>
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
+                              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
+                              className={`block p-2 rounded text-sm transition-colors cursor-pointer ${
+                                isSuperBowlLXPage
+                                  ? 'bg-[#0050A0] text-white'
+                                  : 'text-white hover:bg-gray-800'
+                              }`}
+                            >
+                              <div className="text-xs flex items-center justify-between">
+                                <div className="flex items-center gap-1">
+                                  <img
+                                    src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                                    alt="Super Bowl LX"
+                                    className="h-5 w-5 object-contain"
+                                  />
+                                  Super Bowl HQ
+                                </div>
+                                <svg
+                                  className={`w-3 h-3 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </div>
+                            </div>
+                            {isSuperBowlLXExpanded && (
+                              <div className="ml-4 mt-1 space-y-1">
+                                {[
+                                  { id: 'overview', label: 'Overview' },
+                                  { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
+                                  { id: 'rosters', label: 'Rosters & Depth Charts' },
+                                  { id: 'injuries', label: 'Injury Report' },
+                                  { id: 'stats', label: 'Stats Comparison' },
+                                  { id: 'head-to-head', label: 'Head-to-Head' },
+                                  { id: 'history', label: 'Super Bowl History' },
+                                ].map((tab) => (
+                                  <Link
+                                    key={tab.id}
+                                    href={`/super-bowl-lx?tab=${tab.id}`}
+                                    className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
+                                  >
+                                    <div className="text-xs">{tab.label}</div>
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                         <LinkOrA
                           href={tool.url}
                           {...externalProps}
@@ -289,7 +301,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                             )}
                           </div>
                         </LinkOrA>
-                        {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
+                        {/* PFSN Impact Rankings - expandable submenu after GM Simulator */}
                         {tool.title === 'NFL Ultimate GM Simulator' && (
                           <div>
                             <button
@@ -443,6 +455,22 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
             </Link>
           </li>
 
+          {/* Team Needs */}
+          <li>
+            <Link
+              href="/team-needs"
+              className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+                isActivePage('/team-needs')
+                  ? 'bg-[#0050A0] text-white'
+                  : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2 w-full">
+                <span className="text-sm font-medium">NFL Team Needs</span>
+              </div>
+            </Link>
+          </li>
+
           {/* Browse All Teams Button */}
           <li className="mb-4">
             <Link
@@ -485,60 +513,6 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
               </div>
             </div>
           </li>
-          {/* Super Bowl HQ with Dropdown */}
-          <li>
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
-              className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 cursor-pointer ${
-                isSuperBowlLXPage
-                  ? 'bg-[#0050A0] text-white'
-                  : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
-              }`}
-            >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-2">
-                  <img
-                    src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                    alt="Super Bowl LX"
-                    className="h-6 w-6 object-contain"
-                  />
-                  <span className="text-sm font-medium">Super Bowl HQ</span>
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-            {isSuperBowlLXExpanded && (
-              <div className="mt-1">
-                {[
-                  { id: 'overview', label: 'Overview' },
-                  { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
-                  { id: 'rosters', label: 'Rosters & Depth Charts' },
-                  { id: 'injuries', label: 'Injury Report' },
-                  { id: 'stats', label: 'Stats Comparison' },
-                  { id: 'head-to-head', label: 'Head-to-Head' },
-                  { id: 'history', label: 'Super Bowl History' },
-                ].map((tab) => (
-                  <Link
-                    key={tab.id}
-                    href={`/super-bowl-lx?tab=${tab.id}`}
-                    className="relative flex items-center px-3 py-2 mx-1 ml-4 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
-                  >
-                    <span className="text-sm font-medium truncate">{tab.label}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </li>
           {nflTools.map((tool) => {
             const isActive = !tool.external && isActivePage(tool.url);
             const toolWithIcon = tool as typeof tool & { icon?: string };
@@ -547,6 +521,62 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
 
             return (
               <React.Fragment key={tool.title}>
+                {/* Super Bowl HQ - rendered above Playoff Predictor */}
+                {tool.title === 'NFL Playoff Predictor' && (
+                  <li>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
+                      className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 cursor-pointer ${
+                        isSuperBowlLXPage
+                          ? 'bg-[#0050A0] text-white'
+                          : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
+                            alt="Super Bowl LX"
+                            className="h-6 w-6 object-contain"
+                          />
+                          <span className="text-sm font-medium">Super Bowl HQ</span>
+                        </div>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    {isSuperBowlLXExpanded && (
+                      <div className="mt-1">
+                        {[
+                          { id: 'overview', label: 'Overview' },
+                          { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
+                          { id: 'rosters', label: 'Rosters & Depth Charts' },
+                          { id: 'injuries', label: 'Injury Report' },
+                          { id: 'stats', label: 'Stats Comparison' },
+                          { id: 'head-to-head', label: 'Head-to-Head' },
+                          { id: 'history', label: 'Super Bowl History' },
+                        ].map((tab) => (
+                          <Link
+                            key={tab.id}
+                            href={`/super-bowl-lx?tab=${tab.id}`}
+                            className="relative flex items-center px-3 py-2 mx-1 ml-4 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
+                          >
+                            <span className="text-sm font-medium truncate">{tab.label}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                )}
                 <li>
                   <ToolLink
                     href={tool.url}
@@ -570,7 +600,7 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
                     </span>
                   </ToolLink>
                 </li>
-                {/* PFSN Impact Rankings - expandable submenu after Free Agency Tracker */}
+                {/* PFSN Impact Rankings - expandable submenu after GM Simulator */}
                 {tool.title === 'NFL Ultimate GM Simulator' && (
                   <>
                     <li>
