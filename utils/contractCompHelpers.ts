@@ -152,7 +152,8 @@ export function findContractComps(
         if (isNaN(contractAge)) return null;
 
         const ageDiff = Math.abs(agent.age - contractAge);
-        const ageSimilarity = Math.max(0, 1 - ageDiff / 15);
+        if (ageDiff > 3) return null; // Max 3 year age difference
+        const ageSimilarity = Math.max(0, 1 - ageDiff / 3);
 
         const contractImpact = getContractImpact(c);
         let matchPct: number;
