@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import PlayerImage from '@/components/PlayerImage';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import Pagination from '@/components/Pagination';
+import ContractComps from '@/components/ContractComps';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getPositionColor } from '@/utils/colorHelpers';
@@ -17,6 +18,7 @@ import {
   getPositionImpactUrl,
   transformFreeAgentData,
 } from '@/utils/freeAgentHelpers';
+import { type ContractSheet, hasContractComps } from '@/utils/contractCompHelpers';
 
 export default function FreeAgencyTrackerClient() {
   const allTeams = getAllTeams();
@@ -26,6 +28,43 @@ export default function FreeAgencyTrackerClient() {
   const [loading, setLoading] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Expandable row + contract comps state (lazy loaded)
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [contractSheets, setContractSheets] = useState<ContractSheet[]>([]);
+  const [contractsLoading, setContractsLoading] = useState(false);
+  const [contractsFetched, setContractsFetched] = useState(false);
+
+  const fetchContractSheets = useCallback(async () => {
+    if (contractsFetched || contractsLoading) return;
+    setContractsLoading(true);
+    try {
+      const res = await fetch(getApiPath('api/contract-estimations'));
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      if (data.sheets) setContractSheets(data.sheets);
+      setContractsFetched(true);
+    } catch {
+      // Silent fail — comps just won't show
+    } finally {
+      setContractsLoading(false);
+    }
+  }, [contractsFetched, contractsLoading]);
+
+  const toggleRow = useCallback((rowKey: string, isExpandable: boolean) => {
+    if (!isExpandable) return;
+    setExpandedRows(prev => {
+      const next = new Set(prev);
+      if (next.has(rowKey)) {
+        next.delete(rowKey);
+      } else {
+        next.add(rowKey);
+        // Lazy-load contract data on first expand
+        if (!contractsFetched) fetchContractSheets();
+      }
+      return next;
+    });
+  }, [contractsFetched, fetchContractSheets]);
 
   // Filter States
   const [selectedTeam, setSelectedTeam] = useState('all');
@@ -111,6 +150,30 @@ export default function FreeAgencyTrackerClient() {
     }
 
     fetchFreeAgents();
+  }, [hasLoaded]);
+
+  // Silent background polling every 2 minutes for live updates
+  useEffect(() => {
+    if (!hasLoaded) return;
+
+    const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(getApiPath('api/free-agents'));
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (data.error || !data.output || !Array.isArray(data.output)) return;
+
+        const transformed = transformFreeAgentData(data.output);
+        setAllFreeAgents(transformed);
+      } catch {
+        // Silent fail — don't disrupt the user
+      }
+    }, POLL_INTERVAL);
+
+    return () => clearInterval(interval);
   }, [hasLoaded]);
 
   // Extract unique positions for filter with custom order
@@ -472,89 +535,116 @@ export default function FreeAgencyTrackerClient() {
                           const signed2026TeamInfo = getTeamInfo(mapTeamNameToId(agent.signed2026Team));
                           const isTagged = agent.faType === 'Franchise';
                           const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
+                          const rowKey = `${agent.rank}-${agent.name}`;
+                          const isExpandable = hasContractComps(agent.position);
+                          const isExpanded = expandedRows.has(rowKey);
 
                           return (
-                            <tr key={`${agent.rank}-${agent.name}`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center">
-                                {agent.rank}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm font-medium">
-                                <Link
-                                  href={`/players/${generatePlayerSlug(agent.name)}`}
-                                  className="flex items-center gap-2 text-[#0050A0] hover:underline"
-                                >
-                                  <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="sm" />
-                                  {agent.name}
-                                </Link>
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
-                                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
-                                  {agent.position}
-                                </span>
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm">
-                                {teamInfo ? (
-                                  <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
-                                    <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
-                                    <span className="font-medium text-[#0050A0]">{teamInfo.abbreviation}</span>
-                                  </Link>
-                                ) : agent.current2025Team ? (
-                                  <span className="text-gray-500 text-xs block text-center">{agent.current2025Team}</span>
-                                ) : (
-                                  <span className="text-gray-400 block text-center">—</span>
-                                )}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
-                                {agent.faType}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
-                                {agent.age}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm font-semibold text-center">
-                                {agent.pfsn2025Impact > 0 ? (
-                                  <a
-                                    href={getPositionImpactUrl(agent.position)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:opacity-80 transition-opacity text-blue-600"
+                            <React.Fragment key={rowKey}>
+                              <tr
+                                className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${isExpandable ? 'cursor-pointer hover:bg-blue-50/50' : ''} ${isExpanded ? '!bg-blue-50' : ''}`}
+                                onClick={() => toggleRow(rowKey, isExpandable)}
+                              >
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center">
+                                  <span className="flex items-center justify-center gap-1">
+                                    {isExpandable && (
+                                      <svg
+                                        className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                      </svg>
+                                    )}
+                                    {agent.rank}
+                                  </span>
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm font-medium">
+                                  <Link
+                                    href={`/players/${generatePlayerSlug(agent.name)}`}
+                                    className="flex items-center gap-2 text-[#0050A0] hover:underline"
+                                    onClick={e => e.stopPropagation()}
                                   >
-                                    {agent.pfsn2025Impact.toFixed(1)}
-                                  </a>
-                                ) : (
-                                  <span className="text-gray-400">—</span>
-                                )}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm">
-                                {signed2026TeamInfo ? (
-                                  <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
-                                    <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
-                                    <span className="font-medium text-[#0050A0]">{signed2026TeamInfo.abbreviation}</span>
+                                    <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="sm" />
+                                    {agent.name}
                                   </Link>
-                                ) : isUnsigned ? (
-                                  <span className="text-gray-400 block text-center">—</span>
-                                ) : (
-                                  <span className="text-gray-500 text-xs block text-center">{agent.signed2026Team}</span>
-                                )}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
-                                {agent.positionRank}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
-                                {isTagged ? (
-                                  <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">
-                                    Tagged
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
+                                  <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
+                                    {agent.position}
                                   </span>
-                                ) : isUnsigned ? (
-                                  <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
-                                    Unsigned
-                                  </span>
-                                ) : (
-                                  <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
-                                    Signed
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm">
+                                  {teamInfo ? (
+                                    <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()}>
+                                      <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
+                                      <span className="font-medium text-[#0050A0]">{teamInfo.abbreviation}</span>
+                                    </Link>
+                                  ) : agent.current2025Team ? (
+                                    <span className="text-gray-500 text-xs block text-center">{agent.current2025Team}</span>
+                                  ) : (
+                                    <span className="text-gray-400 block text-center">—</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
+                                  {agent.faType}
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
+                                  {agent.age}
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm font-semibold text-center">
+                                  {agent.pfsn2025Impact > 0 ? (
+                                    <a
+                                      href={getPositionImpactUrl(agent.position)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:opacity-80 transition-opacity text-blue-600"
+                                      onClick={e => e.stopPropagation()}
+                                    >
+                                      {agent.pfsn2025Impact.toFixed(1)}
+                                    </a>
+                                  ) : (
+                                    <span className="text-gray-400">—</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm">
+                                  {signed2026TeamInfo ? (
+                                    <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()}>
+                                      <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
+                                      <span className="font-medium text-[#0050A0]">{signed2026TeamInfo.abbreviation}</span>
+                                    </Link>
+                                  ) : isUnsigned ? (
+                                    <span className="text-gray-400 block text-center">—</span>
+                                  ) : (
+                                    <span className="text-gray-500 text-xs block text-center">{agent.signed2026Team}</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
+                                  {agent.positionRank}
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-center font-semibold">
+                                  {isTagged ? (
+                                    <span className="text-purple-600">Tagged</span>
+                                  ) : isUnsigned ? (
+                                    <span className="text-red-600">Unsigned</span>
+                                  ) : (
+                                    <span className="text-green-600">Signed</span>
+                                  )}
+                                </td>
+                              </tr>
+                              {isExpanded && (
+                                <tr className="bg-white">
+                                  <td colSpan={10} className="p-0 border-b-2 border-[#0050A0]/20">
+                                    <ContractComps
+                                      agent={agent}
+                                      contractSheets={contractSheets}
+                                      loading={contractsLoading}
+                                    />
+                                  </td>
+                                </tr>
+                              )}
+                            </React.Fragment>
                           );
                         })}
                       </tbody>
