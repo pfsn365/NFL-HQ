@@ -233,7 +233,7 @@ export default function FreeAgencyTrackerClient() {
       } else if (selectedSignedStatus === 'signed') {
         matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '') && agent.faType !== 'Franchise';
       } else if (selectedSignedStatus === 'tagged') {
-        matchesSignedStatus = agent.faType === 'Franchise';
+        matchesSignedStatus = agent.faType === 'Franchise' || agent.faType === 'Transition';
       }
 
       return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus && matchesSearch;
@@ -536,7 +536,7 @@ export default function FreeAgencyTrackerClient() {
                         {paginatedFreeAgents.map((agent, index) => {
                           const teamInfo = getTeamInfo(mapTeamNameToId(agent.current2025Team));
                           const signed2026TeamInfo = getTeamInfo(mapTeamNameToId(agent.signed2026Team));
-                          const isTagged = agent.faType === 'Franchise';
+                          const isTagged = agent.faType === 'Franchise' || agent.faType === 'Transition';
                           const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
                           const rowKey = `${agent.rank}-${agent.name}`;
                           const isExpandable = hasContractComps(agent.position);

@@ -54,9 +54,11 @@ export default function FreeAgencyTicker() {
   useEffect(() => {
     if (tickerRef.current && agents.length > 0) {
       const scrollWidth = tickerRef.current.scrollWidth;
-      // ~75px per second scroll speed — one copy is half the total width
+      // One copy is half the total width; faster on mobile for snappier feel
       const onePassWidth = scrollWidth / 2;
-      const duration = Math.max(20, onePassWidth / 75);
+      const isMobile = window.innerWidth < 640;
+      const speed = isMobile ? 110 : 75;
+      const duration = Math.max(15, onePassWidth / speed);
       tickerRef.current.style.setProperty('--ticker-duration', `${duration}s`);
     }
   }, [agents]);
@@ -115,7 +117,7 @@ export default function FreeAgencyTicker() {
                   >
                     <span className="text-xs text-gray-400 font-mono">#{agent.rank}</span>
                     <span className="text-sm font-semibold whitespace-nowrap">{agent.name}</span>
-                    {agent.faType === 'Franchise' ? (
+                    {agent.faType === 'Franchise' || agent.faType === 'Transition' ? (
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/90 text-white">
                         TAGGED
                       </span>
