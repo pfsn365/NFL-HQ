@@ -548,7 +548,10 @@ export default function FreeAgencyTrackerClient() {
                                 className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${isExpandable ? 'cursor-pointer hover:bg-blue-50/50' : ''} ${isExpanded ? '!bg-blue-50' : ''}`}
                                 onClick={() => toggleRow(rowKey, isExpandable)}
                               >
-                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center">
+                                <td
+                                  className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center"
+                                  style={{ backgroundColor: isExpanded ? '#eff6ff' : index % 2 === 0 ? 'white' : '#f9fafb' }}
+                                >
                                   <span className="flex items-center justify-center gap-1">
                                     {isExpandable && (
                                       <svg

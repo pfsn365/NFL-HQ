@@ -74,14 +74,6 @@ td, th { font-variant-numeric: tabular-nums; }
   z-index: 15;
 }
 
-.table-sticky-col tbody tr:nth-child(odd) td:first-child {
-  background-color: white;
-}
-
-.table-sticky-col tbody tr:nth-child(even) td:first-child {
-  background-color: #f9fafb;
-}
-
 .table-sticky-col td:first-child::after {
   content: '';
   position: absolute;
@@ -104,6 +96,13 @@ td, th { font-variant-numeric: tabular-nums; }
 
 @media (max-height: 700px) {
   .table-scroll-lg {
+    max-height: 60vh;
+  }
+}
+
+/* Mobile: constrain all scroll containers so tables scroll in a fixed box */
+@media (max-width: 768px) {
+  .table-scroll-container {
     max-height: 60vh;
   }
 }

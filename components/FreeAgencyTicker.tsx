@@ -57,7 +57,7 @@ export default function FreeAgencyTicker() {
       // One copy is half the total width; faster on mobile for snappier feel
       const onePassWidth = scrollWidth / 2;
       const isMobile = window.innerWidth < 640;
-      const speed = isMobile ? 110 : 75;
+      const speed = isMobile ? 150 : 75;
       const duration = Math.max(15, onePassWidth / speed);
       tickerRef.current.style.setProperty('--ticker-duration', `${duration}s`);
     }
