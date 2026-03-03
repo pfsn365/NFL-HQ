@@ -63,6 +63,8 @@ interface TeamSummary {
   highCount: number;
   avgNeed: number;
   capSpace: number | null;
+  record: string | null;
+  draftPicks: number | null;
 }
 
 type SortMode = 'needs' | 'alpha' | 'division' | 'cap';
@@ -76,12 +78,13 @@ export default function TeamNeedsClient() {
   // Live data
   const [freeAgents, setFreeAgents] = useState<FreeAgent[]>([]);
   const [salaryCapMap, setSalaryCapMap] = useState<Record<string, number>>({});
+  const [recordMap, setRecordMap] = useState<Record<string, string>>({});
+  const [draftPicksMap, setDraftPicksMap] = useState<Record<string, number>>({});
   // UI state
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [positionFilter, setPositionFilter] = useState('all');
-  const [sortMode, setSortMode] = useState<SortMode>('needs');
-  const [heatmapOpen, setHeatmapOpen] = useState(true);
+  const [sortMode, setSortMode] = useState<SortMode>('alpha');
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const [expandedPositions, setExpandedPositions] = useState<Set<string>>(new Set());
 
@@ -97,9 +100,11 @@ export default function TeamNeedsClient() {
   useEffect(() => {
     async function fetchLiveData() {
       try {
-        const [faRes, capRes] = await Promise.all([
+        const [faRes, capRes, standingsRes, draftRes] = await Promise.all([
           fetch(getApiPath('api/free-agents')),
           fetch(getApiPath('api/nfl/salary-cap/all')),
+          fetch(getApiPath('nfl/teams/api/standings')),
+          fetch(getApiPath('nfl/teams/api/future-draft-picks/all')),
         ]);
 
         if (faRes.ok) {
@@ -111,10 +116,11 @@ export default function TeamNeedsClient() {
 
         if (capRes.ok) {
           const capData = await capRes.json();
-          if (Array.isArray(capData)) {
+          const capTeams = capData.teams ?? capData;
+          if (Array.isArray(capTeams)) {
             const map: Record<string, number> = {};
-            for (const entry of capData) {
-              const teamId = mapTeamNameToId(entry.team || entry.teamName);
+            for (const entry of capTeams) {
+              const teamId = entry.teamId || mapTeamNameToId(entry.team || entry.teamName);
               if (teamId && entry.capSpace != null) {
                 map[teamId] = typeof entry.capSpace === 'number'
                   ? entry.capSpace
@@ -122,6 +128,30 @@ export default function TeamNeedsClient() {
               }
             }
             setSalaryCapMap(map);
+          }
+        }
+        if (standingsRes.ok) {
+          const standingsData = await standingsRes.json();
+          if (Array.isArray(standingsData.standings)) {
+            const map: Record<string, string> = {};
+            for (const entry of standingsData.standings) {
+              if (entry.teamId && entry.recordString) {
+                // Strip trailing "-0" ties (show 3-14, not 3-14-0)
+                map[entry.teamId] = entry.recordString.replace(/-0$/, '');
+              }
+            }
+            setRecordMap(map);
+          }
+        }
+
+        if (draftRes.ok) {
+          const draftData = await draftRes.json();
+          if (draftData.teams) {
+            const map: Record<string, number> = {};
+            for (const [teamId, info] of Object.entries<any>(draftData.teams)) {
+              map[teamId] = info.totalPicks;
+            }
+            setDraftPicksMap(map);
           }
         }
       } catch (e) {
@@ -195,9 +225,11 @@ export default function TeamNeedsClient() {
         highCount,
         avgNeed,
         capSpace: salaryCapMap[team.id] ?? null,
+        record: recordMap[team.id] ?? null,
+        draftPicks: draftPicksMap[team.id] ?? null,
       };
     });
-  }, [allTeams, salaryCapMap]);
+  }, [allTeams, salaryCapMap, recordMap, draftPicksMap]);
 
   // Filtered + sorted
   const filteredTeams = useMemo(() => {
@@ -273,28 +305,6 @@ export default function TeamNeedsClient() {
     });
   };
 
-  const scrollToTeam = (teamId: string) => {
-    const el = document.getElementById(`team-card-${teamId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      const idx = filteredTeams.findIndex(t => t.team.id === teamId);
-      const siblingIdx = idx % 2 === 0 ? idx + 1 : idx - 1;
-      const siblingId = filteredTeams[siblingIdx]?.team.id;
-      setExpandedCards(prev => {
-        const next = new Set(prev).add(teamId);
-        if (siblingId) next.add(siblingId);
-        return next;
-      });
-    }
-  };
-
-  // Get need level for a team + position abbr
-  const getNeedForTeam = (teamId: string, posAbbr: string): number => {
-    const needs = teamNeeds[teamId] || [];
-    const found = needs.find(n => getAbbrFromFullName(n.position) === posAbbr);
-    return found?.needLevel ?? 0;
-  };
-
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
@@ -317,6 +327,11 @@ export default function TeamNeedsClient() {
           </p>
         </div>
       </header>
+
+      {/* Raptive Header Ad */}
+      <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
+        <div className="raptive-pfn-header-90 w-full h-full"></div>
+      </div>
 
       {/* Filters */}
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
@@ -358,116 +373,10 @@ export default function TeamNeedsClient() {
         </div>
       </div>
 
-      {/* Heatmap (collapsible) */}
-      <div className="px-4 sm:px-6 pt-4 pb-6">
-        <button
-          onClick={() => setHeatmapOpen(prev => !prev)}
-          className="flex items-center gap-2 mb-3 cursor-pointer hover:opacity-80 transition-opacity"
-        >
-          <h2 className="text-lg font-bold text-gray-900">Position Need Heatmap</h2>
-          <svg
-            className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${heatmapOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-
-        {/* Legend (always visible) */}
-        <div className="flex items-center gap-4 mb-3 text-[10px] text-gray-500">
-          <span>Low need</span>
-          <div className="flex gap-0.5">
-            {['#f3f4f6', '#fecaca', '#fca5a5', '#f87171', '#b91c1c', '#7f1d1d'].map(c => (
-              <div
-                key={c}
-                className="w-5 h-3 rounded-sm"
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-          <span>Critical need</span>
-        </div>
-
-        {heatmapOpen && (
-          <>
-            <div className="table-scroll-container overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-              <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
-                <colgroup>
-                  <col style={{ width: '160px' }} />
-                  {HEATMAP_POSITIONS.map(pos => (
-                    <col key={pos} />
-                  ))}
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th className="sticky left-0 bg-gray-100 z-10 px-2 py-1.5 text-left text-[10px] font-semibold text-gray-600 uppercase tracking-wide border-r border-gray-200">
-                      Team
-                    </th>
-                    {HEATMAP_POSITIONS.map(pos => (
-                      <th key={pos} className="px-0 py-1.5 text-center text-[10px] font-semibold text-gray-600 uppercase tracking-wide">
-                        {pos}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTeams.map(({ team }, rowIdx) => (
-                    <tr
-                      key={team.id}
-                      className={`hover:bg-blue-50/40 transition-colors ${rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}`}
-                    >
-                      <td className={`sticky left-0 z-10 px-2 py-1 border-r border-gray-200 overflow-hidden ${rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                        <div
-                          className="flex items-center gap-1.5 cursor-pointer"
-                          onClick={() => scrollToTeam(team.id)}
-                        >
-                          <img src={team.logoUrl} alt={team.fullName} className="w-4 h-4 object-contain" />
-                          <span className="text-[11px] font-medium text-gray-800">{team.fullName}</span>
-                        </div>
-                      </td>
-                      {HEATMAP_POSITIONS.map(pos => {
-                        const level = getNeedForTeam(team.id, pos);
-                        // WCAG AA-compliant color pairs (all ≥ 4.5:1 contrast)
-                        let bg: string, fg: string;
-                        if (level >= 9)      { bg = '#7f1d1d'; fg = '#ffffff'; } // 9.6:1
-                        else if (level >= 7) { bg = '#b91c1c'; fg = '#ffffff'; } // 6.4:1
-                        else if (level >= 5) { bg = '#f87171'; fg = '#1c1917'; } // 6.4:1
-                        else if (level >= 3) { bg = '#fca5a5'; fg = '#1c1917'; } // 9.4:1
-                        else if (level >= 1) { bg = '#fecaca'; fg = '#374151'; } // 7.3:1
-                        else                 { bg = '#f3f4f6'; fg = '#4b5563'; } // 6.4:1
-                        return (
-                          <td
-                            key={pos}
-                            className="px-0.5 py-0.5 text-center cursor-pointer"
-                            onClick={() => scrollToTeam(team.id)}
-                            title={`${team.abbreviation} ${pos}: ${level.toFixed(1)} (${getNeedLabel(level)})`}
-                          >
-                            <div
-                              className="h-6 rounded-sm flex items-center justify-center font-bold text-[10px]"
-                              style={{ backgroundColor: bg, color: fg }}
-                            >
-                              {level.toFixed(0)}
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-          </>
-        )}
-      </div>
-
       {/* Team Cards */}
-      <div className="px-4 sm:px-6 pb-8">
-        <h2 className="text-lg font-bold text-gray-900 mb-3">Team By Team Breakdown</h2>
+      <div className="px-4 sm:px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {filteredTeams.map(({ team, needs, criticalCount, highCount, avgNeed, capSpace }) => {
+          {filteredTeams.map(({ team, needs, criticalCount, highCount, avgNeed, capSpace, record, draftPicks }) => {
             const isExpanded = expandedCards.has(team.id);
             const addressed = addressedPositionsByTeam.get(team.id);
 
@@ -489,23 +398,14 @@ export default function TeamNeedsClient() {
                     <div className="flex items-center gap-3">
                       <img src={team.logoUrl} alt={team.fullName} className="w-8 h-8 object-contain" />
                       <div>
-                        <h3 className="font-bold text-gray-900 text-sm sm:text-base">{team.fullName}</h3>
+                        <h3 className="font-bold text-gray-900 text-sm sm:text-base">
+                          {team.fullName}
+                          {record && <span className="font-normal text-gray-500 ml-1">({record})</span>}
+                        </h3>
                         <span className="text-xs text-gray-500">{team.division}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {/* Cap space */}
-                      {capSpace !== null && (
-                        <span
-                          className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                          style={{
-                            backgroundColor: getCapColor(capSpace) + '18',
-                            color: getCapColor(capSpace),
-                          }}
-                        >
-                          {formatCap(capSpace)}
-                        </span>
-                      )}
                       <svg
                         className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                         fill="none"
@@ -519,9 +419,19 @@ export default function TeamNeedsClient() {
 
                   {/* Summary stats */}
                   <div className="flex gap-4 mt-2 text-xs">
-                    <span className="text-red-600 font-semibold">{criticalCount} Critical</span>
-                    <span className="text-orange-600 font-semibold">{highCount} High</span>
-                    <span className="text-gray-600">Avg: {avgNeed.toFixed(1)}</span>
+                    {capSpace !== null && (
+                      <span className="font-semibold text-[#0050A0]">
+                        Cap: {formatCap(capSpace)}
+                      </span>
+                    )}
+                    {draftPicks !== null && (
+                      <span className="font-semibold text-[#0050A0]">
+                        2026 Draft Picks: {draftPicks}
+                      </span>
+                    )}
+                    <span className="font-semibold text-[#0050A0]">
+                      Avg Need: {avgNeed.toFixed(1)}
+                    </span>
                   </div>
 
                   {/* Needs Addressed badges */}

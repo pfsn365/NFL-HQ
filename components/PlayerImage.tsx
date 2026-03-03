@@ -80,10 +80,10 @@ export default function PlayerImage({
   if (imageSource === 'fallback') {
     return (
       <div
-        className={`${sizeClass} rounded-full flex items-center justify-center flex-shrink-0 ${className}`}
+        className={`${sizeClass} rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${className}`}
         style={{ backgroundColor: `${teamColor}20` }}
       >
-        <span className="font-semibold" style={{ color: teamColor }}>
+        <span className="font-semibold leading-none" style={{ color: teamColor, fontSize: '0.55em' }}>
           {getInitials(name)}
         </span>
       </div>
