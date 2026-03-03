@@ -82,6 +82,7 @@ function toComp(c: Record<string, string>, matchPct: number): ContractComp | nul
   const contractAge = parseFloat(c['Age']);
   const yearSigned = (c['Year Signed'] || '').trim();
   if (isNaN(contractAge) || !yearSigned) return null;
+  if (parseInt(yearSigned) < 2015) return null;
 
   return {
     matchPct,
@@ -93,6 +94,17 @@ function toComp(c: Record<string, string>, matchPct: number): ContractComp | nul
     guaranteed: c['Guaranteed'] || '',
     age: c['Age'] || '',
     pfsnImpact: getContractImpact(c),
+  };
+}
+
+/** Keep only the first (best) entry per player name */
+function dedupeByPlayer(): (comp: ContractComp) => boolean {
+  const seen = new Set<string>();
+  return (comp: ContractComp) => {
+    const key = comp.player.trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   };
 }
 
@@ -114,17 +126,26 @@ export function findContractComps(
   const sheetNames = POSITION_TO_SHEETS[agent.position];
   if (!sheetNames) return [];
 
-  // Pool contracts from all relevant position sheets
+  // Pool contracts from all relevant position sheets, excluding the agent themselves
+  const agentNameLower = agent.name.trim().toLowerCase();
   const allContracts: Record<string, string>[] = [];
   for (const name of sheetNames) {
     const sheet = sheets.find(s => s.sheetName === name);
-    if (sheet) allContracts.push(...sheet.contracts);
+    if (sheet) {
+      for (const c of sheet.contracts) {
+        if ((c['Player'] || '').trim().toLowerCase() !== agentNameLower) {
+          allContracts.push(c);
+        }
+      }
+    }
   }
 
-  const useImpactMatching = agent.pfsn2025Impact >= 75;
+  // Use 3-year average when available, fall back to single-year 2025 impact
+  const agentImpact = agent.averageImpact > 0 ? agent.averageImpact : agent.pfsn2025Impact;
+  const useImpactMatching = agentImpact >= 70;
 
   if (useImpactMatching) {
-    // --- Tier 1: Impact-based matching ---
+    // --- Unsigned, solid impact: 3yr avg impact (70%) + age (30%) ---
     return allContracts
       .map(c => {
         const contractAge = parseFloat(c['Age']);
@@ -136,25 +157,22 @@ export function findContractComps(
         const contractImpact = getContractImpact(c);
         let matchPct: number;
 
-        if (contractImpact > 0) {
-          // Has impact data → 70% impact + 30% age
-          const impactDiff = Math.abs(agent.pfsn2025Impact - contractImpact);
-          const impactSimilarity = Math.max(0, 1 - impactDiff / 40);
-          matchPct = (0.7 * impactSimilarity + 0.3 * ageSimilarity) * 100;
-        } else {
-          // No impact data → age-only, capped at 60% so impact matches rank higher
-          matchPct = ageSimilarity * 60;
-        }
+        if (contractImpact <= 0) return null; // Skip contracts without impact data
+        const impactDiff = Math.abs(agentImpact - contractImpact);
+        if (impactDiff > 5) return null; // Skip contracts with 5+ point impact gap
+        const impactSimilarity = Math.max(0, 1 - impactDiff / 5);
+        matchPct = (0.7 * impactSimilarity + 0.3 * ageSimilarity) * 100;
 
         matchPct = Math.round(matchPct * 10) / 10;
         return toComp(c, matchPct);
       })
       .filter((c): c is ContractComp => c !== null)
       .sort((a, b) => b.matchPct - a.matchPct)
+      .filter(dedupeByPlayer())
       .slice(0, topN);
   }
 
-  // --- Tier 2: Low/no impact → top contracts by value within ±3 years of age ---
+  // --- Unsigned, low/no impact: top contracts by value within ±3 years of age ---
   return allContracts
     .map(c => {
       const contractAge = parseFloat(c['Age']);
@@ -164,5 +182,6 @@ export function findContractComps(
     })
     .filter((c): c is ContractComp => c !== null)
     .sort((a, b) => parseMoney(b.apy) - parseMoney(a.apy))
+    .filter(dedupeByPlayer())
     .slice(0, topN);
 }

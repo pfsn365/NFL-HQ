@@ -64,7 +64,9 @@ export default function ContractComps({ agent, contractSheets, loading }: Contra
               <th className="px-3 py-2 text-right font-semibold text-gray-600">APY</th>
               <th className="px-3 py-2 text-right font-semibold text-gray-600">Guaranteed</th>
               <th className="px-3 py-2 text-center font-semibold text-gray-600">Age</th>
-              <th className="px-3 py-2 text-center font-semibold text-gray-600">Impact</th>
+              <th className="px-3 py-2 text-center font-semibold text-gray-600 cursor-help" title="Avg. PFSN Impact grade over the 3 seasons before signing">
+                Impact
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">

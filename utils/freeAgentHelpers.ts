@@ -8,8 +8,10 @@ export interface FreeAgent {
   faType: 'UFA' | 'RFA' | 'ERFA' | 'Void' | 'SFA' | string;
   age: number;
   pfsn2025Impact: number;
+  averageImpact: number;
   signed2026Team: string;
   positionRank: number;
+  newAAV: string;
   teamId?: string;
 }
 
@@ -23,6 +25,8 @@ export interface RawFreeAgentData {
   'PFSN 2025 Impact': string | number;
   '2026 Team': string;
   'Pos. Rank': string | number;
+  'New AAV': string;
+  'Average Impact': string | number;
 }
 
 export type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank';
@@ -122,6 +126,10 @@ export function transformFreeAgentData(rawData: RawFreeAgentData[]): FreeAgent[]
         : parseFloat(agent['PFSN 2025 Impact'] as string) || 0,
       signed2026Team: agent['2026 Team'] || '',
       positionRank,
+      newAAV: agent['New AAV'] || '',
+      averageImpact: typeof agent['Average Impact'] === 'number'
+        ? agent['Average Impact']
+        : parseFloat(agent['Average Impact'] as string) || 0,
       teamId
     };
   });

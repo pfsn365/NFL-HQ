@@ -18,7 +18,7 @@ import {
   getPositionImpactUrl,
   transformFreeAgentData,
 } from '@/utils/freeAgentHelpers';
-import { type ContractSheet, hasContractComps } from '@/utils/contractCompHelpers';
+import { type ContractSheet, hasContractComps, formatCompactMoney } from '@/utils/contractCompHelpers';
 
 export default function FreeAgencyTrackerClient() {
   const allTeams = getAllTeams();
@@ -511,11 +511,14 @@ export default function FreeAgencyTrackerClient() {
                             className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
                             onClick={() => handleSort('pfsn2025Impact')}
                           >
-                            Impact Grade
+                            2025 Impact
                             <SortIndicator column="pfsn2025Impact" />
                           </th>
                           <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             2026 Team
+                          </th>
+                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
+                            New AAV
                           </th>
                           <th
                             className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
@@ -620,6 +623,9 @@ export default function FreeAgencyTrackerClient() {
                                     <span className="text-gray-500 text-xs block text-center">{agent.signed2026Team}</span>
                                   )}
                                 </td>
+                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center font-medium">
+                                  {agent.newAAV ? formatCompactMoney(agent.newAAV) : <span className="text-gray-400">—</span>}
+                                </td>
                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                                   {agent.positionRank}
                                 </td>
@@ -635,7 +641,7 @@ export default function FreeAgencyTrackerClient() {
                               </tr>
                               {isExpanded && (
                                 <tr className="bg-white">
-                                  <td colSpan={10} className="p-0 border-b-2 border-[#0050A0]/20">
+                                  <td colSpan={11} className="p-0 border-b-2 border-[#0050A0]/20">
                                     <ContractComps
                                       agent={agent}
                                       contractSheets={contractSheets}
