@@ -6,6 +6,7 @@ import PlayerImage from '@/components/PlayerImage';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import Pagination from '@/components/Pagination';
 import ContractComps from '@/components/ContractComps';
+import ContractRankings from '@/components/ContractRankings';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import {
@@ -63,6 +64,16 @@ export default function FreeAgencyTrackerClient() {
       }
       return next;
     });
+  }, [contractsFetched, fetchContractSheets]);
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'tracker' | 'rankings'>('tracker');
+
+  const handleTabChange = useCallback((tab: 'tracker' | 'rankings') => {
+    setActiveTab(tab);
+    if (tab === 'rankings' && !contractsFetched) {
+      fetchContractSheets();
+    }
   }, [contractsFetched, fetchContractSheets]);
 
   // Filter States
@@ -323,9 +334,41 @@ export default function FreeAgencyTrackerClient() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
+        {/* Tabs */}
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+          <div className="flex border-b border-gray-200">
+            <button
+              onClick={() => handleTabChange('tracker')}
+              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+                activeTab === 'tracker'
+                  ? 'border-[#0050A0] text-[#0050A0]'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Free Agents
+            </button>
+            <button
+              onClick={() => handleTabChange('rankings')}
+              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+                activeTab === 'rankings'
+                  ? 'border-[#0050A0] text-[#0050A0]'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Contract Rankings
+            </button>
+          </div>
+        </div>
+
         {/* Content */}
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
-          {loading ? (
+          {activeTab === 'rankings' ? (
+            <ContractRankings
+              freeAgents={allFreeAgents}
+              contractSheets={contractSheets}
+              loading={contractsLoading}
+            />
+          ) : loading ? (
             /* Loading State */
             <SkeletonLoader type="table" rows={15} />
           ) : error ? (

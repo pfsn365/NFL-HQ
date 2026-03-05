@@ -48,8 +48,86 @@ export function hasContractComps(position: string): boolean {
   return !NO_COMP_POSITIONS.has(position) && position in POSITION_TO_SHEETS;
 }
 
+export { POSITION_TO_SHEETS };
+
+export interface RankedContract {
+  player: string;
+  team: string;
+  position: string;
+  yearSigned: string;
+  years: string;
+  apy: number;
+  guaranteed: number;
+  age: string;
+  pfsnImpact: number;
+  is2026Signing: boolean;
+}
+
+/**
+ * Build a ranked list of contracts for a position group, with 2026 signings slotted in.
+ * Returns all contracts sorted by AAV descending.
+ */
+export function buildContractRankings(
+  position: string,
+  sheets: ContractSheet[],
+  signings: { player: string; team: string; position: string; age: number; apy: string; impact: number }[]
+): RankedContract[] {
+  const sheetNames = POSITION_TO_SHEETS[position];
+  if (!sheetNames) return [];
+
+  const contracts: RankedContract[] = [];
+
+  // Add historical contracts from sheets
+  for (const name of sheetNames) {
+    const sheet = sheets.find(s => s.sheetName === name);
+    if (!sheet) continue;
+    for (const c of sheet.contracts) {
+      const yearSigned = (c['Year Signed'] || '').trim();
+      if (!yearSigned || parseInt(yearSigned) < 2020) continue;
+      const apy = parseMoney(c['APY'] || '');
+      if (apy === 0) continue;
+
+      contracts.push({
+        player: c['Player'] || '',
+        team: c['Team'] || '',
+        position,
+        yearSigned,
+        years: c['Years'] || '',
+        apy,
+        guaranteed: parseMoney(c['Guaranteed'] || ''),
+        age: c['Age'] || '',
+        pfsnImpact: getContractImpact(c),
+        is2026Signing: false,
+      });
+    }
+  }
+
+  // Add 2026 signings
+  for (const s of signings) {
+    const apy = parseMoney(s.apy);
+    if (apy === 0) continue;
+    contracts.push({
+      player: s.player,
+      team: s.team,
+      position: s.position,
+      yearSigned: '2026',
+      years: '—',
+      apy,
+      guaranteed: 0,
+      age: String(s.age),
+      pfsnImpact: s.impact,
+      is2026Signing: true,
+    });
+  }
+
+  // Sort by AAV descending by default
+  contracts.sort((a, b) => b.apy - a.apy);
+
+  return contracts;
+}
+
 /** Parse dollar strings like "$25,000,000" → number */
-function parseMoney(val: string): number {
+export function parseMoney(val: string): number {
   if (!val) return 0;
   const cleaned = val.replace(/[$,]/g, '');
   const num = parseFloat(cleaned);
