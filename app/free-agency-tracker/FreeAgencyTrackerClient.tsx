@@ -19,6 +19,8 @@ import {
   transformFreeAgentData,
 } from '@/utils/freeAgentHelpers';
 import { type ContractSheet, hasContractComps, formatCompactMoney } from '@/utils/contractCompHelpers';
+import { teamNeeds } from '@/data/team-needs';
+import { getNeedCategoryFromAbbr } from '@/utils/positionMapping';
 
 export default function FreeAgencyTrackerClient() {
   const allTeams = getAllTeams();
@@ -309,6 +311,47 @@ export default function FreeAgencyTrackerClient() {
     return allTeams.find(t => t.id === teamId);
   };
 
+  // Position needs popover
+  const [needsPopover, setNeedsPopover] = useState<{ position: string; top: number; left: number } | null>(null);
+
+  const getTopTeamNeeds = useCallback((posAbbr: string) => {
+    const needCategory = getNeedCategoryFromAbbr(posAbbr);
+    const results: { teamId: string; teamName: string; logoUrl: string; needLevel: number }[] = [];
+
+    for (const [teamId, needs] of Object.entries(teamNeeds)) {
+      const match = needs.find(n => n.position === needCategory);
+      if (match) {
+        const team = allTeams.find(t => t.id === teamId);
+        if (team) {
+          results.push({
+            teamId,
+            teamName: team.name,
+            logoUrl: team.logoUrl,
+            needLevel: match.needLevel,
+          });
+        }
+      }
+    }
+
+    return results.sort((a, b) => b.needLevel - a.needLevel).slice(0, 5);
+  }, [allTeams]);
+
+  const handlePositionClick = useCallback((e: React.MouseEvent, position: string) => {
+    e.stopPropagation();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setNeedsPopover(prev =>
+      prev?.position === position ? null : { position, top: rect.bottom + 4, left: rect.left + rect.width / 2 }
+    );
+  }, []);
+
+  // Close popover on outside click
+  useEffect(() => {
+    if (!needsPopover) return;
+    const handleClick = () => setNeedsPopover(null);
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [needsPopover]);
+
   return (
       <main id="main-content" className="pt-[48px] lg:pt-0">
         {/* Header */}
@@ -334,8 +377,8 @@ export default function FreeAgencyTrackerClient() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
-        {/* Tabs */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+        {/* Tabs — hidden until Contract Rankings is ready for production */}
+        {/* <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
           <div className="flex border-b border-gray-200">
             <button
               onClick={() => handleTabChange('tracker')}
@@ -358,7 +401,7 @@ export default function FreeAgencyTrackerClient() {
               Contract Rankings
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Content */}
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
@@ -619,15 +662,18 @@ export default function FreeAgencyTrackerClient() {
                                   </Link>
                                 </td>
                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
-                                  <span className="text-xs font-semibold text-gray-900">
+                                  <button
+                                    className="text-xs font-semibold text-[#0050A0] hover:underline cursor-pointer"
+                                    onClick={(e) => handlePositionClick(e, agent.position)}
+                                  >
                                     {agent.position}
-                                  </span>
+                                  </button>
                                 </td>
                                 <td className="px-3 py-2 whitespace-nowrap text-sm">
                                   {teamInfo ? (
                                     <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()}>
                                       <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
-                                      <span className="font-medium text-[#0050A0]">{teamInfo.abbreviation}</span>
+                                      <span className="font-medium text-[#0050A0] hover:underline">{teamInfo.abbreviation}</span>
                                     </Link>
                                   ) : agent.current2025Team ? (
                                     <span className="text-gray-500 text-xs block text-center">{agent.current2025Team}</span>
@@ -647,7 +693,7 @@ export default function FreeAgencyTrackerClient() {
                                       href={getPositionImpactUrl(agent.position)}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="hover:opacity-80 transition-opacity text-blue-600"
+                                      className="hover:underline text-[#0050A0]"
                                       onClick={e => e.stopPropagation()}
                                     >
                                       {agent.pfsn2025Impact.toFixed(1)}
@@ -660,7 +706,7 @@ export default function FreeAgencyTrackerClient() {
                                   {signed2026TeamInfo ? (
                                     <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()}>
                                       <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
-                                      <span className="font-medium text-[#0050A0]">{signed2026TeamInfo.abbreviation}</span>
+                                      <span className="font-medium text-[#0050A0] hover:underline">{signed2026TeamInfo.abbreviation}</span>
                                     </Link>
                                   ) : isUnsigned ? (
                                     <span className="text-gray-400 block text-center">—</span>
@@ -720,6 +766,54 @@ export default function FreeAgencyTrackerClient() {
             </>
           )}
         </div>
+
+        {/* Position Needs Popover */}
+        {needsPopover && (() => {
+          const topNeeds = getTopTeamNeeds(needsPopover.position);
+          const needCategory = getNeedCategoryFromAbbr(needsPopover.position);
+          const displayNames: Record<string, string> = {
+            'Offensive Center': 'Center',
+            'Offensive Guard': 'Guard',
+            'Offensive Tackle': 'Tackle',
+            'Defensive Tackle': 'DT',
+            'Running Back': 'RB',
+            'Wide Receiver': 'WR',
+            'Tight End': 'TE',
+          };
+          const displayName = displayNames[needCategory] || needCategory;
+          return (
+            <div
+              className="fixed z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-3 w-64"
+              style={{ top: needsPopover.top, left: needsPopover.left, transform: 'translateX(-50%)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h4 className="text-xs font-bold text-gray-800 mb-2 uppercase tracking-wide">
+                Top {displayName} Needs
+              </h4>
+              {topNeeds.length === 0 ? (
+                <p className="text-xs text-gray-500">No team needs data available.</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {topNeeds.map((team, i) => (
+                    <Link
+                      key={team.teamId}
+                      href="/team-needs"
+                      className="flex items-center gap-2 hover:bg-gray-50 rounded px-1.5 py-1 -mx-1.5 transition-colors"
+                      onClick={() => setNeedsPopover(null)}
+                    >
+                      <span className="text-xs font-bold text-gray-400 w-4">{i + 1}</span>
+                      <img src={team.logoUrl} alt={team.teamName} className="w-5 h-5" />
+                      <span className="text-sm font-medium text-gray-900 flex-1">{team.teamName}</span>
+                      <span className={`text-xs font-bold ${team.needLevel >= 7 ? 'text-red-600' : team.needLevel >= 4 ? 'text-amber-600' : 'text-green-600'}`}>
+                        {team.needLevel.toFixed(1)}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </main>
   );
 }

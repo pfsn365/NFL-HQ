@@ -77,7 +77,10 @@ export function buildContractRankings(
 
   const contracts: RankedContract[] = [];
 
-  // Add historical contracts from sheets
+  // Build set of 2026 signing player names for dedup
+  const signingNames = new Set(signings.map(s => s.player.trim().toLowerCase()));
+
+  // Add historical contracts from sheets (skip 2026 entries that overlap with signings)
   for (const name of sheetNames) {
     const sheet = sheets.find(s => s.sheetName === name);
     if (!sheet) continue;
@@ -87,9 +90,17 @@ export function buildContractRankings(
       const apy = parseMoney(c['APY'] || '');
       if (apy === 0) continue;
 
+      // Skip historical 2026 entries for players we have as signings
+      const playerName = (c['Player'] || '').trim().toLowerCase();
+      if (parseInt(yearSigned) >= 2026 && signingNames.has(playerName)) continue;
+
+      // For teams like "NYJ/LV", use the last team (current team)
+      const rawTeam = (c['Team'] || '').trim();
+      const team = rawTeam.includes('/') ? rawTeam.split('/').pop()!.trim() : rawTeam;
+
       contracts.push({
         player: c['Player'] || '',
-        team: c['Team'] || '',
+        team,
         position,
         yearSigned,
         years: c['Years'] || '',

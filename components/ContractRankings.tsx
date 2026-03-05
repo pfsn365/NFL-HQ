@@ -53,18 +53,29 @@ export default function ContractRankings({ freeAgents, contractSheets, loading }
     return allTeams.find(t => t.id === teamId) || null;
   };
 
-  // Build 2026 signings from free agents who have signed + have AAV
+  // Build 2026 signings from free agents who have signed or been tagged + have AAV
   const signings2026 = useMemo(() => {
     return freeAgents
-      .filter(a => a.signed2026Team && a.signed2026Team.trim() !== '' && a.newAAV)
-      .map(a => ({
-        player: a.name,
-        team: a.signed2026Team,
-        position: a.position,
-        age: a.age,
-        apy: a.newAAV,
-        impact: a.pfsn2025Impact,
-      }));
+      .filter(a => {
+        if (!a.newAAV) return false;
+        const isTagged = a.faType === 'Franchise' || a.faType === 'Transition';
+        const isSigned = a.signed2026Team && a.signed2026Team.trim() !== '';
+        return isSigned || isTagged;
+      })
+      .map(a => {
+        const isTagged = a.faType === 'Franchise' || a.faType === 'Transition';
+        const team = (a.signed2026Team && a.signed2026Team.trim() !== '')
+          ? a.signed2026Team
+          : isTagged ? a.current2025Team : '';
+        return {
+          player: a.name,
+          team,
+          position: a.position,
+          age: a.age,
+          apy: a.newAAV,
+          impact: a.pfsn2025Impact,
+        };
+      });
   }, [freeAgents]);
 
   // Get available groups (only show groups that have sheet data)
@@ -272,23 +283,25 @@ export default function ContractRankings({ freeAgents, contractSheets, loading }
                         {rank ?? ''}
                       </td>
                       <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <span className="flex items-center gap-1">
+                          {contract.player}
+                          {contract.is2026Signing && (
+                            <span className="text-[10px] font-bold text-green-700 uppercase">New</span>
+                          )}
+                        </span>
+                      </td>
+                      <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                         {(() => {
                           const teamInfo = getTeamInfo(contract.team);
                           return (
-                            <span className="flex items-center gap-2">
+                            <span className="flex items-center justify-center gap-2">
                               {teamInfo && (
                                 <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 flex-shrink-0" />
                               )}
-                              {contract.player}
-                              {contract.is2026Signing && (
-                                <span className="text-[10px] font-bold text-green-700 uppercase">New</span>
-                              )}
+                              {teamInfo ? teamInfo.name : contract.team}
                             </span>
                           );
                         })()}
-                      </td>
-                      <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
-                        {contract.team}
                       </td>
                       <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                         {contract.yearSigned}
