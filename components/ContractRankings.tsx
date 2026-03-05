@@ -2,12 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import type { FreeAgent } from '@/utils/freeAgentHelpers';
+import { mapTeamNameToId } from '@/utils/freeAgentHelpers';
+import { getAllTeams } from '@/data/teams';
 import {
   type ContractSheet,
   type RankedContract,
   buildContractRankings,
   POSITION_TO_SHEETS,
-  formatCompactMoney,
 } from '@/utils/contractCompHelpers';
 
 interface ContractRankingsProps {
@@ -16,7 +17,7 @@ interface ContractRankingsProps {
   loading: boolean;
 }
 
-type SortField = 'apy' | 'guaranteed' | 'age' | 'yearSigned' | 'player' | 'years';
+type SortField = 'apy' | 'guaranteed' | 'age' | 'yearSigned' | 'player' | 'years' | 'pfsnImpact';
 
 const POSITION_GROUPS: { label: string; positions: string[] }[] = [
   { label: 'QB', positions: ['QB'] },
@@ -40,9 +41,17 @@ function formatMoney(val: number): string {
 }
 
 export default function ContractRankings({ freeAgents, contractSheets, loading }: ContractRankingsProps) {
+  const allTeams = getAllTeams();
   const [selectedGroup, setSelectedGroup] = useState(0);
   const [sortField, setSortField] = useState<SortField>('apy');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+  const getTeamInfo = (teamName: string) => {
+    if (!teamName) return null;
+    const teamId = mapTeamNameToId(teamName);
+    if (!teamId) return null;
+    return allTeams.find(t => t.id === teamId) || null;
+  };
 
   // Build 2026 signings from free agents who have signed + have AAV
   const signings2026 = useMemo(() => {
@@ -107,6 +116,8 @@ export default function ContractRankings({ freeAgents, contractSheets, loading }
           aVal = parseInt(a.yearSigned) || 0; bVal = parseInt(b.yearSigned) || 0; break;
         case 'years':
           aVal = parseInt(a.years) || 0; bVal = parseInt(b.years) || 0; break;
+        case 'pfsnImpact':
+          aVal = a.pfsnImpact; bVal = b.pfsnImpact; break;
         case 'player':
           return sortDir === 'asc'
             ? a.player.localeCompare(b.player)
@@ -237,8 +248,11 @@ export default function ContractRankings({ freeAgents, contractSheets, loading }
                   >
                     Guaranteed<SortIndicator field="guaranteed" />
                   </th>
-                  <th className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
-                    Impact
+                  <th
+                    className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                    onClick={() => handleSort('pfsnImpact')}
+                  >
+                    Impact<SortIndicator field="pfsnImpact" />
                   </th>
                 </tr>
               </thead>
@@ -258,10 +272,20 @@ export default function ContractRankings({ freeAgents, contractSheets, loading }
                         {rank ?? ''}
                       </td>
                       <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {contract.player}
-                        {contract.is2026Signing && (
-                          <span className="ml-1.5 text-[10px] font-bold text-green-700 uppercase">New</span>
-                        )}
+                        {(() => {
+                          const teamInfo = getTeamInfo(contract.team);
+                          return (
+                            <span className="flex items-center gap-2">
+                              {teamInfo && (
+                                <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 flex-shrink-0" />
+                              )}
+                              {contract.player}
+                              {contract.is2026Signing && (
+                                <span className="text-[10px] font-bold text-green-700 uppercase">New</span>
+                              )}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-sm text-gray-700 text-center">
                         {contract.team}
