@@ -144,43 +144,6 @@ export default function StatsPageContent() {
     return allTeams.find(t => t.id === teamId);
   };
 
-  // Get color for position badge
-  const getPositionColor = (position: string) => {
-    const pos = position.toUpperCase();
-    // Quarterbacks
-    if (pos === 'QB') {
-      return 'bg-purple-100 text-purple-700 border-purple-200';
-    }
-    // Running Backs
-    else if (pos === 'RB' || pos === 'FB') {
-      return 'bg-green-100 text-green-700 border-green-200';
-    }
-    // Wide Receivers / Tight Ends
-    else if (pos === 'WR' || pos === 'TE') {
-      return 'bg-blue-100 text-blue-700 border-blue-200';
-    }
-    // Offensive Line
-    else if (pos === 'OT' || pos === 'OG' || pos === 'C' || pos === 'OL') {
-      return 'bg-amber-100 text-amber-700 border-amber-200';
-    }
-    // Defensive Line
-    else if (pos === 'DE' || pos === 'DT' || pos === 'NT' || pos === 'DL') {
-      return 'bg-red-100 text-red-700 border-red-200';
-    }
-    // Linebackers
-    else if (pos === 'LB' || pos === 'ILB' || pos === 'OLB' || pos === 'MLB') {
-      return 'bg-orange-100 text-orange-700 border-orange-200';
-    }
-    // Defensive Backs
-    else if (pos === 'CB' || pos === 'S' || pos === 'FS' || pos === 'SS' || pos === 'DB') {
-      return 'bg-cyan-100 text-cyan-700 border-cyan-200';
-    }
-    // Special Teams
-    else if (pos === 'K' || pos === 'P' || pos === 'LS') {
-      return 'bg-pink-100 text-pink-700 border-pink-200';
-    }
-    return 'bg-gray-100 text-gray-700 border-gray-200';
-  };
 
   // Calculate per-game value
   const calculatePerGame = (value: string, gamesPlayed: number): string => {
@@ -410,7 +373,7 @@ export default function StatsPageContent() {
 
                             {/* Position */}
                             <td className="px-2 py-3 sm:py-4">
-                              <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md border text-[10px] sm:text-xs font-semibold ${getPositionColor(player.position)}`}>
+                              <span className="text-[10px] sm:text-xs font-semibold text-gray-900">
                                 {player.position}
                               </span>
                             </td>
@@ -647,7 +610,7 @@ export default function StatsPageContent() {
                   <div className="text-sm text-gray-600">
                     {selectedPlayer.gamesPlayed} Games Played
                   </div>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-md border text-sm font-semibold ${getPositionColor(selectedPlayer.position)}`}>
+                  <span className="text-sm font-semibold text-gray-900">
                     {selectedPlayer.position}
                   </span>
                 </div>

@@ -8,7 +8,6 @@ import Pagination from '@/components/Pagination';
 import ContractComps from '@/components/ContractComps';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
-import { getPositionColor } from '@/utils/colorHelpers';
 import {
   type FreeAgent,
   type RawFreeAgentData,
@@ -577,7 +576,7 @@ export default function FreeAgencyTrackerClient() {
                                   </Link>
                                 </td>
                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-center">
-                                  <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(agent.position)}`}>
+                                  <span className="text-xs font-semibold text-gray-900">
                                     {agent.position}
                                   </span>
                                 </td>

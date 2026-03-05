@@ -6,7 +6,6 @@ import PlayerImage from '@/components/PlayerImage';
 import { getAllTeams, TeamData } from '@/data/teams';
 import { teamNeeds, PositionNeed } from '@/data/team-needs';
 import { getApiPath } from '@/utils/api';
-import { getPositionColor } from '@/utils/colorHelpers';
 import {
   type FreeAgent,
   generatePlayerSlug,
@@ -485,7 +484,7 @@ export default function TeamNeedsClient() {
                               onClick={() => togglePosition(posKey)}
                             >
                               {/* Position badge */}
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${getPositionColor(posAbbr)}`}>
+                              <span className="text-[10px] font-bold text-gray-900">
                                 {posAbbr}
                               </span>
 

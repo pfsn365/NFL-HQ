@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Pagination from '@/components/Pagination';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
-import { getPositionColor, getStatusColor } from '@/utils/colorHelpers';
+import { getStatusColor } from '@/utils/colorHelpers';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface InjuryData {
@@ -359,7 +359,7 @@ export default function InjuriesClient() {
 
                           {/* Position */}
                           <td className="px-3 py-2">
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(injury.position)}`}>
+                            <span className="text-xs font-semibold text-gray-900">
                               {injury.position}
                             </span>
                           </td>
@@ -494,7 +494,7 @@ export default function InjuriesClient() {
 
                               {/* Position */}
                               <td className="px-3 py-2">
-                                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getPositionColor(injury.position)}`}>
+                                <span className="text-xs font-semibold text-gray-900">
                                   {injury.position}
                                 </span>
                               </td>

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { getApiPath } from '@/utils/api';
-import { getPositionColor } from '@/utils/colorHelpers';
 import { transformFreeAgentData, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
 let cachedAgents: FreeAgent[] | null = null;
@@ -126,7 +125,7 @@ export default function FreeAgencyTicker() {
                         SIGNED
                       </span>
                     ) : (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${getPositionColor(agent.position)}`}>
+                      <span className="text-[10px] font-bold text-gray-900">
                         {agent.position}
                       </span>
                     )}

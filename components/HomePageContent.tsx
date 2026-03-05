@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { getAllTeams } from '@/data/teams';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getApiPath } from '@/utils/api';
-import { getPositionColor } from '@/utils/colorHelpers';
 import PlayerImage from '@/components/PlayerImage';
 import { transformFreeAgentData, generatePlayerSlug, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
@@ -354,7 +353,7 @@ export default function HomePageContent() {
                               </div>
                             </td>
                             <td className="px-1.5 sm:px-3 py-2 whitespace-nowrap text-base text-center">
-                              <span className={`inline-block px-2.5 py-0.5 rounded text-sm font-semibold border ${getPositionColor(agent.position)}`}>
+                              <span className="text-sm font-semibold text-gray-900">
                                 {agent.position}
                               </span>
                             </td>
@@ -380,11 +379,11 @@ export default function HomePageContent() {
                             </td>
                             <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-sm text-center">
                               {agent.faType === 'Franchise' ? (
-                                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">Tagged</span>
+                                <span className="text-xs font-semibold text-purple-600">Tagged</span>
                               ) : agent.signed2026Team && agent.signed2026Team.trim() !== '' ? (
-                                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700 border border-green-200">Signed</span>
+                                <span className="text-xs font-semibold text-green-600">Signed</span>
                               ) : (
-                                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Unsigned</span>
+                                <span className="text-xs font-semibold text-red-600">Unsigned</span>
                               )}
                             </td>
                           </tr>

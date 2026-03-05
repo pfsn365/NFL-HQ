@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Pagination from '@/components/Pagination';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
-import { getPositionColor } from '@/utils/colorHelpers';
 import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface PlayerWithTeam {
@@ -314,7 +313,7 @@ export default function PlayersDirectoryClient() {
                               {player.name}
                             </h3>
                             <div className="flex items-center justify-center gap-2 mt-1">
-                              <span className={`px-2 py-0.5 rounded text-xs font-medium ${getPositionColor(player.position)}`}>
+                              <span className="text-xs font-semibold text-gray-900">
                                 {player.position}
                               </span>
                               <span className="text-gray-500 text-sm">#{player.jerseyNumber}</span>
