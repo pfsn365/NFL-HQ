@@ -12,6 +12,8 @@ export interface FreeAgent {
   signed2026Team: string;
   positionRank: number;
   newAAV: string;
+  projAAV: string;
+  projYears: string;
   teamId?: string;
 }
 
@@ -27,6 +29,8 @@ export interface RawFreeAgentData {
   'Pos. Rank': string | number;
   'New AAV': string;
   'Average Impact': string | number;
+  'Proj. AAV': string;
+  'Proj. Years': string;
 }
 
 export type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank';
@@ -127,6 +131,8 @@ export function transformFreeAgentData(rawData: RawFreeAgentData[]): FreeAgent[]
       signed2026Team: agent['2026 Team'] || '',
       positionRank,
       newAAV: agent['New AAV'] || '',
+      projAAV: agent['Proj. AAV'] || '',
+      projYears: agent['Proj. Years'] || '',
       averageImpact: typeof agent['Average Impact'] === 'number'
         ? agent['Average Impact']
         : parseFloat(agent['Average Impact'] as string) || 0,

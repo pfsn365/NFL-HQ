@@ -131,10 +131,27 @@ export function buildContractRankings(
     });
   }
 
-  // Sort by AAV descending by default
-  contracts.sort((a, b) => b.apy - a.apy);
+  // Deduplicate: keep only each player's most recent contract (latest year, then highest AAV)
+  const playerBest = new Map<string, RankedContract>();
+  for (const c of contracts) {
+    const key = c.player.trim().toLowerCase();
+    const existing = playerBest.get(key);
+    if (!existing) {
+      playerBest.set(key, c);
+    } else {
+      const existingYear = parseInt(existing.yearSigned) || 0;
+      const currentYear = parseInt(c.yearSigned) || 0;
+      if (currentYear > existingYear || (currentYear === existingYear && c.apy > existing.apy)) {
+        playerBest.set(key, c);
+      }
+    }
+  }
 
-  return contracts;
+  // Sort by AAV descending by default
+  const deduped = Array.from(playerBest.values());
+  deduped.sort((a, b) => b.apy - a.apy);
+
+  return deduped;
 }
 
 /** Parse dollar strings like "$25,000,000" → number */

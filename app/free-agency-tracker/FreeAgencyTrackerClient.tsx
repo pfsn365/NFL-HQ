@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import PlayerImage from '@/components/PlayerImage';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import Pagination from '@/components/Pagination';
 import ContractComps from '@/components/ContractComps';
 import ContractRankings from '@/components/ContractRankings';
+import MarketSidebar from '@/components/MarketSidebar';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import {
@@ -18,7 +19,7 @@ import {
   getPositionImpactUrl,
   transformFreeAgentData,
 } from '@/utils/freeAgentHelpers';
-import { type ContractSheet, hasContractComps, formatCompactMoney } from '@/utils/contractCompHelpers';
+import { type ContractSheet, hasContractComps, formatCompactMoney, parseMoney } from '@/utils/contractCompHelpers';
 import { teamNeeds } from '@/data/team-needs';
 import { getNeedCategoryFromAbbr } from '@/utils/positionMapping';
 
@@ -188,6 +189,13 @@ export default function FreeAgencyTrackerClient() {
     return () => clearInterval(interval);
   }, [hasLoaded]);
 
+  // Eagerly fetch contract sheets for market sidebar
+  useEffect(() => {
+    if (hasLoaded && !contractsFetched) {
+      fetchContractSheets();
+    }
+  }, [hasLoaded, contractsFetched, fetchContractSheets]);
+
   // Extract unique positions for filter with custom order
   const availablePositions = useMemo(() => {
     const positionOrder = ['QB', 'RB', 'FB', 'WR', 'TE', 'OT', 'OG', 'OC', 'OL', 'DT', 'EDGE', 'LB', 'CB', 'S', 'K', 'P', 'LS'];
@@ -284,6 +292,31 @@ export default function FreeAgencyTrackerClient() {
     setCurrentPage(1);
   }, [selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
 
+  // Market summary stats — scoped to the currently selected position (or all)
+  const marketSummary = useMemo(() => {
+    const positionGroup = selectedPosition === 'all'
+      ? allFreeAgents
+      : allFreeAgents.filter(a => a.position === selectedPosition);
+
+    const total = positionGroup.length;
+    const signed = positionGroup.filter(a => a.signed2026Team && a.signed2026Team.trim() !== '' && a.faType !== 'Franchise' && a.faType !== 'Transition');
+    const tagged = positionGroup.filter(a => a.faType === 'Franchise' || a.faType === 'Transition');
+    const signedCount = signed.length + tagged.length;
+
+    let totalCommitted = 0;
+    for (const a of [...signed, ...tagged]) {
+      if (a.newAAV) totalCommitted += parseMoney(a.newAAV);
+    }
+
+    // Top remaining unsigned FA (highest rank = lowest number)
+    const unsigned = positionGroup
+      .filter(a => (!a.signed2026Team || a.signed2026Team.trim() === '') && a.faType !== 'Franchise' && a.faType !== 'Transition')
+      .sort((a, b) => a.rank - b.rank);
+    const topUnsigned = unsigned[0] || null;
+
+    return { total, signedCount, totalCommitted, topUnsigned, position: selectedPosition };
+  }, [allFreeAgents, selectedPosition]);
+
   // Sort Handler
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -310,6 +343,21 @@ export default function FreeAgencyTrackerClient() {
     if (!teamId) return null;
     return allTeams.find(t => t.id === teamId);
   };
+
+  // Main table ref for syncing sidebar height
+  const mainTableRef = useRef<HTMLDivElement>(null);
+  const [mainTableHeight, setMainTableHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!mainTableRef.current) return;
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setMainTableHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(mainTableRef.current);
+    return () => observer.disconnect();
+  }, [loading, error]);
 
   // Position needs popover
   const [needsPopover, setNeedsPopover] = useState<{ position: string; top: number; left: number } | null>(null);
@@ -377,41 +425,9 @@ export default function FreeAgencyTrackerClient() {
           <div className="raptive-pfn-header-90 w-full h-full"></div>
         </div>
 
-        {/* Tabs — hidden until Contract Rankings is ready for production */}
-        {/* <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
-          <div className="flex border-b border-gray-200">
-            <button
-              onClick={() => handleTabChange('tracker')}
-              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
-                activeTab === 'tracker'
-                  ? 'border-[#0050A0] text-[#0050A0]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Free Agents
-            </button>
-            <button
-              onClick={() => handleTabChange('rankings')}
-              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
-                activeTab === 'rankings'
-                  ? 'border-[#0050A0] text-[#0050A0]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Contract Rankings
-            </button>
-          </div>
-        </div> */}
-
         {/* Content */}
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1200px]">
-          {activeTab === 'rankings' ? (
-            <ContractRankings
-              freeAgents={allFreeAgents}
-              contractSheets={contractSheets}
-              loading={contractsLoading}
-            />
-          ) : loading ? (
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1400px]">
+          {loading ? (
             /* Loading State */
             <SkeletonLoader type="table" rows={15} />
           ) : error ? (
@@ -551,6 +567,63 @@ export default function FreeAgencyTrackerClient() {
                 </div>
               </div>
 
+              {/* Market Summary Bar */}
+              {allFreeAgents.length > 0 && (
+                <div className="rounded-lg shadow-sm mb-6 overflow-hidden">
+                  <div className="px-4 py-2" style={{ backgroundColor: '#0050A0' }}>
+                    <h4 className="text-sm font-bold text-white tracking-wide">
+                      {marketSummary.position === 'all' ? '2026 Free Agency Overview' : `${marketSummary.position} Market Overview`}
+                    </h4>
+                  </div>
+                  <div className="bg-white grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
+                    {/* Signed */}
+                    <div className="px-4 py-3 text-center">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Signed / Tagged</p>
+                      <p className="text-xl font-extrabold text-gray-900">
+                        {marketSummary.signedCount}
+                      </p>
+                    </div>
+                    {/* Remaining */}
+                    <div className="px-4 py-3 text-center">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Still Available</p>
+                      <p className="text-xl font-extrabold text-gray-900">
+                        {marketSummary.total - marketSummary.signedCount}
+                      </p>
+                    </div>
+                    {/* Money Committed */}
+                    <div className="px-4 py-3 text-center">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Money Committed</p>
+                      <p className="text-xl font-extrabold text-gray-900">
+                        {marketSummary.totalCommitted >= 1_000_000_000
+                          ? `$${(marketSummary.totalCommitted / 1_000_000_000).toFixed(2)}B`
+                          : marketSummary.totalCommitted >= 1_000_000
+                            ? `$${(marketSummary.totalCommitted / 1_000_000).toFixed(1)}M`
+                            : marketSummary.totalCommitted > 0
+                              ? `$${(marketSummary.totalCommitted / 1_000).toFixed(0)}K`
+                              : '$0'}
+                      </p>
+                    </div>
+                    {/* Top Unsigned */}
+                    <div className="px-4 py-3 text-center">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Top Available Free Agent</p>
+                      {marketSummary.topUnsigned ? (
+                        <Link
+                          href={`/players/${generatePlayerSlug(marketSummary.topUnsigned.name)}`}
+                          className="text-base font-extrabold text-[#0050A0] hover:underline"
+                        >
+                          {marketSummary.topUnsigned.name}
+                        </Link>
+                      ) : (
+                        <p className="text-base font-extrabold text-gray-500">—</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col lg:flex-row gap-6">
+              {/* Main Content */}
+              <div className="flex-1 min-w-0" ref={mainTableRef}>
               {/* Table */}
               {paginatedFreeAgents.length === 0 ? (
                 <div className="bg-white rounded-lg shadow-sm p-8 text-center">
@@ -671,9 +744,8 @@ export default function FreeAgencyTrackerClient() {
                                 </td>
                                 <td className="px-3 py-2 whitespace-nowrap text-sm">
                                   {teamInfo ? (
-                                    <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()}>
+                                    <Link href={`/teams/${teamInfo.id}/depth-chart`} className="flex items-center justify-center hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()} title={teamInfo.fullName}>
                                       <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
-                                      <span className="font-medium text-[#0050A0] hover:underline">{teamInfo.abbreviation}</span>
                                     </Link>
                                   ) : agent.current2025Team ? (
                                     <span className="text-gray-500 text-xs block text-center">{agent.current2025Team}</span>
@@ -704,9 +776,8 @@ export default function FreeAgencyTrackerClient() {
                                 </td>
                                 <td className="px-3 py-2 whitespace-nowrap text-sm">
                                   {signed2026TeamInfo ? (
-                                    <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center justify-center gap-2 hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()}>
+                                    <Link href={`/teams/${signed2026TeamInfo.id}`} className="flex items-center justify-center hover:opacity-80 transition-opacity" onClick={e => e.stopPropagation()} title={signed2026TeamInfo.fullName}>
                                       <img src={signed2026TeamInfo.logoUrl} alt={signed2026TeamInfo.abbreviation} className="w-6 h-6 sm:w-8 sm:h-8" />
-                                      <span className="font-medium text-[#0050A0] hover:underline">{signed2026TeamInfo.abbreviation}</span>
                                     </Link>
                                   ) : isUnsigned ? (
                                     <span className="text-gray-400 block text-center">—</span>
@@ -733,11 +804,13 @@ export default function FreeAgencyTrackerClient() {
                               {isExpanded && (
                                 <tr className="bg-white">
                                   <td colSpan={11} className="p-0 border-b-2 border-[#0050A0]/20">
-                                    <ContractComps
-                                      agent={agent}
-                                      contractSheets={contractSheets}
-                                      loading={contractsLoading}
-                                    />
+                                    <div className="px-4 sm:px-6 py-4">
+                                      <ContractComps
+                                        agent={agent}
+                                        contractSheets={contractSheets}
+                                        loading={contractsLoading}
+                                      />
+                                    </div>
                                   </td>
                                 </tr>
                               )}
@@ -763,6 +836,18 @@ export default function FreeAgencyTrackerClient() {
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Market Sidebar */}
+            <div className="w-full lg:w-72 flex-shrink-0" style={mainTableHeight ? { height: mainTableHeight } : undefined}>
+              <MarketSidebar
+                selectedPosition={selectedPosition}
+                freeAgents={allFreeAgents}
+                contractSheets={contractSheets}
+                loading={contractsLoading}
+              />
+            </div>
+            </div>
             </>
           )}
         </div>

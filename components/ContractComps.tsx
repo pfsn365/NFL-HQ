@@ -23,7 +23,7 @@ export default function ContractComps({ agent, contractSheets, loading }: Contra
 
   if (!hasContractComps(agent.position)) {
     return (
-      <div className="px-6 py-4 text-sm text-gray-500 italic">
+      <div className="text-sm text-gray-500 italic">
         Contract comps are not available for {agent.position} players.
       </div>
     );
@@ -31,7 +31,7 @@ export default function ContractComps({ agent, contractSheets, loading }: Contra
 
   if (loading) {
     return (
-      <div className="px-6 py-6 flex items-center gap-3">
+      <div className="flex items-center gap-3 py-2">
         <div className="w-4 h-4 border-2 border-[#0050A0] border-t-transparent rounded-full animate-spin" />
         <span className="text-sm text-gray-600">Loading contract comps...</span>
       </div>
@@ -40,14 +40,14 @@ export default function ContractComps({ agent, contractSheets, loading }: Contra
 
   if (comps.length === 0) {
     return (
-      <div className="px-6 py-4 text-sm text-gray-500 italic">
+      <div className="text-sm text-gray-500 italic">
         No comparable contracts found for this player.
       </div>
     );
   }
 
   return (
-    <div className="px-4 sm:px-6 py-4">
+    <div>
       <h4 className="text-sm font-bold text-gray-800 mb-3">
         Historical Contract Comps
       </h4>
