@@ -6,7 +6,7 @@ import { getAllTeams } from '@/data/teams';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getApiPath } from '@/utils/api';
 import PlayerImage from '@/components/PlayerImage';
-import { transformFreeAgentData, generatePlayerSlug, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
+import { transformFreeAgentData, generatePlayerSlug, mapTeamNameToId, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
 export default function HomePageContent() {
   const router = useRouter();
@@ -381,7 +381,11 @@ export default function HomePageContent() {
                               {agent.faType === 'Franchise' || agent.faType === 'Transition' ? (
                                 <span className="text-xs font-semibold text-purple-600">Tagged</span>
                               ) : agent.signed2026Team && agent.signed2026Team.trim() !== '' ? (
-                                <span className="text-xs font-semibold text-green-600">Signed</span>
+                                agent.current2025Team && mapTeamNameToId(agent.signed2026Team) === mapTeamNameToId(agent.current2025Team) ? (
+                                  <span className="text-xs font-semibold text-blue-600">Re-Signed</span>
+                                ) : (
+                                  <span className="text-xs font-semibold text-green-600">Signed</span>
+                                )
                               ) : (
                                 <span className="text-xs font-semibold text-red-600">Unsigned</span>
                               )}

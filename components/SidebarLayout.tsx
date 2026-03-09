@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import NFLTeamsSidebar from '@/components/NFLTeamsSidebar';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface SidebarLayoutProps {
   children: React.ReactNode;
@@ -37,7 +38,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       {/* Toggle button - desktop only, positioned below the ticker */}
       <button
         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        className={`hidden lg:flex fixed top-10 z-20 w-8 h-8 bg-black items-center justify-center rounded-r-md transition-all duration-300 hover:bg-gray-800 cursor-pointer ${
+        className={`hidden lg:flex fixed top-10 z-40 w-8 h-8 bg-black items-center justify-center rounded-r-md transition-all duration-300 hover:bg-gray-800 cursor-pointer ${
           sidebarCollapsed ? 'left-0' : 'left-64'
         }`}
         aria-label={sidebarCollapsed ? 'Open sidebar' : 'Close sidebar'}
@@ -90,6 +91,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
           sidebarCollapsed ? 'lg:ml-0' : 'lg:ml-64'
         }`}
       >
+        <GMSimBanner />
         {children}
       </div>
     </div>

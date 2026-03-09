@@ -716,6 +716,8 @@ export default function FreeAgencyTrackerClient() {
                           const signed2026TeamInfo = getTeamInfo(mapTeamNameToId(agent.signed2026Team));
                           const isTagged = agent.faType === 'Franchise' || agent.faType === 'Transition';
                           const isUnsigned = !agent.signed2026Team || agent.signed2026Team.trim() === '';
+                          const isReSigned = !isTagged && !isUnsigned && !!agent.current2025Team &&
+                            mapTeamNameToId(agent.signed2026Team) === mapTeamNameToId(agent.current2025Team);
                           const rowKey = `${agent.rank}-${agent.name}`;
                           const isExpandable = hasContractComps(agent.position);
                           const isExpanded = expandedRows.has(rowKey);
@@ -816,6 +818,8 @@ export default function FreeAgencyTrackerClient() {
                                     <span className="text-purple-600">Tagged</span>
                                   ) : isUnsigned ? (
                                     <span className="text-red-600">Unsigned</span>
+                                  ) : isReSigned ? (
+                                    <span className="text-blue-600">Re-Signed</span>
                                   ) : (
                                     <span className="text-green-600">Signed</span>
                                   )}
