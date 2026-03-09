@@ -103,9 +103,10 @@ export default function TeamNeedsTab({ team }: TeamNeedsTabProps) {
   const [needs, setNeeds] = useState<PositionNeed[]>([]);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchNeeds() {
       try {
-        const res = await fetch(getApiPath('api/team-needs'));
+        const res = await fetch(getApiPath('api/team-needs'), { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           if (data.teamNeeds?.[team.id]) {
@@ -114,7 +115,8 @@ export default function TeamNeedsTab({ team }: TeamNeedsTabProps) {
             return;
           }
         }
-      } catch {
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return;
         // fall through to static fallback
       }
       // Fallback to static data
@@ -125,6 +127,7 @@ export default function TeamNeedsTab({ team }: TeamNeedsTabProps) {
       setIsLoading(false);
     }
     fetchNeeds();
+    return () => controller.abort();
   }, [team.id]);
 
   const togglePosition = (position: string) => {

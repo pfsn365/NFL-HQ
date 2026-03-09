@@ -111,9 +111,10 @@ export default function HomePageContent() {
 
   // Fetch top free agents
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchTopFreeAgents() {
       try {
-        const response = await fetch(getApiPath('api/free-agents'));
+        const response = await fetch(getApiPath('api/free-agents'), { signal: controller.signal });
         if (!response.ok) throw new Error('Failed to fetch');
         const data = await response.json();
         const transformed = transformFreeAgentData(data.output as RawFreeAgentData[]);
@@ -122,12 +123,14 @@ export default function HomePageContent() {
           .slice(0, 5);
         setTopFreeAgents(top);
       } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         console.error('Error fetching free agents:', err);
       } finally {
-        setFreeAgentsLoading(false);
+        if (!controller.signal.aborted) setFreeAgentsLoading(false);
       }
     }
     fetchTopFreeAgents();
+    return () => controller.abort();
   }, []);
 
   // Stat leaders - NFL stats
@@ -190,41 +193,40 @@ export default function HomePageContent() {
 
   // Fetch stat leaders
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchStatLeaders() {
       try {
-        const response = await fetch(getApiPath('api/nfl/stat-leaders?season=2025&limit=5'));
+        const response = await fetch(getApiPath('api/nfl/stat-leaders?season=2025&limit=5'), { signal: controller.signal });
 
         if (response.ok) {
           const data = await response.json();
-          // Only set data if there's no error
           if (data.data && !data.error) {
-            // Extract only the 4 categories we want
             setStatLeaders({
               passingYards: data.data.passingYards || [],
               rushingYards: data.data.rushingYards || [],
               receivingYards: data.data.receivingYards || [],
               tackles: data.data.tackles || [],
             });
-          } else if (data.error) {
-            // Keep statLeaders as null to show unavailable message
           }
         }
       } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         console.error('Error fetching stat leaders:', err);
       } finally {
-        setStatLeadersLoading(false);
+        if (!controller.signal.aborted) setStatLeadersLoading(false);
       }
     }
 
     fetchStatLeaders();
+    return () => controller.abort();
   }, []);
 
   // Fetch latest articles
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchLatestArticles() {
       try {
-        // Fetch from the Insights feed (most general news)
-        const response = await fetch(getApiPath('api/proxy-rss?url=' + encodeURIComponent('https://www.profootballnetwork.com/insights/feed/')));
+        const response = await fetch(getApiPath('api/proxy-rss?url=' + encodeURIComponent('https://www.profootballnetwork.com/insights/feed/')), { signal: controller.signal });
 
         if (response.ok) {
           const data = await response.json();
@@ -233,13 +235,15 @@ export default function HomePageContent() {
           }
         }
       } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         console.error('Error fetching latest articles:', err);
       } finally {
-        setArticlesLoading(false);
+        if (!controller.signal.aborted) setArticlesLoading(false);
       }
     }
 
     fetchLatestArticles();
+    return () => controller.abort();
   }, []);
 
   return (
@@ -613,7 +617,7 @@ export default function HomePageContent() {
               {/* Player Rankings Builder Card — Hero */}
               <Link
                 href="/player-rankings-builder"
-                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-orange-500 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
+                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-[#0050A0] border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
               >
                 <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-2">
                   Player Rankings Builder
@@ -622,7 +626,7 @@ export default function HomePageContent() {
                   Rank and compare NFL players by position
                 </p>
 
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
+                <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
                   <p className="text-lg font-semibold text-gray-700">Drag & Drop Player Rankings</p>
                 </div>
 
@@ -637,7 +641,7 @@ export default function HomePageContent() {
               {/* Power Rankings Builder Card — Hero */}
               <Link
                 href="/power-rankings-builder"
-                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-cyan-500 border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
+                className="group relative bg-white rounded-xl p-8 border-l-4 border-l-[#0050A0] border border-gray-200 hover:border-[#0050A0] hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
               >
                 <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#0050A0] transition-colors mb-2">
                   Power Rankings Builder
@@ -646,7 +650,7 @@ export default function HomePageContent() {
                   Create and customize your own NFL team power rankings
                 </p>
 
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
+                <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-lg p-6 text-center flex-grow flex flex-col justify-center min-h-[100px]">
                   <p className="text-lg font-semibold text-gray-700">Drag & Drop Rankings</p>
                 </div>
 

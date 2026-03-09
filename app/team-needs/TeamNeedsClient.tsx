@@ -100,14 +100,16 @@ export default function TeamNeedsClient() {
   // Fetch live data on mount
   // ---------------------------------------------------------------------------
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchLiveData() {
       try {
+        const opts = { signal: controller.signal };
         const [faRes, capRes, standingsRes, draftRes, needsRes] = await Promise.all([
-          fetch(getApiPath('api/free-agents')),
-          fetch(getApiPath('api/nfl/salary-cap/all')),
-          fetch(getApiPath('nfl/teams/api/standings')),
-          fetch(getApiPath('nfl/teams/api/future-draft-picks/all')),
-          fetch(getApiPath('api/team-needs')),
+          fetch(getApiPath('api/free-agents'), opts),
+          fetch(getApiPath('api/nfl/salary-cap/all'), opts),
+          fetch(getApiPath('nfl/teams/api/standings'), opts),
+          fetch(getApiPath('nfl/teams/api/future-draft-picks/all'), opts),
+          fetch(getApiPath('api/team-needs'), opts),
         ]);
 
         if (faRes.ok) {
@@ -165,10 +167,12 @@ export default function TeamNeedsClient() {
           }
         }
       } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return;
         console.error('Error fetching live data:', e);
       }
     }
     fetchLiveData();
+    return () => controller.abort();
   }, []);
 
   // ---------------------------------------------------------------------------

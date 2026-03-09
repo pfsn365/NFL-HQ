@@ -131,11 +131,12 @@ export default function FreeAgencyTrackerClient() {
   // Data Fetching
   useEffect(() => {
     if (hasLoaded) return;
+    const controller = new AbortController();
 
     async function fetchFreeAgents() {
       try {
         setLoading(true);
-        const response = await fetch(getApiPath('api/free-agents'));
+        const response = await fetch(getApiPath('api/free-agents'), { signal: controller.signal });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
@@ -157,32 +158,38 @@ export default function FreeAgencyTrackerClient() {
           throw new Error('Invalid data format from API');
         }
       } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         console.error('Error fetching free agents:', err);
         setError(err instanceof Error ? err.message : 'Failed to load free agent data');
       } finally {
-        setLoading(false);
-        setHasLoaded(true);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          setHasLoaded(true);
+        }
       }
     }
 
     fetchFreeAgents();
 
     // Fetch live team needs (non-blocking)
-    fetch(getApiPath('api/team-needs'))
+    fetch(getApiPath('api/team-needs'), { signal: controller.signal })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.teamNeeds) setTeamNeeds(data.teamNeeds); })
       .catch(() => {}); // keep static fallback
+
+    return () => controller.abort();
   }, [hasLoaded]);
 
-  // Silent background polling every 2 minutes for live updates
+  // Silent background polling every 5 minutes for live updates
   useEffect(() => {
     if (!hasLoaded) return;
+    const controller = new AbortController();
 
     const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(getApiPath('api/free-agents'));
+        const response = await fetch(getApiPath('api/free-agents'), { signal: controller.signal });
         if (!response.ok) return;
 
         const data = await response.json();
@@ -195,7 +202,7 @@ export default function FreeAgencyTrackerClient() {
       }
     }, POLL_INTERVAL);
 
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); controller.abort(); };
   }, [hasLoaded]);
 
   // Eagerly fetch contract sheets for market sidebar
@@ -260,7 +267,7 @@ export default function FreeAgencyTrackerClient() {
       if (selectedSignedStatus === 'unsigned') {
         matchesSignedStatus = !agent.signed2026Team || agent.signed2026Team.trim() === '';
       } else if (selectedSignedStatus === 'signed') {
-        matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '') && agent.faType !== 'Franchise';
+        matchesSignedStatus = !!(agent.signed2026Team && agent.signed2026Team.trim() !== '') && agent.faType !== 'Franchise' && agent.faType !== 'Transition';
       } else if (selectedSignedStatus === 'tagged') {
         matchesSignedStatus = agent.faType === 'Franchise' || agent.faType === 'Transition';
       }

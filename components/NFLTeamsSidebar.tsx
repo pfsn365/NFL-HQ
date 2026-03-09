@@ -1,388 +1,429 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface NFLTeamsSidebarProps {
   isMobile?: boolean;
 }
 
+interface NavItem {
+  title: string;
+  url: string;
+  internal: boolean;
+}
+
 const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  // NFL Tools starts expanded on both mobile and desktop
-  const [isNFLToolsExpanded, setIsNFLToolsExpanded] = useState(true);
-  const [isImpactRankingsExpanded, setIsImpactRankingsExpanded] = useState(false);
-  const [isOtherToolsExpanded, setIsOtherToolsExpanded] = useState(!isMobile);
-  const [isSuperBowlLXExpanded, setIsSuperBowlLXExpanded] = useState(false);
+  const [expandedHub, setExpandedHub] = useState<string | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Helper to normalize pathname by removing trailing slashes for comparison
   const normalizePath = (path: string) => path.replace(/\/$/, '');
-
-  // Get the normalized current pathname (usePathname returns path without basePath)
   const normalizedPathname = normalizePath(pathname);
-
-  // Check if current page matches a given URL
-  // usePathname() returns path without basePath, and our URLs are also without basePath
-  const isActivePage = (url: string) => {
-    return normalizedPathname === normalizePath(url);
-  };
-
-  // Check if we're on the home page (pathname will be '' or '/' when at /nfl-hq/)
+  const isActivePage = (url: string) => normalizedPathname === normalizePath(url);
   const isHomePage = normalizedPathname === '' || normalizedPathname === '/';
 
-  // Check if we're on the Super Bowl LX page
-  const isSuperBowlLXPage = normalizedPathname === '/super-bowl-lx';
+  const isOnHubPage = (hubUrl: string) => {
+    const normalizedUrl = normalizePath(hubUrl);
+    return normalizedPathname === normalizedUrl || normalizedPathname.startsWith(normalizedUrl);
+  };
 
-  const nflTools = [
-    { title: 'NFL Articles', url: '/articles', external: false },
-    { title: 'NFL Salary Cap Tracker', url: '/salary-cap-tracker', external: false },
-    { title: 'NFL Ultimate GM Simulator', url: 'https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/', external: true },
-    { title: 'NFL Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', external: true },
-    { title: 'NFL Schedule', url: '/schedule', external: false },
-    { title: 'NFL Standings', url: '/standings', external: false },
-    { title: 'NFL Injury Report', url: '/injuries', external: false },
-    { title: 'NFL Stat Leaders', url: '/stats', external: false },
-    { title: 'NFL Draft HQ', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', external: true },
-    { title: 'NFL Power Rankings Builder', url: '/power-rankings-builder', external: false },
-    { title: 'NFL Player Rankings Builder', url: '/player-rankings-builder', external: false },
-    { title: 'NFL Transactions', url: '/transactions', external: false },
-    { title: 'NFL Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor', external: true },
-    { title: 'NFL Offseason Manager', url: 'https://www.profootballnetwork.com/nfl-offseason-salary-cap-free-agency-manager', external: true },
-    { title: 'NFL Player Pages', url: '/players', external: false },
-    { title: 'NFL Player Guessing Game', url: 'https://www.profootballnetwork.com/nfl-player-guessing-game/', external: true },
-    { title: 'NFL Connections', url: 'https://www.profootballnetwork.com/games/nfl-connections/', external: true },
+  // Navigate to hub page and expand dropdown (matches draft hub pattern)
+  const navigateToHub = (hubTitle: string, hubUrl: string) => {
+    if (isOnHubPage(hubUrl)) {
+      setExpandedHub(expandedHub === hubTitle ? null : hubTitle);
+    } else {
+      router.push(hubUrl);
+      setExpandedHub(hubTitle);
+      if (isMobile) setIsExpanded(false);
+    }
+  };
+
+  // Super Bowl HQ — expandable hub
+  const superBowlHub = {
+    title: 'Super Bowl HQ',
+    url: '/super-bowl-lx',
+    logo: 'https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png',
+    tabs: [
+      { title: 'Overview', tab: 'overview' },
+      { title: 'Path to Super Bowl', tab: 'path-to-super-bowl' },
+      { title: 'Rosters & Depth Charts', tab: 'rosters' },
+      { title: 'Injury Report', tab: 'injuries' },
+      { title: 'Stats Comparison', tab: 'stats' },
+      { title: 'Head-to-Head', tab: 'head-to-head' },
+      { title: 'Super Bowl History', tab: 'history' },
+    ],
+  };
+
+  // PFSN Impact Rankings — expandable hub
+  const impactRankingsHub = {
+    title: 'PFSN Impact Rankings',
+    tabs: [
+      { title: 'Team Offense', url: 'https://www.profootballnetwork.com/nfl-offense-rankings-impact/' },
+      { title: 'Team Defense', url: 'https://www.profootballnetwork.com/nfl-defense-rankings-impact/' },
+      { title: 'QB', url: 'https://www.profootballnetwork.com/nfl-qb-rankings-impact/' },
+      { title: 'RB', url: 'https://www.profootballnetwork.com/nfl-rb-rankings-impact/' },
+      { title: 'WR', url: 'https://www.profootballnetwork.com/nfl-wr-rankings-impact/' },
+      { title: 'TE', url: 'https://www.profootballnetwork.com/nfl-te-rankings-impact/' },
+      { title: 'OL', url: 'https://www.profootballnetwork.com/nfl-player-ol-rankings-impact/' },
+      { title: 'DT', url: 'https://www.profootballnetwork.com/nfl-dt-rankings-impact/' },
+      { title: 'EDGE', url: 'https://www.profootballnetwork.com/nfl-edge-rankings-impact/' },
+      { title: 'LB', url: 'https://www.profootballnetwork.com/nfl-lb-rankings-impact/' },
+      { title: 'CB', url: 'https://www.profootballnetwork.com/nfl-cb-rankings-impact/' },
+      { title: 'SAF', url: 'https://www.profootballnetwork.com/nfl-saf-rankings-impact/' },
+    ],
+  };
+
+  // Auto-expand hub dropdown when on a hub page
+  useEffect(() => {
+    if (isOnHubPage(superBowlHub.url)) {
+      setExpandedHub(superBowlHub.title);
+    }
+  }, [pathname]);
+
+  // ── Grouped navigation sections ─────────────────────────────────────
+
+  const navSections = [
+    {
+      label: 'Offseason Hub',
+      items: [
+        { title: 'Team Needs', url: '/team-needs', internal: true },
+        { title: 'Salary Cap Tracker', url: '/salary-cap-tracker', internal: true },
+        { title: 'NFL Articles', url: '/articles', internal: true },
+        { title: 'Offseason Manager', url: 'https://www.profootballnetwork.com/nfl-offseason-salary-cap-free-agency-manager', internal: false },
+      ],
+    },
+    {
+      label: 'Rankings',
+      items: [
+        { title: 'Player Rankings Builder', url: '/player-rankings-builder', internal: true },
+        { title: 'Power Rankings Builder', url: '/power-rankings-builder', internal: true },
+      ],
+      // PFSN Impact Rankings expandable hub is rendered before these items
+      hasImpactRankings: true,
+    },
+    {
+      label: 'Season',
+      items: [
+        { title: 'Schedule', url: '/schedule', internal: true },
+        { title: 'Standings', url: '/standings', internal: true },
+        { title: 'Injury Report', url: '/injuries', internal: true },
+        { title: 'Stat Leaders', url: '/stats', internal: true },
+        { title: 'Transactions', url: '/transactions', internal: true },
+        { title: 'Player Pages', url: '/players', internal: true },
+      ],
+    },
+    {
+      label: 'Simulators & Games',
+      items: [
+        { title: 'Mock Draft Simulator', url: 'https://www.profootballnetwork.com/mockdraft', internal: false },
+        { title: 'Playoff Predictor', url: 'https://www.profootballnetwork.com/nfl-playoff-predictor', internal: false },
+        { title: 'Player Guessing Game', url: 'https://www.profootballnetwork.com/nfl-player-guessing-game/', internal: false },
+        { title: 'NFL Connections', url: 'https://www.profootballnetwork.com/games/nfl-connections/', internal: false },
+      ],
+    },
+    {
+      label: 'Other Hubs',
+      items: [
+        { title: 'NFL Draft HQ', url: 'https://www.profootballnetwork.com/nfl-draft-hq/', internal: false },
+      ],
+      // Super Bowl HQ expandable hub is rendered before these items
+      hasSuperBowlHub: true,
+    },
   ];
 
+  // ── Shared helpers ──────────────────────────────────────────────────
 
-  const otherTools = [
-    { title: 'Fantasy Football HQ', url: 'https://www.profootballnetwork.com/fantasy/football/' },
-    { title: 'CFB Transfer Portal Tracker', url: 'https://www.profootballnetwork.com/cfb-hq/transfer-portal-tracker' },
-    { title: 'CFB HQ', url: 'https://www.profootballnetwork.com/cfb-hq' },
-    { title: 'CFB Playoff Predictor', url: 'https://www.profootballnetwork.com/cfb/playoff-predictor-cfb-cta/' },
-    { title: 'NBA HQ', url: 'https://www.profootballnetwork.com/nba-hq/' },
-    { title: 'NBA Mock Draft Simulator', url: 'https://www.profootballnetwork.com/nba-mock-draft-simulator' },
-    { title: 'World Cup Simulator', url: 'https://www.profootballnetwork.com/fifa-world-cup-simulator/' },
-    { title: 'MLB Playoff Predictor', url: 'https://www.profootballnetwork.com/mlb-playoff-predictor/' },
-    { title: 'Tennis Simulator', url: 'https://www.profootballnetwork.com/tennis-simulator/' },
-    { title: 'NASCAR Predictor', url: 'https://www.profootballnetwork.com/nascar-predictor/' },
-  ];
+  const ExternalIcon = () => (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50 flex-shrink-0">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+  );
 
-  const impactRankings = [
-    { title: 'Team Offense', url: 'https://www.profootballnetwork.com/nfl-offense-rankings-impact/' },
-    { title: 'Team Defense', url: 'https://www.profootballnetwork.com/nfl-defense-rankings-impact/' },
-    { title: 'QB', url: 'https://www.profootballnetwork.com/nfl-qb-rankings-impact/' },
-    { title: 'RB', url: 'https://www.profootballnetwork.com/nfl-rb-rankings-impact/' },
-    { title: 'WR', url: 'https://www.profootballnetwork.com/nfl-wr-rankings-impact/' },
-    { title: 'TE', url: 'https://www.profootballnetwork.com/nfl-te-rankings-impact/' },
-    { title: 'OL', url: 'https://www.profootballnetwork.com/nfl-player-ol-rankings-impact/' },
-    { title: 'DT', url: 'https://www.profootballnetwork.com/nfl-dt-rankings-impact/' },
-    { title: 'EDGE', url: 'https://www.profootballnetwork.com/nfl-edge-rankings-impact/' },
-    { title: 'LB', url: 'https://www.profootballnetwork.com/nfl-lb-rankings-impact/' },
-    { title: 'CB', url: 'https://www.profootballnetwork.com/nfl-cb-rankings-impact/' },
-    { title: 'SAF', url: 'https://www.profootballnetwork.com/nfl-saf-rankings-impact/' },
-  ];
+  const renderNavItem = (item: NavItem, closeMobile = false) => {
+    const isActive = item.internal && isActivePage(item.url);
+    const linkContent = (
+      <span className="text-[13px] font-medium truncate flex items-center gap-2">
+        {item.title}
+        {!item.internal && <ExternalIcon />}
+      </span>
+    );
 
-  // Mobile version
+    return (
+      <li key={item.title}>
+        {item.internal ? (
+          <Link
+            href={item.url}
+            onClick={closeMobile ? () => setIsExpanded(false) : undefined}
+            className={`relative flex items-center px-3 py-1.5 mx-1 rounded-md transition-all duration-200 ${
+              isActive
+                ? 'bg-[#0050A0] text-white'
+                : 'text-gray-400 hover:bg-gray-800/50 hover:text-white'
+            }`}
+          >
+            {linkContent}
+          </Link>
+        ) : (
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative flex items-center px-3 py-1.5 mx-1 rounded-md transition-all duration-200 text-gray-400 hover:bg-gray-800/50 hover:text-white"
+          >
+            {linkContent}
+          </a>
+        )}
+      </li>
+    );
+  };
+
+  // Section header (matches draft hub exactly)
+  const SectionHeader = ({ label }: { label: string }) => (
+    <li className="pt-8 mb-1">
+      <div className="px-3 mx-1 mb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-gray-100 uppercase tracking-wider">{label}</span>
+          </div>
+          <div className="flex-1 ml-3 h-px bg-gradient-to-r from-gray-600 to-transparent"></div>
+        </div>
+      </div>
+    </li>
+  );
+
+  // Impact Rankings expandable
+  const renderImpactRankings = (closeMobile = false) => {
+    const isHubExpanded = expandedHub === impactRankingsHub.title;
+    return (
+      <li>
+        <button
+          onClick={() => setExpandedHub(isHubExpanded ? null : impactRankingsHub.title)}
+          className="w-full relative flex items-center justify-between px-3 py-1.5 mx-1 rounded-md transition-all duration-200 cursor-pointer text-gray-400 hover:bg-gray-800/50 hover:text-white"
+        >
+          <span className="text-[13px] font-medium truncate">{impactRankingsHub.title}</span>
+          <svg
+            className={`w-4 h-4 transition-transform flex-shrink-0 ${isHubExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {isHubExpanded && (
+          <ul className="mt-1 ml-4 space-y-0.5">
+            {impactRankingsHub.tabs.map((tab) => (
+              <li key={tab.title}>
+                <a
+                  href={tab.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMobile ? () => setIsExpanded(false) : undefined}
+                  className="block px-3 py-1.5 mx-1 rounded-md text-[13px] font-medium text-gray-400 hover:bg-gray-800/50 hover:text-white transition-all duration-200"
+                >
+                  <span className="flex items-center gap-2">
+                    {tab.title}
+                    <ExternalIcon />
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
+  // Super Bowl HQ expandable
+  const renderSuperBowlHub = (closeMobile = false) => {
+    const isHubActive = isOnHubPage(superBowlHub.url);
+    const isHubExpanded = expandedHub === superBowlHub.title;
+    return (
+      <li>
+        <button
+          onClick={() => navigateToHub(superBowlHub.title, superBowlHub.url)}
+          className={`w-full relative flex items-center justify-between px-3 py-1.5 mx-1 rounded-md transition-all duration-200 cursor-pointer ${
+            isHubActive
+              ? 'bg-[#0050A0] text-white'
+              : 'text-gray-400 hover:bg-gray-800/50 hover:text-white'
+          }`}
+        >
+          <span className="text-[13px] font-medium truncate flex items-center gap-2">
+            <img
+              src={superBowlHub.logo}
+              alt="Super Bowl LX"
+              className="h-5 w-5 object-contain"
+            />
+            {superBowlHub.title}
+          </span>
+          <svg
+            className={`w-4 h-4 transition-transform flex-shrink-0 ${isHubExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {isHubExpanded && (
+          <ul className="mt-1 ml-4 space-y-0.5">
+            {superBowlHub.tabs.map((tab) => (
+              <li key={tab.tab}>
+                <Link
+                  href={`${superBowlHub.url}?tab=${tab.tab}`}
+                  onClick={closeMobile ? () => setIsExpanded(false) : undefined}
+                  className="block px-3 py-1.5 mx-1 rounded-md text-[13px] font-medium text-gray-400 hover:bg-gray-800/50 hover:text-white transition-all duration-200"
+                >
+                  {tab.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
+  // Render all nav sections
+  const renderSections = (closeMobile = false) => (
+    <>
+      {navSections.map((section) => (
+        <React.Fragment key={section.label}>
+          <SectionHeader label={section.label} />
+          {'hasImpactRankings' in section && section.hasImpactRankings && renderImpactRankings(closeMobile)}
+          {'hasSuperBowlHub' in section && section.hasSuperBowlHub && renderSuperBowlHub(closeMobile)}
+          {section.items.map((item) => renderNavItem(item, closeMobile))}
+        </React.Fragment>
+      ))}
+    </>
+  );
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  MOBILE
+  // ══════════════════════════════════════════════════════════════════════
+
   if (isMobile) {
     return (
       <div className="w-full bg-black">
-        <div className="flex items-center justify-between px-4 py-3 bg-black">
-          <div className="flex items-center gap-3">
-            {/* Hamburger menu icon */}
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="text-white p-2.5 -m-1.5 rounded-lg hover:bg-white/10 active:bg-white/20 transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-
-            {/* PFSN Logo */}
-            <a href="https://www.profootballnetwork.com" target="_blank" rel="noopener noreferrer" className="block">
-              <img
-                src="https://statico.profootballnetwork.com/wp-content/uploads/2025/06/12093424/tools-navigation-06-12-25.jpg"
-                alt="PFSN Logo"
-                style={{ height: '24px' }}
-                className="h-6 w-auto transition-all duration-300 hover:opacity-80"
-              />
-            </a>
-
-            <span className="text-white font-semibold text-sm">NFL HQ</span>
-          </div>
-
-          {/* Dropdown arrow - clickable */}
+        <div className="flex items-center justify-between px-3 h-12 bg-black">
+          {/* Left — Hamburger / X */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-white p-1"
-            aria-label="Toggle dropdown"
+            className="text-white p-2 cursor-pointer"
+            aria-label="Toggle menu"
           >
-            <svg
-              className={`w-4 h-4 transform transition-transform duration-300 ease-out ${isExpanded ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            {isExpanded ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
           </button>
+
+          {/* Center — PFSN Logo */}
+          <a href="https://www.profootballnetwork.com" target="_blank" rel="noopener noreferrer" className="absolute left-1/2 transform -translate-x-1/2">
+            <img
+              src="https://statico.profootballnetwork.com/wp-content/uploads/2025/06/12093424/tools-navigation-06-12-25.jpg"
+              alt="PFSN Logo"
+              loading="lazy"
+              width="96"
+              height="24"
+              className="h-6 w-auto transition-all duration-300 hover:opacity-80"
+            />
+          </a>
+
+          {/* Right — spacer to balance layout */}
+          <div className="w-9" />
         </div>
 
         {isExpanded && (
-          <div className="bg-black border-t border-gray-800 max-h-[calc(100vh-57px)] overflow-y-auto">
-            {/* Home, Super Bowl LX, and Browse All Teams */}
-            <div className="px-4 py-2 border-b border-gray-800">
-              <div className="grid grid-cols-1 gap-1">
-                <Link
-                  href="/"
-                  className={`block p-2 rounded text-sm transition-colors ${
-                    isHomePage
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-white hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="text-xs">Home</div>
-                </Link>
-                <Link
-                  href="/free-agency-tracker"
-                  className={`block p-2 rounded text-sm transition-colors ${
-                    isActivePage('/free-agency-tracker')
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-white hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="text-xs">NFL Free Agency Tracker</div>
-                </Link>
-                <Link
-                  href="/team-needs"
-                  className={`block p-2 rounded text-sm transition-colors ${
-                    isActivePage('/team-needs')
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-white hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="text-xs">NFL Team Needs</div>
-                </Link>
-                <Link
-                  href="/teams"
-                  className={`block p-2 rounded text-sm transition-colors ${
-                    isActivePage('/teams')
-                      ? 'bg-[#0050A0] text-white'
-                      : 'text-white hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="text-xs">Browse All Teams</div>
-                </Link>
-              </div>
+          <div className="bg-black border-t border-gray-800 max-h-[calc(100vh-48px)] flex flex-col">
+            {/* Sticky top links */}
+            <div className="bg-black border-b border-gray-800 pt-4 pb-2 flex-shrink-0">
+              <ul className="space-y-0.5">
+                <li>
+                  <Link
+                    href="/"
+                    onClick={() => setIsExpanded(false)}
+                    className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+                      isHomePage
+                        ? 'bg-[#0050A0] text-white'
+                        : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span className="text-[13px] font-medium">Home</span>
+                    </div>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/free-agency-tracker"
+                    onClick={() => setIsExpanded(false)}
+                    className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+                      isActivePage('/free-agency-tracker')
+                        ? 'bg-[#0050A0] text-white'
+                        : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      <span className="text-[13px] font-medium">NFL Free Agency Tracker</span>
+                    </div>
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsExpanded(false)}
+                    className="relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span className="text-[13px] font-medium">Ultimate GM Simulator</span>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <Link
+                    href="/teams"
+                    onClick={() => setIsExpanded(false)}
+                    className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
+                      isActivePage('/teams')
+                        ? 'bg-[#0050A0] text-white'
+                        : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                      </svg>
+                      <span className="text-[13px] font-medium">Browse All Teams</span>
+                    </div>
+                  </Link>
+                </li>
+              </ul>
             </div>
 
-            {/* NFL TOOLS Section */}
-            <div className="px-4 py-2 border-b border-gray-800">
-              <div
-                role="button"
-                tabIndex={0}
-                aria-expanded={isNFLToolsExpanded}
-                aria-controls="nfl-tools-menu"
-                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0050A0] rounded"
-                onClick={() => setIsNFLToolsExpanded(!isNFLToolsExpanded)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsNFLToolsExpanded(!isNFLToolsExpanded); } }}
-              >
-                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">NFL Tools</div>
-                <svg
-                  className={`w-4 h-4 text-[#0050A0] transform transition-transform duration-300 ease-out ${isNFLToolsExpanded ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-              {isNFLToolsExpanded && (
-                <div className="grid grid-cols-1 gap-1">
-                  {nflTools.map((tool, index) => {
-                    const isActive = !tool.external && isActivePage(tool.url);
-                    const toolWithIcon = tool as typeof tool & { icon?: string };
-
-                    const LinkOrA = tool.external ? 'a' : Link;
-                    const externalProps = tool.external ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
-
-                    return (
-                      <React.Fragment key={tool.title}>
-                        {/* Super Bowl HQ - rendered above Playoff Predictor */}
-                        {tool.title === 'NFL Playoff Predictor' && (
-                          <div>
-                            <div
-                              role="button"
-                              tabIndex={0}
-                              onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
-                              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
-                              className={`block p-2 rounded text-sm transition-colors cursor-pointer ${
-                                isSuperBowlLXPage
-                                  ? 'bg-[#0050A0] text-white'
-                                  : 'text-white hover:bg-gray-800'
-                              }`}
-                            >
-                              <div className="text-xs flex items-center justify-between">
-                                <div className="flex items-center gap-1">
-                                  <img
-                                    src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                                    alt="Super Bowl LX"
-                                    className="h-5 w-5 object-contain"
-                                  />
-                                  Super Bowl HQ
-                                </div>
-                                <svg
-                                  className={`w-3 h-3 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                              </div>
-                            </div>
-                            {isSuperBowlLXExpanded && (
-                              <div className="ml-4 mt-1 space-y-1">
-                                {[
-                                  { id: 'overview', label: 'Overview' },
-                                  { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
-                                  { id: 'rosters', label: 'Rosters & Depth Charts' },
-                                  { id: 'injuries', label: 'Injury Report' },
-                                  { id: 'stats', label: 'Stats Comparison' },
-                                  { id: 'head-to-head', label: 'Head-to-Head' },
-                                  { id: 'history', label: 'Super Bowl History' },
-                                ].map((tab) => (
-                                  <Link
-                                    key={tab.id}
-                                    href={`/super-bowl-lx?tab=${tab.id}`}
-                                    className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
-                                  >
-                                    <div className="text-xs">{tab.label}</div>
-                                  </Link>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        <LinkOrA
-                          href={tool.url}
-                          {...externalProps}
-                          className={`block p-2 rounded text-sm transition-colors ${
-                            isActive ? 'bg-[#0050A0] text-white' : 'text-white hover:bg-gray-800'
-                          }`}
-                        >
-                          <div className="text-xs flex items-center gap-2">
-                            <span>{tool.title}</span>
-                            {toolWithIcon.icon && (
-                              <img src={toolWithIcon.icon} alt="" className="w-6 h-6 object-contain flex-shrink-0" />
-                            )}
-                          </div>
-                        </LinkOrA>
-                        {/* PFSN Impact Rankings - expandable submenu after GM Simulator */}
-                        {tool.title === 'NFL Ultimate GM Simulator' && (
-                          <div>
-                            <button
-                              onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
-                              className="w-full flex items-center justify-between p-2 rounded text-sm transition-colors text-white hover:bg-gray-800 cursor-pointer"
-                            >
-                              <div className="text-xs">PFSN Impact Rankings</div>
-                              <svg
-                                className={`w-3 h-3 transform transition-transform duration-300 ease-out ${isImpactRankingsExpanded ? 'rotate-180' : ''}`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </button>
-                            {isImpactRankingsExpanded && (
-                              <div className="pl-3 grid grid-cols-1 gap-1">
-                                {impactRankings.map((item) => (
-                                  <a
-                                    key={item.title}
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
-                                  >
-                                    <div className="text-xs">{item.title}</div>
-                                  </a>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* OTHER TOOLS Section */}
-            <div className="px-4 py-2">
-              <div
-                role="button"
-                tabIndex={0}
-                aria-expanded={isOtherToolsExpanded}
-                aria-controls="other-tools-menu"
-                className="flex items-center justify-between mb-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0050A0] rounded"
-                onClick={() => setIsOtherToolsExpanded(!isOtherToolsExpanded)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOtherToolsExpanded(!isOtherToolsExpanded); } }}
-              >
-                <div className="text-[#0050A0] text-xs font-bold uppercase tracking-wider">Other Sports</div>
-                <svg
-                  className={`w-4 h-4 text-[#0050A0] transform transition-transform duration-300 ease-out ${isOtherToolsExpanded ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-              {isOtherToolsExpanded && (
-                <div className="grid grid-cols-1 gap-1">
-                  {otherTools.map((tool) => (
-                    <a
-                      key={tool.title}
-                      href={tool.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block p-2 rounded text-sm transition-colors text-white hover:bg-gray-800"
-                    >
-                      <div className="text-xs">{tool.title}</div>
-                    </a>
-                  ))}
-                </div>
-              )}
+            {/* Scrollable nav */}
+            <div className="overflow-y-auto flex-1 py-4">
+              <ul className="space-y-0.5">
+                {renderSections(true)}
+              </ul>
             </div>
           </div>
         )}
@@ -390,26 +431,29 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
     );
   }
 
-  // Desktop version
+  // ══════════════════════════════════════════════════════════════════════
+  //  DESKTOP
+  // ══════════════════════════════════════════════════════════════════════
+
   return (
     <div className="w-full h-full bg-black border-r border-gray-800 flex flex-col">
       {/* Header with logo */}
       <div className="flex items-center justify-center px-4 py-4 border-b border-gray-800">
-        <a href="https://www.profootballnetwork.com" target="_blank" rel="noopener noreferrer" className="block">
+        <a href="https://www.profootballnetwork.com" target="_blank" rel="noopener noreferrer" className="block w-full">
           <img
             src="https://statico.profootballnetwork.com/wp-content/uploads/2025/06/12093424/tools-navigation-06-12-25.jpg"
             alt="PFSN Logo"
-            width={240}
-            height={48}
+            loading="lazy"
+            width="232"
+            height="58"
             className="w-full h-auto transition-all duration-300 hover:opacity-80"
           />
         </a>
       </div>
 
-      {/* Navigation - scrollable section */}
-      <nav className="flex-1 overflow-y-auto py-4 teams-sidebar-scroll">
+      {/* Sticky top links */}
+      <div className="bg-black border-b border-gray-800 pt-4 pb-2">
         <ul className="space-y-0.5">
-          {/* Home Button */}
           <li>
             <Link
               href="/"
@@ -420,26 +464,13 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
               }`}
             >
               <div className="flex items-center gap-2 w-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
-                <span className="text-sm font-medium">Home</span>
+                <span className="text-[13px] font-medium">Home</span>
               </div>
             </Link>
           </li>
-
-          {/* Free Agency Tracker */}
           <li>
             <Link
               href="/free-agency-tracker"
@@ -450,29 +481,29 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
               }`}
             >
               <div className="flex items-center gap-2 w-full">
-                <span className="text-sm font-medium">NFL Free Agency Tracker</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span className="text-[13px] font-medium">NFL Free Agency Tracker</span>
               </div>
             </Link>
           </li>
-
-          {/* Team Needs */}
           <li>
-            <Link
-              href="/team-needs"
-              className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
-                isActivePage('/team-needs')
-                  ? 'bg-[#0050A0] text-white'
-                  : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
-              }`}
+            <a
+              href="https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
             >
               <div className="flex items-center gap-2 w-full">
-                <span className="text-sm font-medium">NFL Team Needs</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="text-[13px] font-medium">Ultimate GM Simulator</span>
               </div>
-            </Link>
+            </a>
           </li>
-
-          {/* Browse All Teams Button */}
-          <li className="mb-4">
+          <li>
             <Link
               href="/teams"
               className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
@@ -482,201 +513,24 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
               }`}
             >
               <div className="flex items-center gap-2 w-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
-                <span className="text-sm font-medium">Browse All Teams</span>
+                <span className="text-[13px] font-medium">Browse All Teams</span>
               </div>
             </Link>
           </li>
+        </ul>
+      </div>
 
-          {/* NFL Tools Section */}
-          <li className="mb-2 pt-2">
-            <div className="px-3 mb-2">
-              <div className="flex items-center justify-between min-w-0">
-                <div className="flex items-center gap-2 min-w-0 flex-shrink">
-                  <div className="h-0.5 w-3 bg-gray-600 rounded flex-shrink-0"></div>
-                  <span className="text-xs font-bold text-gray-100 uppercase tracking-wider truncate">NFL Tools</span>
-                </div>
-                <div className="flex-1 ml-3 h-px bg-gradient-to-r from-gray-800 to-transparent flex-shrink-0"></div>
-              </div>
-            </div>
-          </li>
-          {nflTools.map((tool) => {
-            const isActive = !tool.external && isActivePage(tool.url);
-            const toolWithIcon = tool as typeof tool & { icon?: string };
-            const ToolLink = tool.external ? 'a' : Link;
-            const toolExternalProps = tool.external ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
-
-            return (
-              <React.Fragment key={tool.title}>
-                {/* Super Bowl HQ - rendered above Playoff Predictor */}
-                {tool.title === 'NFL Playoff Predictor' && (
-                  <li>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsSuperBowlLXExpanded(!isSuperBowlLXExpanded); } }}
-                      className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 cursor-pointer ${
-                        isSuperBowlLXPage
-                          ? 'bg-[#0050A0] text-white'
-                          : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2">
-                          <img
-                            src="https://staticd.profootballnetwork.com/skm/assets/pfn/sblx-logo.png"
-                            alt="Super Bowl LX"
-                            className="h-6 w-6 object-contain"
-                          />
-                          <span className="text-sm font-medium">Super Bowl HQ</span>
-                        </div>
-                        <svg
-                          className={`w-4 h-4 transition-transform ${isSuperBowlLXExpanded ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                    {isSuperBowlLXExpanded && (
-                      <div className="mt-1">
-                        {[
-                          { id: 'overview', label: 'Overview' },
-                          { id: 'path-to-super-bowl', label: 'Path to Super Bowl' },
-                          { id: 'rosters', label: 'Rosters & Depth Charts' },
-                          { id: 'injuries', label: 'Injury Report' },
-                          { id: 'stats', label: 'Stats Comparison' },
-                          { id: 'head-to-head', label: 'Head-to-Head' },
-                          { id: 'history', label: 'Super Bowl History' },
-                        ].map((tab) => (
-                          <Link
-                            key={tab.id}
-                            href={`/super-bowl-lx?tab=${tab.id}`}
-                            className="relative flex items-center px-3 py-2 mx-1 ml-4 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
-                          >
-                            <span className="text-sm font-medium truncate">{tab.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </li>
-                )}
-                <li>
-                  <ToolLink
-                    href={tool.url}
-                    {...toolExternalProps}
-                    className={`relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 ${
-                      isActive
-                        ? 'bg-[#0050A0] text-white'
-                        : 'text-gray-100 hover:bg-gray-800/50 hover:text-white'
-                    }`}
-                  >
-                    <span className="text-sm font-medium truncate flex items-center gap-2">
-                      {tool.title}
-                      {toolWithIcon.icon && (
-                        <img src={toolWithIcon.icon} alt="" className="w-7 h-7 object-contain flex-shrink-0" />
-                      )}
-                      {tool.external && (
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      )}
-                    </span>
-                  </ToolLink>
-                </li>
-                {/* PFSN Impact Rankings - expandable submenu after GM Simulator */}
-                {tool.title === 'NFL Ultimate GM Simulator' && (
-                  <>
-                    <li>
-                      <button
-                        onClick={() => setIsImpactRankingsExpanded(!isImpactRankingsExpanded)}
-                        className="w-full relative flex items-center justify-between px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white cursor-pointer"
-                      >
-                        <span className="text-sm font-medium truncate">
-                          PFSN Impact Rankings
-                        </span>
-                        <svg
-                          className={`w-4 h-4 transform transition-transform duration-300 ease-out ${isImpactRankingsExpanded ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                    </li>
-                    {isImpactRankingsExpanded && impactRankings.map((item) => (
-                      <li key={item.title}>
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="relative flex items-center px-3 py-2 mx-1 ml-4 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
-                        >
-                          <span className="text-sm font-medium truncate flex items-center gap-2">
-                            {item.title}
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </span>
-                        </a>
-                      </li>
-                    ))}
-                  </>
-                )}
-              </React.Fragment>
-            );
-          })}
-
-          {/* Other Tools Section */}
-          <li className="pt-6">
-            <div className="px-3 mb-2">
-              <div className="flex items-center justify-between min-w-0">
-                <div className="flex items-center gap-2 min-w-0 flex-shrink">
-                  <div className="h-0.5 w-3 bg-gray-600 rounded flex-shrink-0"></div>
-                  <span className="text-xs font-bold text-gray-100 uppercase tracking-wider truncate">Other Sports</span>
-                </div>
-                <div className="flex-1 ml-3 h-px bg-gradient-to-r from-gray-800 to-transparent flex-shrink-0"></div>
-              </div>
-            </div>
-          </li>
-          {otherTools.map((tool) => (
-            <li key={tool.title}>
-              <a
-                href={tool.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative flex items-center px-3 py-2 mx-1 rounded-md transition-all duration-200 text-gray-100 hover:bg-gray-800/50 hover:text-white"
-              >
-                <span className="text-sm font-medium truncate flex items-center gap-2">
-                  {tool.title}
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-3 h-3 opacity-50">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </span>
-              </a>
-            </li>
-          ))}
+      {/* Navigation — scrollable section */}
+      <nav className="flex-1 overflow-y-auto py-4 teams-sidebar-scroll">
+        <ul className="space-y-0.5">
+          {renderSections(false)}
         </ul>
       </nav>
 
-      {/* Bottom padding for footer ad - 92px blank space */}
+      {/* Bottom padding for footer ad */}
       <div className="h-[92px] bg-black border-t border-gray-800" aria-hidden="true"></div>
 
       {/* Scrollbar styling */}
