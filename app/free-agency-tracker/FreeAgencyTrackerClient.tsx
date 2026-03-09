@@ -272,7 +272,7 @@ export default function FreeAgencyTrackerClient() {
   // Filtering Logic
   const filteredFreeAgents = useMemo(() => {
     return allFreeAgents.filter(agent => {
-      const matchesTeam = selectedTeam === 'all' || agent.teamId === selectedTeam;
+      const matchesTeam = selectedTeam === 'all' || agent.teamId === selectedTeam || mapTeamNameToId(agent.signed2026Team) === selectedTeam;
       const matchesPosition = selectedPositions.size === 0 || selectedPositions.has(agent.position);
       const matchesFaType = selectedFaType === 'all' || agent.faType === selectedFaType;
       const matchesSearch = debouncedSearch.trim() === '' || agent.name.toLowerCase().includes(debouncedSearch.toLowerCase());
