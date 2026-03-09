@@ -12,7 +12,7 @@ import {
 } from '@/utils/contractCompHelpers';
 
 interface MarketSidebarProps {
-  selectedPosition: string;
+  selectedPositions: Set<string>;
   freeAgents: FreeAgent[];
   contractSheets: ContractSheet[];
   loading: boolean;
@@ -47,7 +47,7 @@ function formatMoney(val: number): string {
   return `$${val}`;
 }
 
-export default function MarketSidebar({ selectedPosition, freeAgents, contractSheets, loading }: MarketSidebarProps) {
+export default function MarketSidebar({ selectedPositions, freeAgents, contractSheets, loading }: MarketSidebarProps) {
   const allTeams = getAllTeams();
 
   const getTeamInfo = (teamName: string) => {
@@ -89,40 +89,41 @@ export default function MarketSidebar({ selectedPosition, freeAgents, contractSh
     const allContracts: RankedContract[] = [];
     const seen = new Set<string>();
 
-    if (selectedPosition === 'all') {
-      // Show all positions
-      for (const pos of Object.keys(POSITION_TO_SHEETS)) {
-        const posSignings = signings2026.filter(s => s.position === pos);
-        const contracts = buildContractRankings(pos, contractSheets, posSignings);
-        for (const c of contracts) {
-          const key = `${c.player}-${c.yearSigned}-${c.team}`;
-          if (!seen.has(key)) {
-            seen.add(key);
-            allContracts.push(c);
-          }
-        }
-      }
+    // Determine which positions to show contracts for
+    let targetPositions: string[];
+    if (selectedPositions.size === 0) {
+      targetPositions = Object.keys(POSITION_TO_SHEETS);
     } else {
-      const groupPositions = POSITION_GROUP[selectedPosition] || [selectedPosition];
-      for (const p of groupPositions) {
-        if (!(p in POSITION_TO_SHEETS)) continue;
-        const posSignings = signings2026.filter(s => groupPositions.includes(s.position));
-        const contracts = buildContractRankings(p, contractSheets, posSignings);
-        for (const c of contracts) {
-          const key = `${c.player}-${c.yearSigned}-${c.team}`;
-          if (!seen.has(key)) {
-            seen.add(key);
-            allContracts.push(c);
-          }
+      // Expand each selected position through POSITION_GROUP, then deduplicate
+      const expanded = new Set<string>();
+      for (const pos of selectedPositions) {
+        const group = POSITION_GROUP[pos] || [pos];
+        group.forEach(p => expanded.add(p));
+      }
+      targetPositions = [...expanded].filter(p => p in POSITION_TO_SHEETS);
+    }
+
+    for (const pos of targetPositions) {
+      const posSignings = signings2026.filter(s => targetPositions.includes(s.position));
+      const contracts = buildContractRankings(pos, contractSheets, posSignings);
+      for (const c of contracts) {
+        const key = `${c.player}-${c.yearSigned}-${c.team}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          allContracts.push(c);
         }
       }
     }
 
     allContracts.sort((a, b) => b.apy - a.apy);
     return allContracts;
-  }, [contractSheets, selectedPosition, signings2026]);
+  }, [contractSheets, selectedPositions, signings2026]);
 
-  const posLabel = selectedPosition === 'all' ? 'Current' : selectedPosition;
+  const posLabel = selectedPositions.size === 0
+    ? 'Current'
+    : selectedPositions.size === 1
+      ? [...selectedPositions][0]
+      : `${selectedPositions.size}-Pos`;
 
   if (loading) {
     return (

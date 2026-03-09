@@ -84,7 +84,8 @@ export default function FreeAgencyTrackerClient() {
 
   // Filter States
   const [selectedTeam, setSelectedTeam] = useState('all');
-  const [selectedPosition, setSelectedPosition] = useState('all');
+  const [selectedPositions, setSelectedPositions] = useState<Set<string>>(new Set());
+  const [positionDropdownOpen, setPositionDropdownOpen] = useState(false);
   const [selectedFaType, setSelectedFaType] = useState('all');
   const [selectedSignedStatus, setSelectedSignedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -212,20 +213,33 @@ export default function FreeAgencyTrackerClient() {
     }
   }, [hasLoaded, contractsFetched, fetchContractSheets]);
 
+  // Position groupings for offense/defense filter
+  const offensePositions = ['QB', 'RB', 'FB', 'WR', 'TE', 'OT', 'OG', 'OC', 'OL'];
+  const defensePositions = ['DT', 'DE', 'EDGE', 'LB', 'ILB', 'OLB', 'CB', 'S', 'FS', 'SS'];
+  const specialTeamsPositions = ['K', 'P', 'LS'];
+
   // Extract unique positions for filter with custom order
   const availablePositions = useMemo(() => {
-    const positionOrder = ['QB', 'RB', 'FB', 'WR', 'TE', 'OT', 'OG', 'OC', 'OL', 'DT', 'EDGE', 'LB', 'CB', 'S', 'K', 'P', 'LS'];
+    const positionOrder = [...offensePositions, ...defensePositions, ...specialTeamsPositions];
     const positions = new Set(allFreeAgents.map(a => a.position).filter(Boolean));
     return Array.from(positions).sort((a, b) => {
       const indexA = positionOrder.indexOf(a);
       const indexB = positionOrder.indexOf(b);
-      // If position not in order list, put it at the end
       if (indexA === -1 && indexB === -1) return a.localeCompare(b);
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
       return indexA - indexB;
     });
   }, [allFreeAgents]);
+
+  // Group available positions by side of ball
+  const groupedPositions = useMemo(() => {
+    const offense = availablePositions.filter(p => offensePositions.includes(p));
+    const defense = availablePositions.filter(p => defensePositions.includes(p));
+    const special = availablePositions.filter(p => specialTeamsPositions.includes(p));
+    const other = availablePositions.filter(p => !offensePositions.includes(p) && !defensePositions.includes(p) && !specialTeamsPositions.includes(p));
+    return { offense, defense, special, other };
+  }, [availablePositions]);
 
   // Extract unique FA types for filter
   const availableFaTypes = useMemo(() => {
@@ -248,18 +262,18 @@ export default function FreeAgencyTrackerClient() {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (selectedTeam !== 'all') count++;
-    if (selectedPosition !== 'all') count++;
+    if (selectedPositions.size > 0) count++;
     if (selectedFaType !== 'all') count++;
     if (selectedSignedStatus !== 'all') count++;
     if (searchQuery.trim() !== '') count++;
     return count;
-  }, [selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
+  }, [selectedTeam, selectedPositions, selectedFaType, selectedSignedStatus, searchQuery]);
 
   // Filtering Logic
   const filteredFreeAgents = useMemo(() => {
     return allFreeAgents.filter(agent => {
       const matchesTeam = selectedTeam === 'all' || agent.teamId === selectedTeam;
-      const matchesPosition = selectedPosition === 'all' || agent.position === selectedPosition;
+      const matchesPosition = selectedPositions.size === 0 || selectedPositions.has(agent.position);
       const matchesFaType = selectedFaType === 'all' || agent.faType === selectedFaType;
       const matchesSearch = debouncedSearch.trim() === '' || agent.name.toLowerCase().includes(debouncedSearch.toLowerCase());
 
@@ -274,7 +288,7 @@ export default function FreeAgencyTrackerClient() {
 
       return matchesTeam && matchesPosition && matchesFaType && matchesSignedStatus && matchesSearch;
     });
-  }, [allFreeAgents, selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, debouncedSearch]);
+  }, [allFreeAgents, selectedTeam, selectedPositions, selectedFaType, selectedSignedStatus, debouncedSearch]);
 
   // Sorting Logic
   const sortedFreeAgents = useMemo(() => {
@@ -313,13 +327,13 @@ export default function FreeAgencyTrackerClient() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTeam, selectedPosition, selectedFaType, selectedSignedStatus, searchQuery]);
+  }, [selectedTeam, selectedPositions, selectedFaType, selectedSignedStatus, searchQuery]);
 
   // Market summary stats — scoped to the currently selected position (or all)
   const marketSummary = useMemo(() => {
-    const positionGroup = selectedPosition === 'all'
+    const positionGroup = selectedPositions.size === 0
       ? allFreeAgents
-      : allFreeAgents.filter(a => a.position === selectedPosition);
+      : allFreeAgents.filter(a => selectedPositions.has(a.position));
 
     const total = positionGroup.length;
     const signed = positionGroup.filter(a => a.signed2026Team && a.signed2026Team.trim() !== '' && a.faType !== 'Franchise' && a.faType !== 'Transition');
@@ -337,8 +351,8 @@ export default function FreeAgencyTrackerClient() {
       .sort((a, b) => a.rank - b.rank);
     const topUnsigned = unsigned[0] || null;
 
-    return { total, signedCount, totalCommitted, topUnsigned, position: selectedPosition };
-  }, [allFreeAgents, selectedPosition]);
+    return { total, signedCount, totalCommitted, topUnsigned, positions: selectedPositions };
+  }, [allFreeAgents, selectedPositions]);
 
   // Sort Handler
   const handleSort = (key: SortKey) => {
@@ -489,7 +503,7 @@ export default function FreeAgencyTrackerClient() {
                     <button
                       onClick={() => {
                         setSelectedTeam('all');
-                        setSelectedPosition('all');
+                        setSelectedPositions(new Set());
                         setSelectedFaType('all');
                         setSelectedSignedStatus('all');
                         setSearchQuery('');
@@ -517,20 +531,150 @@ export default function FreeAgencyTrackerClient() {
                     </select>
                   </div>
 
-                  {/* Position Filter */}
-                  <div>
-                    <label htmlFor="fa-position-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Position</label>
-                    <select
-                      id="fa-position-filter"
-                      value={selectedPosition}
-                      onChange={e => setSelectedPosition(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer"
+                  {/* Position Filter — Multi-select */}
+                  <div className="relative">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Position</label>
+                    <button
+                      type="button"
+                      onClick={() => setPositionDropdownOpen(!positionDropdownOpen)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0050A0] bg-white text-sm cursor-pointer text-left flex items-center justify-between"
                     >
-                      <option value="all">All Positions</option>
-                      {availablePositions.map(position => (
-                        <option key={position} value={position}>{position} ({positionCounts[position] || 0})</option>
-                      ))}
-                    </select>
+                      <span className="truncate">
+                        {selectedPositions.size === 0
+                          ? 'All Positions'
+                          : selectedPositions.size <= 3
+                            ? [...selectedPositions].join(', ')
+                            : `${selectedPositions.size} positions`}
+                      </span>
+                      <svg className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${positionDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {positionDropdownOpen && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setPositionDropdownOpen(false)} />
+                        <div className="absolute z-20 mt-1 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-3 max-h-80 overflow-y-auto">
+                          {/* Quick select buttons */}
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPositions(new Set())}
+                              className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+                                selectedPositions.size === 0
+                                  ? 'bg-[#0050A0] text-white'
+                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              }`}
+                            >
+                              All
+                            </button>
+                            {[
+                              { label: 'Offense', positions: groupedPositions.offense },
+                              { label: 'Defense', positions: groupedPositions.defense },
+                              { label: 'Special Teams', positions: groupedPositions.special },
+                            ].map(group => {
+                              const groupSet = new Set(group.positions);
+                              const allSelected = group.positions.length > 0 && group.positions.every(p => selectedPositions.has(p));
+                              return (
+                                <button
+                                  key={group.label}
+                                  type="button"
+                                  onClick={() => {
+                                    if (allSelected) {
+                                      setSelectedPositions(prev => {
+                                        const next = new Set(prev);
+                                        group.positions.forEach(p => next.delete(p));
+                                        return next;
+                                      });
+                                    } else {
+                                      setSelectedPositions(prev => {
+                                        const next = new Set(prev);
+                                        group.positions.forEach(p => next.add(p));
+                                        return next;
+                                      });
+                                    }
+                                  }}
+                                  className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+                                    allSelected
+                                      ? 'bg-[#0050A0] text-white'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  }`}
+                                >
+                                  {group.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Position checkboxes by group */}
+                          {[
+                            { label: 'Offense', positions: groupedPositions.offense },
+                            { label: 'Defense', positions: groupedPositions.defense },
+                            { label: 'Special Teams', positions: groupedPositions.special },
+                          ].map(group => group.positions.length > 0 && (
+                            <div key={group.label} className="mb-2.5">
+                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{group.label}</div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {group.positions.map(pos => {
+                                  const isSelected = selectedPositions.has(pos);
+                                  return (
+                                    <button
+                                      key={pos}
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedPositions(prev => {
+                                          const next = new Set(prev);
+                                          if (next.has(pos)) next.delete(pos);
+                                          else next.add(pos);
+                                          return next;
+                                        });
+                                      }}
+                                      className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
+                                        isSelected
+                                          ? 'bg-[#0050A0] text-white'
+                                          : 'bg-gray-50 text-gray-700 border border-gray-200 hover:border-[#0050A0] hover:text-[#0050A0]'
+                                      }`}
+                                    >
+                                      {pos} <span className="opacity-60">({positionCounts[pos] || 0})</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                          {groupedPositions.other.length > 0 && (
+                            <div className="mb-2.5">
+                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Other</div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {groupedPositions.other.map(pos => {
+                                  const isSelected = selectedPositions.has(pos);
+                                  return (
+                                    <button
+                                      key={pos}
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedPositions(prev => {
+                                          const next = new Set(prev);
+                                          if (next.has(pos)) next.delete(pos);
+                                          else next.add(pos);
+                                          return next;
+                                        });
+                                      }}
+                                      className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
+                                        isSelected
+                                          ? 'bg-[#0050A0] text-white'
+                                          : 'bg-gray-50 text-gray-700 border border-gray-200 hover:border-[#0050A0] hover:text-[#0050A0]'
+                                      }`}
+                                    >
+                                      {pos} <span className="opacity-60">({positionCounts[pos] || 0})</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* FA Type Filter */}
@@ -595,7 +739,7 @@ export default function FreeAgencyTrackerClient() {
                 <div className="rounded-lg shadow-sm mb-6 overflow-hidden">
                   <div className="px-4 py-2" style={{ backgroundColor: '#0050A0' }}>
                     <h4 className="text-sm font-bold text-white tracking-wide">
-                      {marketSummary.position === 'all' ? '2026 Free Agency Overview' : `${marketSummary.position} Market Overview`}
+                      {marketSummary.positions.size === 0 ? '2026 Free Agency Overview' : marketSummary.positions.size === 1 ? `${[...marketSummary.positions][0]} Market Overview` : `${marketSummary.positions.size}-Position Market Overview`}
                     </h4>
                   </div>
                   <div className="bg-white grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
@@ -872,7 +1016,7 @@ export default function FreeAgencyTrackerClient() {
             {/* Market Sidebar */}
             <div className="w-full lg:w-72 flex-shrink-0" style={mainTableHeight ? { height: mainTableHeight } : undefined}>
               <MarketSidebar
-                selectedPosition={selectedPosition}
+                selectedPositions={selectedPositions}
                 freeAgents={allFreeAgents}
                 contractSheets={contractSheets}
                 loading={contractsLoading}
