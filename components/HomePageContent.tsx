@@ -378,7 +378,7 @@ export default function HomePageContent() {
                               )}
                             </td>
                             <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-sm text-center">
-                              {agent.faType === 'Franchise' ? (
+                              {agent.faType === 'Franchise' || agent.faType === 'Transition' ? (
                                 <span className="text-xs font-semibold text-purple-600">Tagged</span>
                               ) : agent.signed2026Team && agent.signed2026Team.trim() !== '' ? (
                                 <span className="text-xs font-semibold text-green-600">Signed</span>

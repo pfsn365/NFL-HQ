@@ -33,7 +33,7 @@ export interface RawFreeAgentData {
   'Proj. Years': string;
 }
 
-export type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank';
+export type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank' | 'newAAV';
 
 export function generatePlayerSlug(name: string): string {
   return name

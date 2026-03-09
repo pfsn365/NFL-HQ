@@ -20,11 +20,14 @@ import {
   transformFreeAgentData,
 } from '@/utils/freeAgentHelpers';
 import { type ContractSheet, hasContractComps, formatCompactMoney, parseMoney } from '@/utils/contractCompHelpers';
-import { teamNeeds } from '@/data/team-needs';
+import { teamNeeds as staticTeamNeeds, type TeamNeeds } from '@/data/team-needs';
 import { getNeedCategoryFromAbbr } from '@/utils/positionMapping';
 
 export default function FreeAgencyTrackerClient() {
   const allTeams = getAllTeams();
+
+  // Team needs (API with static fallback)
+  const [teamNeeds, setTeamNeeds] = useState<TeamNeeds>(staticTeamNeeds);
 
   // State Management
   const [allFreeAgents, setAllFreeAgents] = useState<FreeAgent[]>([]);
@@ -163,6 +166,12 @@ export default function FreeAgencyTrackerClient() {
     }
 
     fetchFreeAgents();
+
+    // Fetch live team needs (non-blocking)
+    fetch(getApiPath('api/team-needs'))
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.teamNeeds) setTeamNeeds(data.teamNeeds); })
+      .catch(() => {}); // keep static fallback
   }, [hasLoaded]);
 
   // Silent background polling every 2 minutes for live updates
@@ -270,6 +279,13 @@ export default function FreeAgencyTrackerClient() {
         return sortDirection === 'asc'
           ? aValue.toString().localeCompare(bValue.toString())
           : bValue.toString().localeCompare(aValue.toString());
+      }
+
+      // Parse money strings for newAAV
+      if (sortKey === 'newAAV') {
+        const aNum = parseMoney(a.newAAV);
+        const bNum = parseMoney(b.newAAV);
+        return sortDirection === 'desc' ? bNum - aNum : aNum - bNum;
       }
 
       // Numeric comparison
@@ -382,7 +398,7 @@ export default function FreeAgencyTrackerClient() {
     }
 
     return results.sort((a, b) => b.needLevel - a.needLevel).slice(0, 5);
-  }, [allTeams]);
+  }, [allTeams, teamNeeds]);
 
   const handlePositionClick = useCallback((e: React.MouseEvent, position: string) => {
     e.stopPropagation();
@@ -675,8 +691,12 @@ export default function FreeAgencyTrackerClient() {
                           <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
                             2026 Team
                           </th>
-                          <th scope="col" className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white">
-                            New AAV
+                          <th
+                            scope="col"
+                            className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"
+                            onClick={() => handleSort('newAAV')}
+                          >
+                            New AAV <SortIndicator column="newAAV" />
                           </th>
                           <th
                             className="py-2 px-2 sm:px-3 text-center text-xs font-semibold text-white cursor-pointer hover:bg-[#003A75] select-none"

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PlayerImage from '@/components/PlayerImage';
 import { getAllTeams, TeamData } from '@/data/teams';
-import { teamNeeds, PositionNeed } from '@/data/team-needs';
+import { teamNeeds as staticTeamNeeds, PositionNeed, TeamNeeds } from '@/data/team-needs';
 import { getApiPath } from '@/utils/api';
 import {
   type FreeAgent,
@@ -74,6 +74,9 @@ type SortMode = 'needs' | 'alpha' | 'division' | 'cap';
 export default function TeamNeedsClient() {
   const allTeams = useMemo(() => getAllTeams(), []);
 
+  // Team needs data (API with static fallback)
+  const [teamNeeds, setTeamNeeds] = useState<TeamNeeds>(staticTeamNeeds);
+
   // Live data
   const [freeAgents, setFreeAgents] = useState<FreeAgent[]>([]);
   const [salaryCapMap, setSalaryCapMap] = useState<Record<string, number>>({});
@@ -99,11 +102,12 @@ export default function TeamNeedsClient() {
   useEffect(() => {
     async function fetchLiveData() {
       try {
-        const [faRes, capRes, standingsRes, draftRes] = await Promise.all([
+        const [faRes, capRes, standingsRes, draftRes, needsRes] = await Promise.all([
           fetch(getApiPath('api/free-agents')),
           fetch(getApiPath('api/nfl/salary-cap/all')),
           fetch(getApiPath('nfl/teams/api/standings')),
           fetch(getApiPath('nfl/teams/api/future-draft-picks/all')),
+          fetch(getApiPath('api/team-needs')),
         ]);
 
         if (faRes.ok) {
@@ -151,6 +155,13 @@ export default function TeamNeedsClient() {
               map[teamId] = info.totalPicks;
             }
             setDraftPicksMap(map);
+          }
+        }
+
+        if (needsRes.ok) {
+          const needsData = await needsRes.json();
+          if (needsData.teamNeeds) {
+            setTeamNeeds(needsData.teamNeeds);
           }
         }
       } catch (e) {
@@ -228,7 +239,7 @@ export default function TeamNeedsClient() {
         draftPicks: draftPicksMap[team.id] ?? null,
       };
     });
-  }, [allTeams, salaryCapMap, recordMap, draftPicksMap]);
+  }, [allTeams, salaryCapMap, recordMap, draftPicksMap, teamNeeds]);
 
   // Filtered + sorted
   const filteredTeams = useMemo(() => {
@@ -438,7 +449,7 @@ export default function TeamNeedsClient() {
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {Array.from(addressed.entries()).map(([posName, players]) => {
                         const fa = players[0];
-                        const isTagged = fa.faType === 'Franchise';
+                        const isTagged = fa.faType === 'Franchise' || fa.faType === 'Transition';
                         const isResigned = !isTagged && fa.signed2026Team && fa.current2025Team &&
                           mapTeamNameToId(fa.signed2026Team) === mapTeamNameToId(fa.current2025Team);
                         const badgeLabel = isTagged ? 'Tagged' : isResigned ? 'Re-signed' : 'Signed';

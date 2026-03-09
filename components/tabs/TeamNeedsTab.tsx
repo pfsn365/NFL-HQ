@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { TeamData } from '@/data/teams';
-import { teamNeeds, PositionNeed } from '@/data/team-needs';
+import { teamNeeds as staticTeamNeeds, PositionNeed } from '@/data/team-needs';
+import { getApiPath } from '@/utils/api';
 
 interface TeamNeedsTabProps {
   team: TeamData;
@@ -102,12 +103,28 @@ export default function TeamNeedsTab({ team }: TeamNeedsTabProps) {
   const [needs, setNeeds] = useState<PositionNeed[]>([]);
 
   useEffect(() => {
-    // Simulate loading state for consistency with other tabs
-    const teamData = teamNeeds[team.id];
-    if (teamData) {
-      setNeeds(teamData);
+    async function fetchNeeds() {
+      try {
+        const res = await fetch(getApiPath('api/team-needs'));
+        if (res.ok) {
+          const data = await res.json();
+          if (data.teamNeeds?.[team.id]) {
+            setNeeds(data.teamNeeds[team.id]);
+            setIsLoading(false);
+            return;
+          }
+        }
+      } catch {
+        // fall through to static fallback
+      }
+      // Fallback to static data
+      const teamData = staticTeamNeeds[team.id];
+      if (teamData) {
+        setNeeds(teamData);
+      }
+      setIsLoading(false);
     }
-    setIsLoading(false);
+    fetchNeeds();
   }, [team.id]);
 
   const togglePosition = (position: string) => {
