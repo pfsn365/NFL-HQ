@@ -35,13 +35,21 @@ export interface RawFreeAgentData {
 
 export type SortKey = 'pfsn2025Impact' | 'positionRank' | 'age' | 'name' | 'rank' | 'newAAV';
 
+// Map of free agency names → correct roster slugs for known mismatches
+// (nickname vs legal name, abbreviated vs full name, etc.)
+const PLAYER_SLUG_ALIASES: Record<string, string> = {
+  'hollywood-brown': 'marquise-brown',
+  'mitchell-trubisky': 'mitch-trubisky',
+};
+
 export function generatePlayerSlug(name: string): string {
-  return name
+  const slug = name
     .toLowerCase()
     .replace(/[.\s]+/g, '-')
     .replace(/[^\w-]/g, '')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
+  return PLAYER_SLUG_ALIASES[slug] || slug;
 }
 
 /** Generate a slug with common name suffixes stripped (Sr, Jr, II, III, etc.) */
