@@ -272,7 +272,7 @@ export default function HomePageContent() {
         </div>
 
         {/* Sticky Pill Navigation — mobile only */}
-        <div className="sticky top-[48px] z-10 bg-white border-b border-gray-200 shadow-sm lg:hidden">
+        <div className="sticky top-[128px] z-[8] bg-white border-b border-gray-200 shadow-sm lg:hidden">
           <div className="container mx-auto px-4 relative">
             {/* Left fade indicator */}
             {canScrollLeft && (
@@ -337,7 +337,6 @@ export default function HomePageContent() {
                         <th className="py-3 px-1.5 sm:px-4 text-center text-sm font-semibold text-gray-600">Pos</th>
                         <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">2025 Team</th>
                         <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600 hidden sm:table-cell">Age</th>
-                        <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">Impact Grade</th>
                         <th className="py-2 px-2 sm:px-3 text-center text-sm font-semibold text-gray-600">Status</th>
                       </tr>
                     </thead>
@@ -363,9 +362,8 @@ export default function HomePageContent() {
                             </td>
                             <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base text-center">
                               {teamInfo ? (
-                                <div className="flex items-center justify-center gap-2">
+                                <div className="flex items-center justify-center">
                                   <img src={teamInfo.logoUrl} alt={teamInfo.abbreviation} className="w-6 h-6" />
-                                  <span className="text-gray-700">{teamInfo.abbreviation}</span>
                                 </div>
                               ) : (
                                 <span className="text-gray-500">{agent.current2025Team || '—'}</span>
@@ -373,13 +371,6 @@ export default function HomePageContent() {
                             </td>
                             <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base text-gray-700 text-center hidden sm:table-cell">
                               {agent.age}
-                            </td>
-                            <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base font-semibold text-center">
-                              {agent.pfsn2025Impact > 0 ? (
-                                <span className="text-blue-600">{agent.pfsn2025Impact.toFixed(1)}</span>
-                              ) : (
-                                <span className="text-gray-400">—</span>
-                              )}
                             </td>
                             <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-sm text-center">
                               {agent.faType === 'Franchise' || agent.faType === 'Transition' ? (

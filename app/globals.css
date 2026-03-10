@@ -54,6 +54,7 @@ td, th { font-variant-numeric: tabular-nums; }
 .table-scroll-container {
   overflow: auto;
   position: relative;
+  isolation: isolate;
 }
 
 .table-scroll-container thead {
@@ -72,6 +73,7 @@ td, th { font-variant-numeric: tabular-nums; }
 
 .table-sticky-col thead th:first-child {
   z-index: 15;
+  background: inherit;
 }
 
 .table-sticky-col td:first-child::after {

@@ -326,14 +326,14 @@ const NFLTeamsSidebar: React.FC<NFLTeamsSidebarProps> = ({ isMobile = false }) =
           </button>
 
           {/* Center — PFSN Logo */}
-          <a href="https://www.profootballnetwork.com" target="_blank" rel="noopener noreferrer" className="absolute left-1/2 transform -translate-x-1/2">
+          <a href="https://www.profootballnetwork.com" target="_blank" rel="noopener noreferrer" className="absolute left-1/2 transform -translate-x-1/2 h-8 flex items-center">
             <img
               src="https://statico.profootballnetwork.com/wp-content/uploads/2025/06/12093424/tools-navigation-06-12-25.jpg"
               alt="PFSN Logo"
               loading="lazy"
               width="96"
               height="24"
-              className="h-6 w-auto transition-all duration-300 hover:opacity-80"
+              className="max-h-6 w-auto object-contain transition-all duration-300 hover:opacity-80"
             />
           </a>
 

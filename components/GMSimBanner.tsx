@@ -20,8 +20,8 @@ export default function GMSimBanner() {
           {/* Message */}
           <span className="flex-1 min-w-0 flex items-center sm:justify-center justify-start">
             <span className="text-sm sm:text-base font-medium text-gray-900 truncate">
-              <span className="sm:hidden font-bold mr-1">GM SIM:</span>
-              Manage your favorite team's contracts, sign free agents, and run the draft for FREE
+              <span className="hidden sm:inline">Manage your favorite team's contracts, sign free agents, and run the draft for FREE</span>
+              <span className="sm:hidden">Run Your Favorite Team's Offseason</span>
             </span>
           </span>
 
