@@ -5,12 +5,6 @@ import { useState, useEffect } from 'react';
 import { teams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 
-interface ScheduleGame {
-  week: number | string;
-  eventType: string;
-  result?: 'W' | 'L' | 'T' | null;
-}
-
 interface TeamRecord {
   teamId: string;
   record: string;
@@ -22,99 +16,37 @@ export default function TeamsListPageContent() {
   const [teamRecords, setTeamRecords] = useState<Map<string, TeamRecord>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Calculate record from schedule
-  const calculateRecord = (schedule: ScheduleGame[]) => {
-    const regularSeasonGames = schedule.filter(
-      (game: ScheduleGame) => game.eventType === 'Regular Season' && game.result
-    );
-    const wins = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'W').length;
-    const losses = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'L').length;
-    const ties = regularSeasonGames.filter((game: ScheduleGame) => game.result === 'T').length;
-    return `${wins}-${losses}${ties > 0 ? `-${ties}` : ''}`;
-  };
 
   useEffect(() => {
-    const fetchAllRecords = async () => {
+    const fetchStandings = async () => {
       try {
-        // Fetch team schedules in batches to avoid overwhelming the server
-        const batchSize = 5;
-        const records: Array<{ teamId: string; record: string }> = [];
-
-        for (let i = 0; i < teamsList.length; i += batchSize) {
-          const batch = teamsList.slice(i, i + batchSize);
-          const batchPromises = batch.map(async (team) => {
-            try {
-              const response = await fetch(getApiPath(`nfl/teams/api/schedule/${team.id}`), {
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              });
-
-              if (!response || !response.ok) {
-                console.error(`Failed response for ${team.id}:`, response?.status);
-                return { teamId: team.id, record: '0-0' };
-              }
-
-              const data = await response.json();
-              const record = calculateRecord(data.schedule || []);
-              return { teamId: team.id, record };
-            } catch (error) {
-              console.error(`Failed to fetch schedule for ${team.id}:`, error);
-              return { teamId: team.id, record: '0-0' };
-            }
-          });
-
-          const batchResults = await Promise.all(batchPromises);
-          records.push(...batchResults);
-
-          // Small delay between batches
-          if (i + batchSize < teamsList.length) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
+        const response = await fetch(getApiPath('nfl/teams/api/standings'));
+        if (!response.ok) {
+          console.error('Failed to fetch standings:', response.status);
+          return;
         }
 
-        // Calculate division ranks
-        const divisions: { [key: string]: Array<{ teamId: string; record: string; wins: number }> } = {};
+        const data = await response.json();
+        const standings = data.standings || [];
 
-        records.forEach((rec) => {
-          const team = teamsList.find(t => t.id === rec.teamId);
-          if (team) {
-            if (!divisions[team.division]) {
-              divisions[team.division] = [];
-            }
-            const [wins] = rec.record.split('-').map(Number);
-            divisions[team.division].push({ teamId: rec.teamId, record: rec.record, wins: wins || 0 });
-          }
-        });
-
-        // Sort each division and assign ranks
-        Object.keys(divisions).forEach(division => {
-          divisions[division].sort((a, b) => b.wins - a.wins);
-        });
-
-        // Create final records map with ranks
         const recordsMap = new Map<string, TeamRecord>();
-        Object.keys(divisions).forEach(division => {
-          divisions[division].forEach((team, index) => {
-            const rank = index + 1;
-            const rankSuffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th';
-            recordsMap.set(team.teamId, {
-              teamId: team.teamId,
-              record: team.record,
-              divisionRank: `${rank}${rankSuffix}`
-            });
+        standings.forEach((team: { teamId: string; recordString: string; divisionRank: string }) => {
+          recordsMap.set(team.teamId, {
+            teamId: team.teamId,
+            record: team.recordString,
+            divisionRank: team.divisionRank
           });
         });
 
         setTeamRecords(recordsMap);
       } catch (error) {
-        console.error('Failed to fetch records:', error);
+        console.error('Failed to fetch standings:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAllRecords();
+    fetchStandings();
   }, []);
 
   // Group teams by division

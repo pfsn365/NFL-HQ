@@ -622,7 +622,7 @@ export const teams: Record<string, TeamData> = {
     logoUrl: 'https://www.profootballnetwork.com/apps/nfl-logos/los-angeles-chargers.png',
     record: '0-0-0',
     divisionRank: '0th',
-    generalManager: 'Tom Telesco',
+    generalManager: 'Joe Hortiz',
     headCoach: 'Jim Harbaugh',
     offensiveCoordinator: 'Greg Roman',
     defensiveCoordinator: 'Jesse Minter',
@@ -638,7 +638,7 @@ export const teams: Record<string, TeamData> = {
     searchTerms: [
       'chargers', 'los angeles chargers', 'justin herbert', 'keenan allen',
       'mike williams', 'khalil mack', 'derwin james', 'joey bosa',
-      'jim harbaugh', 'tom telesco', 'sofi stadium',
+      'jim harbaugh', 'joe hortiz', 'sofi stadium',
       'los angeles', 'bolt up', 'powder blue'
     ]
   },
@@ -724,7 +724,7 @@ export const teams: Record<string, TeamData> = {
     logoUrl: 'https://www.profootballnetwork.com/apps/nfl-logos/minnesota-vikings.png',
     record: '0-0-0',
     divisionRank: '0th',
-    generalManager: 'Kwesi Adofo-Mensah',
+    generalManager: 'Rob Brzezinski',
     headCoach: 'Kevin O\'Connell',
     offensiveCoordinator: 'Wes Phillips',
     defensiveCoordinator: 'Brian Flores',
@@ -740,7 +740,7 @@ export const teams: Record<string, TeamData> = {
     searchTerms: [
       'vikings', 'minnesota vikings', 'kirk cousins', 'justin jefferson',
       'dalvin cook', 'harrison smith', 'danielle hunter', 'adam thielen',
-      'kevin oconnell', 'kwesi adofo-mensah', 'us bank stadium',
+      'kevin oconnell', 'rob brzezinski', 'us bank stadium',
       'minneapolis', 'skol vikings', 'purple people eaters'
     ]
   },

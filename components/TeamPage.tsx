@@ -260,88 +260,62 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
     }
   }, [activeTab]);
 
-  // Fetch team's schedule and calculate live standings
+  // Fetch team's schedule and standings from the standings API
   useEffect(() => {
-    const fetchScheduleAndCalculateStandings = async () => {
+    const fetchScheduleAndStandings = async () => {
       try {
-        // Get current team's schedule
-        const response = await fetch(getApiPath(`nfl/teams/api/schedule/${team.id}`));
-        if (response.ok) {
-          const data = await response.json();
-          const schedule: ScheduleGame[] = data.schedule || [];
+        // Fetch schedule and standings in parallel
+        const [scheduleResponse, standingsResponse] = await Promise.all([
+          fetch(getApiPath(`nfl/teams/api/schedule/${team.id}`)),
+          fetch(getApiPath(`nfl/teams/api/standings`))
+        ]);
 
-          // Store the full schedule for passing to OverviewTab
+        if (scheduleResponse.ok) {
+          const data = await scheduleResponse.json();
+          const schedule: ScheduleGame[] = data.schedule || [];
           setTeamSchedule(schedule);
 
-          // Calculate current team's record
           const teamRecord = calculateTeamRecord(schedule);
           setLiveRecord(teamRecord);
+        }
 
-          // Get division teams and calculate their records
-          const divisionTeams = getDivisionTeams(team);
-          const standingsPromises = divisionTeams.map(async (divisionTeam) => {
-            try {
-              const divisionResponse = await fetch(getApiPath(`nfl/teams/api/schedule/${divisionTeam.id}`));
-              if (divisionResponse.ok) {
-                const divisionData = await divisionResponse.json();
-                const divisionSchedule: ScheduleGame[] = divisionData.schedule || [];
-                const record = calculateTeamRecord(divisionSchedule);
-                return {
-                  ...divisionTeam,
-                  wins: record.wins,
-                  losses: record.losses,
-                  ties: record.ties,
-                  winPercentage: record.winPercentage
-                };
-              }
-              return {
-                ...divisionTeam,
-                wins: 0,
-                losses: 0,
-                ties: 0,
-                winPercentage: 0
-              };
-            } catch {
-              return {
-                ...divisionTeam,
-                wins: 0,
-                losses: 0,
-                ties: 0,
-                winPercentage: 0
-              };
-            }
-          });
+        if (standingsResponse.ok) {
+          const standingsData = await standingsResponse.json();
+          const allStandings = standingsData.standings || [];
 
-          const divisionStandingsData = await Promise.all(standingsPromises);
-
-          // Sort by win percentage (highest first), then by wins as tiebreaker
-          divisionStandingsData.sort((a, b) => {
-            if (b.winPercentage !== a.winPercentage) {
-              return b.winPercentage - a.winPercentage;
-            }
-            return b.wins - a.wins;
-          });
-
-          setDivisionStandings(divisionStandingsData);
-
-          // Find current team's rank
-          const teamIndex = divisionStandingsData.findIndex(t => t.id === team.id);
-          if (teamIndex !== -1) {
-            const rank = teamIndex + 1;
-            const rankSuffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th';
-
+          // Find current team's standing
+          const teamStanding = allStandings.find((s: { teamId: string }) => s.teamId === team.id);
+          if (teamStanding) {
             setStandings({
-              recordString: formatRecord(teamRecord),
-              divisionRank: `${rank}${rankSuffix}`
+              recordString: teamStanding.recordString,
+              divisionRank: teamStanding.divisionRank
             });
           }
+
+          // Build division standings from the API data
+          const divisionTeams = getDivisionTeams(team);
+          const divisionStandingsFromApi = allStandings
+            .filter((s: { division: string }) => s.division === team.division)
+            .map((s: { teamId: string; record: { wins: number; losses: number; ties: number }; winPercentage: number }) => {
+              const divTeam = divisionTeams.find(t => t.id === s.teamId);
+              return {
+                ...(divTeam || {}),
+                id: s.teamId,
+                wins: s.record.wins,
+                losses: s.record.losses,
+                ties: s.record.ties,
+                winPercentage: s.winPercentage
+              };
+            });
+
+          setDivisionStandings(divisionStandingsFromApi);
         }
       } catch (error) {
-        console.error('Failed to fetch schedule and calculate standings:', error);
+        console.error('Failed to fetch schedule and standings:', error);
       }
     };
 
-    fetchScheduleAndCalculateStandings();
+    fetchScheduleAndStandings();
   }, [team.id, team]);
 
 
