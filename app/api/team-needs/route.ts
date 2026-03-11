@@ -74,6 +74,10 @@ export async function GET() {
     for (const team of allTeams) {
       abbrToTeamId[team.abbreviation] = team.id;
     }
+    // The PFN API uses "WAS" for Washington while the app uses "WSH"
+    if (abbrToTeamId['WSH']) {
+      abbrToTeamId['WAS'] = abbrToTeamId['WSH'];
+    }
 
     // Build writeup lookup: shortName → { position → writeup }
     const writeupMap: Record<string, Record<string, string>> = {};
