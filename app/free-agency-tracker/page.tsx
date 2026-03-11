@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import FreeAgencyTrackerClient from './FreeAgencyTrackerClient';
 
@@ -25,5 +26,9 @@ export const metadata: Metadata = {
 };
 
 export default function FreeAgencyTrackerPage() {
-  return <FreeAgencyTrackerClient />;
+  return (
+    <Suspense>
+      <FreeAgencyTrackerClient />
+    </Suspense>
+  );
 }

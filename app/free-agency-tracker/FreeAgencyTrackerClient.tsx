@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import PlayerImage from '@/components/PlayerImage';
 import SkeletonLoader from '@/components/SkeletonLoader';
@@ -25,6 +26,7 @@ import { getNeedCategoryFromAbbr } from '@/utils/positionMapping';
 
 export default function FreeAgencyTrackerClient() {
   const allTeams = getAllTeams();
+  const searchParams = useSearchParams();
 
   // Team needs (API with static fallback)
   const [teamNeeds, setTeamNeeds] = useState<TeamNeeds>(staticTeamNeeds);
@@ -83,7 +85,7 @@ export default function FreeAgencyTrackerClient() {
   }, [contractsFetched, fetchContractSheets]);
 
   // Filter States
-  const [selectedTeam, setSelectedTeam] = useState('all');
+  const [selectedTeam, setSelectedTeam] = useState(searchParams.get('team') || 'all');
   const [selectedPositions, setSelectedPositions] = useState<Set<string>>(new Set());
   const [positionDropdownOpen, setPositionDropdownOpen] = useState(false);
   const [selectedFaType, setSelectedFaType] = useState('all');

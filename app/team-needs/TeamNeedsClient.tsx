@@ -208,17 +208,12 @@ export default function TeamNeedsClient() {
     return map;
   }, [freeAgents]);
 
-  // Addressed positions by team
-  const addressedPositionsByTeam = useMemo(() => {
-    const map = new Map<string, Map<string, FreeAgent[]>>();
+  // Top 3 signings per team (by rank, lower = better)
+  const topSigningsByTeam = useMemo(() => {
+    const map = new Map<string, FreeAgent[]>();
     for (const [teamId, signings] of signedFAsByTeam) {
-      const posMap = new Map<string, FreeAgent[]>();
-      for (const fa of signings) {
-        const category = getNeedCategoryFromAbbr(fa.position);
-        if (!posMap.has(category)) posMap.set(category, []);
-        posMap.get(category)!.push(fa);
-      }
-      map.set(teamId, posMap);
+      const sorted = [...signings].sort((a, b) => a.rank - b.rank);
+      map.set(teamId, sorted.slice(0, 3));
     }
     return map;
   }, [signedFAsByTeam]);
@@ -392,7 +387,7 @@ export default function TeamNeedsClient() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredTeams.map(({ team, needs, criticalCount, highCount, avgNeed, capSpace, record, draftPicks }) => {
             const isExpanded = expandedCards.has(team.id);
-            const addressed = addressedPositionsByTeam.get(team.id);
+            const topSignings = topSigningsByTeam.get(team.id);
 
             return (
               <div
@@ -448,32 +443,34 @@ export default function TeamNeedsClient() {
                     </span>
                   </div>
 
-                  {/* Needs Addressed badges */}
-                  {addressed && addressed.size > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {Array.from(addressed.entries()).map(([posName, players]) => {
-                        const fa = players[0];
-                        const isTagged = fa.faType === 'Franchise' || fa.faType === 'Transition';
-                        const isResigned = !isTagged && fa.signed2026Team && fa.current2025Team &&
-                          mapTeamNameToId(fa.signed2026Team) === mapTeamNameToId(fa.current2025Team);
-                        const badgeLabel = isTagged ? 'Tagged' : isResigned ? 'Re-signed' : 'Signed';
-                        return (
-                          <span
-                            key={posName}
-                            className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border ${
-                              isTagged
-                                ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                : 'bg-green-50 text-green-700 border-green-200'
-                            }`}
+                  {/* Top Signings */}
+                  {topSignings && topSignings.length > 0 && (
+                    <div className="mt-3" onClick={e => e.stopPropagation()}>
+                      <h4 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Top Signings</h4>
+                      <div className="space-y-1">
+                        {topSignings.map(fa => (
+                          <Link
+                            key={fa.name}
+                            href={`/free-agency-tracker?team=${team.id}`}
+                            className="flex items-center justify-between gap-2 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
                           >
-                            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            {badgeLabel} {fa.name} ({getAbbrFromFullName(posName)})
-                            {players.length > 1 && ` +${players.length - 1}`}
-                          </span>
-                        );
-                      })}
+                            <div className="flex items-center gap-2 min-w-0">
+                              <PlayerImage
+                                slug={generatePlayerSlug(fa.name)}
+                                name={fa.name}
+                                size="sm"
+                                teamColor={team.primaryColor}
+                                className="!w-5 !h-5 flex-shrink-0"
+                              />
+                              <span className="text-xs font-medium text-gray-900 group-hover:text-[#0050A0] transition-colors truncate">{fa.name}</span>
+                              <span className="text-[10px] text-gray-500 flex-shrink-0">{fa.position}</span>
+                            </div>
+                            <span className="text-[10px] font-semibold text-gray-700 flex-shrink-0">
+                              {fa.newAAV && fa.newAAV !== '-' ? fa.newAAV : 'TBD'}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
