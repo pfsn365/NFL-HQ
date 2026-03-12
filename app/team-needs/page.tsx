@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import TeamNeedsClient from './TeamNeedsClient';
 
 export const metadata: Metadata = {
-  title: 'NFL Team Needs 2026: All 32 Teams Draft & Free Agency Needs | NFL HQ',
+  title: 'NFL Team Needs 2026: All 32 Teams Draft & Free Agency Needs',
   description:
     'Comprehensive NFL team needs for all 32 teams heading into the 2026 NFL Draft and free agency. Position-by-position analysis with need ratings, free agent fits, salary cap context, and roster depth.',
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     'NFL team needs rankings',
   ],
   openGraph: {
-    title: 'NFL Team Needs 2026: All 32 Teams | NFL HQ',
+    title: 'NFL Team Needs 2026: All 32 Teams',
     description:
       'Position-by-position team needs analysis for all 32 NFL teams. Explore the heatmap, free agent fits, and cap space context for the 2026 offseason.',
     type: 'website',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NFL Team Needs 2026: All 32 Teams | NFL HQ',
+    title: 'NFL Team Needs 2026: All 32 Teams',
     description:
       'Position-by-position team needs analysis for all 32 NFL teams. Heatmap, free agent fits, cap space context, and more.',
     images: [

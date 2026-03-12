@@ -8,7 +8,7 @@ const PowerRankingsClient = dynamic(() => import('./PowerRankingsClient'), {
 });
 
 export const metadata: Metadata = {
-  title: 'NFL Power Rankings Builder | NFL HQ',
+  title: 'NFL Power Rankings Builder',
   description: 'Create and customize your own NFL power rankings. Rank all 32 teams, download and share your rankings.',
 };
 
