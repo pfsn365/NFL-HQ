@@ -288,7 +288,7 @@ export default function SalaryCapTab({ team }: SalaryCapTabProps) {
                   <tr key={player.name} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="p-2 whitespace-nowrap">
                       <Link
-                        href={`/nfl-hq/players/${player.slug}`}
+                        href={`/players/${player.slug}`}
                         className="font-medium hover:underline cursor-pointer"
                         style={{ color: team.primaryColor }}
                       >

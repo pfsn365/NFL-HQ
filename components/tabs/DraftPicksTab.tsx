@@ -333,7 +333,7 @@ export default function DraftPicksTab({ team }: DraftPicksTabProps) {
                                 <span className="font-medium text-gray-900">TBD</span>
                               ) : (
                                 <Link
-                                  href={`/nfl-hq/players/${getPlayerSlug(pick.name)}`}
+                                  href={`/players/${getPlayerSlug(pick.name)}`}
                                   className="font-medium hover:underline cursor-pointer"
                                   style={{ color: team.primaryColor }}
                                 >

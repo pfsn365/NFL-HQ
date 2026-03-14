@@ -174,7 +174,7 @@ export default function HistoryTab() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           {winnerLogo && <img src={winnerLogo} alt="" className="w-6 h-6 object-contain" />}
-                          <Link href={`/nfl-hq/teams/${sb.winnerTeamId}`} className="font-semibold text-sm hover:text-[#0050A0] hover:underline cursor-pointer">
+                          <Link href={`/teams/${sb.winnerTeamId}`} className="font-semibold text-sm hover:text-[#0050A0] hover:underline cursor-pointer">
                             {sb.winner}
                           </Link>
                         </div>
@@ -184,7 +184,7 @@ export default function HistoryTab() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           {loserLogo && <img src={loserLogo} alt="" className="w-6 h-6 object-contain" />}
-                          <Link href={`/nfl-hq/teams/${sb.loserTeamId}`} className="text-sm text-gray-700 hover:text-[#0050A0] hover:underline cursor-pointer">
+                          <Link href={`/teams/${sb.loserTeamId}`} className="text-sm text-gray-700 hover:text-[#0050A0] hover:underline cursor-pointer">
                             {sb.loser}
                           </Link>
                         </div>
@@ -266,7 +266,7 @@ export default function HistoryTab() {
                               <img src={winnerLogo} alt="" className="w-6 h-6 object-contain" />
                             )}
                             <Link
-                              href={`/nfl-hq/teams/${sb.winnerTeamId}`}
+                              href={`/teams/${sb.winnerTeamId}`}
                               className="font-semibold hover:text-[#0050A0] hover:underline cursor-pointer"
                             >
                               {sb.winner}
@@ -284,7 +284,7 @@ export default function HistoryTab() {
                               <img src={loserLogo} alt="" className="w-6 h-6 object-contain" />
                             )}
                             <Link
-                              href={`/nfl-hq/teams/${sb.loserTeamId}`}
+                              href={`/teams/${sb.loserTeamId}`}
                               className="hover:text-[#0050A0] hover:underline cursor-pointer"
                             >
                               {sb.loser}
@@ -441,7 +441,7 @@ export default function HistoryTab() {
                 return (
                   <Link
                     key={teamId}
-                    href={`/nfl-hq/teams/${teamId}`}
+                    href={`/teams/${teamId}`}
                     className="block border border-gray-200 rounded-lg p-4 hover:shadow-lg hover:border-[#0050A0] transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3 mb-3">
