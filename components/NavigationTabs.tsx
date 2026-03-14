@@ -55,6 +55,7 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
   // Memoize tabs to prevent unnecessary re-renders
   const tabs = useMemo(() => [
     { id: 'overview', label: 'Overview' },
+    { id: 'news', label: 'News' },
     { id: 'schedule', label: 'Schedule' },
     { id: 'roster', label: 'Roster' },
     { id: 'depth-chart', label: 'Depth Chart' },

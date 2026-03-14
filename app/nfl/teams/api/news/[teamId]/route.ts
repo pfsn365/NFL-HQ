@@ -1,40 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as cheerio from 'cheerio';
 
-// Team ID to PFSN team abbreviation mapping
-const teamIdToPFSNMap: Record<string, string> = {
-  'arizona-cardinals': 'ARI',
-  'atlanta-falcons': 'ATL',
-  'baltimore-ravens': 'BAL',
-  'buffalo-bills': 'BUF',
-  'carolina-panthers': 'CAR',
-  'chicago-bears': 'CHI',
-  'cincinnati-bengals': 'CIN',
-  'cleveland-browns': 'CLE',
-  'dallas-cowboys': 'DAL',
-  'denver-broncos': 'DEN',
-  'detroit-lions': 'DET',
-  'green-bay-packers': 'GB',
-  'houston-texans': 'HOU',
-  'indianapolis-colts': 'IND',
-  'jacksonville-jaguars': 'JAX',
-  'kansas-city-chiefs': 'KC',
-  'las-vegas-raiders': 'LV',
-  'los-angeles-chargers': 'LAC',
-  'los-angeles-rams': 'LAR',
-  'miami-dolphins': 'MIA',
-  'minnesota-vikings': 'MIN',
-  'new-england-patriots': 'NE',
-  'new-orleans-saints': 'NO',
-  'new-york-giants': 'NYG',
-  'new-york-jets': 'NYJ',
-  'philadelphia-eagles': 'PHI',
-  'pittsburgh-steelers': 'PIT',
-  'san-francisco-49ers': 'SF',
-  'seattle-seahawks': 'SEA',
-  'tampa-bay-buccaneers': 'TB',
-  'tennessee-titans': 'TEN',
-  'washington-commanders': 'WAS',
-};
+// All 32 team IDs double as RSS feed tag slugs
+const validTeamIds = new Set([
+  'arizona-cardinals', 'atlanta-falcons', 'baltimore-ravens', 'buffalo-bills',
+  'carolina-panthers', 'chicago-bears', 'cincinnati-bengals', 'cleveland-browns',
+  'dallas-cowboys', 'denver-broncos', 'detroit-lions', 'green-bay-packers',
+  'houston-texans', 'indianapolis-colts', 'jacksonville-jaguars', 'kansas-city-chiefs',
+  'las-vegas-raiders', 'los-angeles-chargers', 'los-angeles-rams', 'miami-dolphins',
+  'minnesota-vikings', 'new-england-patriots', 'new-orleans-saints', 'new-york-giants',
+  'new-york-jets', 'philadelphia-eagles', 'pittsburgh-steelers', 'san-francisco-49ers',
+  'seattle-seahawks', 'tampa-bay-buccaneers', 'tennessee-titans', 'washington-commanders',
+]);
+
+function parseRssFeed(xmlData: string): any[] {
+  const $ = cheerio.load(xmlData, { xmlMode: true });
+  const articles: any[] = [];
+
+  $('item').each((_index, element) => {
+    const $item = $(element);
+    const title = $item.find('title').text().trim();
+    const link = $item.find('link').text().trim();
+    const pubDate = $item.find('pubDate').text().trim();
+    const author = $item.find('dc\\:creator, creator').text().trim();
+    const category = $item.find('category').first().text().trim();
+
+    // Clean up description by removing HTML tags
+    const cleanDescription = $item.find('description').text()
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .trim();
+
+    articles.push({
+      title: title || 'Untitled',
+      description: cleanDescription,
+      link: link || '#',
+      pubDate: pubDate || new Date().toISOString(),
+      author: author || undefined,
+      category: category || 'NFL News',
+    });
+  });
+
+  return articles;
+}
 
 export async function GET(
   request: NextRequest,
@@ -43,59 +54,67 @@ export async function GET(
   try {
     const { teamId } = await params;
 
-    // Get PFSN team abbreviation
-    const pfsnTeamAbbr = teamIdToPFSNMap[teamId];
-
-    if (!pfsnTeamAbbr) {
+    if (!validTeamIds.has(teamId)) {
       return NextResponse.json(
-        { error: 'Team not found or not yet mapped' },
+        { error: 'Team not found' },
         { status: 404 }
       );
     }
 
-    // Use the new PFSN API endpoint with dynamic team
-    const apiUrl = `https://gotham.profootballnetwork.com/taxonomy/nfl/news-feeds?pageStart=1&newsType=Fantasy&team=${pfsnTeamAbbr}`;
+    // Fetch both PFN RSS feeds in parallel (tag feed + team HQ feed)
+    const tagFeedUrl = `https://www.profootballnetwork.com/tag/${teamId}/feed/`;
+    const teamHqFeedUrl = `https://www.profootballnetwork.com/nfl-team-hq/${teamId}/feed/`;
 
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'NFL Team Pages/1.0'
-      },
-      next: { revalidate: 3600 } // Cache for 1 hour
-    });
+    const [tagResponse, teamHqResponse] = await Promise.all([
+      fetch(tagFeedUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/rss+xml, application/xml, text/xml',
+          'User-Agent': 'NFL Team Pages/1.0'
+        },
+        next: { revalidate: 3600 }
+      }),
+      fetch(teamHqFeedUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/rss+xml, application/xml, text/xml',
+          'User-Agent': 'NFL Team Pages/1.0'
+        },
+        next: { revalidate: 3600 }
+      })
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`PFSN API error: ${response.status} ${response.statusText}`);
+    let allArticles: any[] = [];
+
+    if (tagResponse.ok) {
+      const tagXml = await tagResponse.text();
+      allArticles = allArticles.concat(parseRssFeed(tagXml));
     }
 
-    const data = await response.json();
+    if (teamHqResponse.ok) {
+      const teamHqXml = await teamHqResponse.text();
+      allArticles = allArticles.concat(parseRssFeed(teamHqXml));
+    }
 
-    // Extract articles from the feeds array
-    const articles = data.feeds || [];
+    if (!tagResponse.ok && !teamHqResponse.ok) {
+      throw new Error(`Both RSS feeds failed: Tag feed ${tagResponse.status}, Team HQ feed ${teamHqResponse.status}`);
+    }
 
-    // Map the PFSN API structure to our expected format
-    const mappedNews = articles.slice(0, 12).map((article: any) => ({
-      title: article.title || 'Untitled',
-      description: article.content || '',
-      link: article.url || '#',
-      pubDate: article.pubDate || new Date().toISOString(),
-      author: article.author || undefined,
-      category: article.categories?.[0] || 'Fantasy'
-    }));
+    // Deduplicate by link URL
+    const uniqueArticles = Array.from(
+      new Map(allArticles.map(a => [a.link, a])).values()
+    );
+
+    // Sort newest first
+    const articles = uniqueArticles
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .slice(0, 12);
 
     return NextResponse.json({
       success: true,
-      articles: mappedNews,
-      count: mappedNews.length,
-      isCardinalsFocused: true, // This endpoint is team-specific
-      team: pfsnTeamAbbr,
-      debug: {
-        totalArticles: articles.length,
-        status: data.status,
-        sampleTitles: mappedNews.slice(0, 3).map((a: any) => a.title)
-      }
+      articles,
+      count: articles.length,
+      isCardinalsFocused: articles.length > 0,
     });
 
   } catch (error) {

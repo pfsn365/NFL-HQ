@@ -27,6 +27,7 @@ import StatsTab from '@/components/tabs/StatsTab';
 import InjuryReportTab from '@/components/tabs/InjuryReportTab';
 import TeamNeedsTab from '@/components/tabs/TeamNeedsTab';
 import RecordByYearTab from '@/components/tabs/RecordByYearTab';
+import NewsTab from '@/components/tabs/NewsTab';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface TeamPageProps {
@@ -414,6 +415,8 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
         return wrapWithErrorBoundary(<InjuryReportTab team={team} />, 'Injury Report');
       case 'record-by-year':
         return wrapWithErrorBoundary(<RecordByYearTab team={team} />, 'Record By Year');
+      case 'news':
+        return wrapWithErrorBoundary(<NewsTab team={team} />, 'News');
       default:
         return wrapWithErrorBoundary(
           <OverviewTab team={team} onTabChange={handleTabChange} />,

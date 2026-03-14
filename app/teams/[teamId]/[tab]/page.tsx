@@ -8,6 +8,7 @@ interface PageProps {
 
 const validTabs = [
   'overview',
+  'news',
   'team-info',
   'team-needs',
   'draft-picks',
@@ -61,6 +62,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   const tabTitles: { [key: string]: string } = {
     'overview': 'Overview',
+    'news': 'News',
     'team-info': 'Team Info',
     'team-needs': 'Team Needs',
     'draft-picks': 'NFL Draft History',
