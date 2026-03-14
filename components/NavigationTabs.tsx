@@ -137,7 +137,7 @@ export default function NavigationTabs({ activeTab, onTabChange, team }: Navigat
             <a
               key={tab.id}
               ref={activeTab === tab.id ? activeLinkRef : null}
-              href={tab.id === 'overview' ? `/nfl-hq/teams/${team.id}/` : `/nfl-hq/teams/${team.id}/${tab.id}/`}
+              href={tab.id === 'overview' ? `/nfl-hq/teams/${team.id}` : `/nfl-hq/teams/${team.id}/${tab.id}`}
               onClick={(e) => {
                 e.preventDefault();
                 onTabChange(tab.id);

@@ -16,7 +16,7 @@ export default function CanonicalURL() {
     }
 
     // Build canonical: use pathname only (strip query params), remove trailing slash
-    const cleanPath = pathname.replace(/\/+$/, '') || '';
+    const cleanPath = pathname.replace(/\/+$/, '');
     const canonicalHref = `${BASE_URL}${cleanPath}`;
 
     // Create and append new canonical link
