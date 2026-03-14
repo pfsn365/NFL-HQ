@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import PlayerProfileClient from './PlayerProfileClient';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -43,6 +44,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Try to fetch actual player data for better SEO
   const data = await getPlayerData(playerSlug);
+
+  if (!data) {
+    return {
+      title: 'Player Not Found',
+      robots: { index: false, follow: false },
+    };
+  }
 
   // Fallback to slug-based name if API fails
   const playerName = data?.player?.name || playerSlug
@@ -124,6 +132,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PlayerProfilePage({ params }: Props) {
   const { playerSlug } = await params;
+
+  const data = await getPlayerData(playerSlug);
+  if (!data) {
+    notFound();
+  }
+
   return (
     <ErrorBoundary componentName="Player Profile">
       <PlayerProfileClient playerSlug={playerSlug} />
