@@ -21,7 +21,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://profootballnetwork.com/nfl-hq'),
+  metadataBase: new URL('https://www.profootballnetwork.com/nfl-hq'),
   title: {
     default: "NFL HQ - Team Pages, Standings, Stats & News",
     template: "%s | NFL HQ"
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://profootballnetwork.com/nfl-hq',
+    url: 'https://www.profootballnetwork.com/nfl-hq',
     title: 'NFL HQ - Team Pages, Standings, Stats & News',
     description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news.',
     siteName: 'NFL HQ',
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     images: ['https://statico.profootballnetwork.com/wp-content/uploads/2026/03/02165035/NFL-HQ.png'],
   },
   alternates: {
-    canonical: 'https://profootballnetwork.com/nfl-hq',
+    canonical: 'https://www.profootballnetwork.com/nfl-hq',
   },
 };
 

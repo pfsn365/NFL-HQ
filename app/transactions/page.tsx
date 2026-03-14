@@ -4,6 +4,9 @@ import TransactionsClient from './TransactionsClient';
 export const metadata: Metadata = {
   title: 'NFL Transactions 2025-26',
   description: 'Latest NFL transactions including signings, releases, trades, and roster moves for all 32 teams.',
+  alternates: {
+    canonical: 'https://www.profootballnetwork.com/nfl-hq/transactions',
+  },
 };
 
 export default function TransactionsPage() {

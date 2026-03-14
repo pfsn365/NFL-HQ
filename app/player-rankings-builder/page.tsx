@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     description: 'Build and share your own NFL player rankings. Rank the top 100 NFL players by position, compare stats, and download your custom rankings.',
     type: 'website',
   },
+  alternates: {
+    canonical: 'https://www.profootballnetwork.com/nfl-hq/player-rankings-builder',
+  },
 };
 
 export default function PlayerRankingsPage() {

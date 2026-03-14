@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: 'Your complete NFL resource featuring all 32 team pages, live standings, playoff bracket, stat leaders, and interactive tools.',
   },
   alternates: {
-    canonical: 'https://www.profootballnetwork.com/nfl-hq/',
+    canonical: 'https://www.profootballnetwork.com/nfl-hq',
   },
 };
 
