@@ -19,7 +19,12 @@ interface PlayerData {
   };
 }
 
-async function getPlayerData(playerSlug: string): Promise<PlayerData | null> {
+interface PlayerFetchResult {
+  data: PlayerData | null;
+  is404: boolean;
+}
+
+async function getPlayerData(playerSlug: string): Promise<PlayerFetchResult> {
   try {
     // Use absolute URL for server-side fetch
     const baseUrl = process.env.VERCEL_URL
@@ -32,10 +37,12 @@ async function getPlayerData(playerSlug: string): Promise<PlayerData | null> {
       next: { revalidate: 86400 },
     });
 
-    if (!response.ok) return null;
-    return await response.json();
+    if (response.status === 404) return { data: null, is404: true };
+    if (!response.ok) return { data: null, is404: false };
+    return { data: await response.json(), is404: false };
   } catch {
-    return null;
+    // Network error / timeout — don't treat as 404
+    return { data: null, is404: false };
   }
 }
 
@@ -43,9 +50,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { playerSlug } = await params;
 
   // Try to fetch actual player data for better SEO
-  const data = await getPlayerData(playerSlug);
+  const { data, is404 } = await getPlayerData(playerSlug);
 
-  if (!data) {
+  if (is404) {
     return {
       title: 'Player Not Found',
       robots: { index: false, follow: false },
@@ -133,8 +140,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PlayerProfilePage({ params }: Props) {
   const { playerSlug } = await params;
 
-  const data = await getPlayerData(playerSlug);
-  if (!data) {
+  const { is404 } = await getPlayerData(playerSlug);
+  if (is404) {
     notFound();
   }
 
