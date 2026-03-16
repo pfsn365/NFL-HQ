@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+
 import { getAllTeams } from '@/data/teams';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getApiPath } from '@/utils/api';
@@ -9,7 +9,6 @@ import PlayerImage from '@/components/PlayerImage';
 import { transformFreeAgentData, generatePlayerSlug, mapTeamNameToId, type RawFreeAgentData, type FreeAgent } from '@/utils/freeAgentHelpers';
 
 export default function HomePageContent() {
-  const router = useRouter();
   const allTeams = getAllTeams();
 
   // Free agents state
@@ -345,15 +344,15 @@ export default function HomePageContent() {
                         const teamInfo = allTeams.find(t => t.id === agent.teamId);
 
                         return (
-                          <tr key={`${agent.rank}-${agent.name}`} onClick={() => router.push('/free-agency-tracker')} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50 transition-colors cursor-pointer group`}>
+                          <tr key={`${agent.rank}-${agent.name}`} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50 transition-colors group`}>
                             <td className="px-3 sm:px-3 py-2 whitespace-nowrap text-base text-center">
                               <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0050A0] text-white text-sm font-bold">{agent.rank}</span>
                             </td>
                             <td className="px-3 sm:px-3 py-2 text-base font-semibold text-gray-900 group-hover:text-[#0050A0] transition-colors">
-                              <div className="flex items-center gap-2.5">
+                              <Link href="/free-agency-tracker" className="flex items-center gap-2.5">
                                 <PlayerImage slug={generatePlayerSlug(agent.name)} name={agent.name} size="md" />
                                 <span className="truncate">{agent.name}</span>
-                              </div>
+                              </Link>
                             </td>
                             <td className="px-1.5 sm:px-3 py-2 whitespace-nowrap text-base text-center">
                               <span className="text-sm font-semibold text-gray-900">

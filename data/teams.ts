@@ -1061,7 +1061,7 @@ export const teams: Record<string, TeamData> = {
     division: 'AFC South',
     primaryColor: '#0C2340',
     secondaryColor: '#4B92DB',
-    logoUrl: 'https://www.profootballnetwork.com/apps/nfl-logos/tennessee-titans.png',
+    logoUrl: 'https://www.profootballnetwork.com/apps/nfl-logos/tennessee-titans.png?nocache',
     record: '0-0-0',
     divisionRank: '0th',
     generalManager: 'Mike Borgonzi',
