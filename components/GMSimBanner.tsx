@@ -2,7 +2,7 @@
 
 export default function GMSimBanner() {
   return (
-    <div className="sticky top-[88px] lg:top-[40px] z-[9] lg:z-[39] w-full">
+    <div className="sticky top-[48px] lg:top-0 z-[9] lg:z-[39] w-full">
       <a
         href="https://www.profootballnetwork.com/cta-ultimate-gm-simulator-nfl/"
         target="_blank"

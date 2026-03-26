@@ -17,6 +17,7 @@ import {
   getAbbrFromFullName,
   getNeedCategoryFromAbbr,
 } from '@/utils/positionMapping';
+import GMSimBanner from '@/components/GMSimBanner';
 
 // ---------------------------------------------------------------------------
 // Reuse need-level helpers from TeamNeedsTab
@@ -336,6 +337,7 @@ export default function TeamNeedsClient() {
           </p>
         </div>
       </header>
+      <GMSimBanner />
 
       {/* Raptive Header Ad */}
       <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface SalaryCapData {
   teamId: string;
@@ -191,6 +192,7 @@ export default function SalaryCapTrackerClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

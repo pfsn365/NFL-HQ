@@ -29,6 +29,7 @@ import TeamNeedsTab from '@/components/tabs/TeamNeedsTab';
 import RecordByYearTab from '@/components/tabs/RecordByYearTab';
 import NewsTab from '@/components/tabs/NewsTab';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface TeamPageProps {
   team: TeamData;
@@ -438,6 +439,7 @@ function TeamPageContent({ team, initialTab }: TeamPageProps) {
           liveDivisionRank={standings?.divisionRank}
           teamStats={teamStats}
         />
+        <GMSimBanner />
 
         <NavigationTabs activeTab={activeTab} onTabChange={handleTabChange} team={team} />
 

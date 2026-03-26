@@ -9,6 +9,7 @@ import StatsComparisonTab from '@/components/super-bowl/StatsComparisonTab';
 import RostersDepthChartsTab from '@/components/super-bowl/RostersDepthChartsTab';
 import PathToSuperBowlTab from '@/components/super-bowl/PathToSuperBowlTab';
 import { getApiPath } from '@/utils/api';
+import GMSimBanner from '@/components/GMSimBanner';
 
 // Live Score Component - fetches Super Bowl score from ESPN
 function LiveScore() {
@@ -256,6 +257,7 @@ export default function SuperBowlLXContent() {
             </div>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Tab Navigation */}
         <div className="bg-white border-b border-gray-200 sticky top-[48px] lg:top-0 z-10 shadow-sm">

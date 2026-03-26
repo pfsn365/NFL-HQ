@@ -10,7 +10,6 @@ import { WebVitals } from '@/components/WebVitals';
 import VideoPlayerScript from '@/components/VideoPlayerScript';
 // Offseason: uncomment when NFL season resumes
 // import NFLScoreTicker from '@/components/NFLScoreTicker';
-import FreeAgencyTicker from '@/components/FreeAgencyTicker';
 import Footer from '@/components/Footer';
 import SidebarLayout from '@/components/SidebarLayout';
 
@@ -138,7 +137,6 @@ export default function RootLayout({
         </a>
         {/* Offseason: uncomment when NFL season resumes */}
         {/* <NFLScoreTicker /> */}
-        <FreeAgencyTicker />
         <CanonicalURL />
         <StructuredData />
         <WebVitals />

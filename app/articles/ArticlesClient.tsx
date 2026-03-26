@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Pagination from '@/components/Pagination';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface Article {
   title: string;
@@ -215,6 +216,7 @@ export default function ArticlesClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { getAllTeams } from '@/data/teams';
 import Link from 'next/link';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface StandingData {
   teamId: string;
@@ -634,6 +635,7 @@ export default function StandingsClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

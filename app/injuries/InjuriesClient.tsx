@@ -7,6 +7,7 @@ import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import { getStatusColor } from '@/utils/colorHelpers';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface InjuryData {
   player: string;
@@ -215,6 +216,7 @@ export default function InjuriesClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

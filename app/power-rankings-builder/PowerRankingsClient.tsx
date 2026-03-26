@@ -25,6 +25,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
   );
 }
 import { getApiPath } from '@/utils/api';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface TeamWithRecord extends TeamData {
   liveRecord?: string;
@@ -882,6 +883,7 @@ export default function PowerRankingsClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

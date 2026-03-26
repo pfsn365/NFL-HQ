@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { getAllTeams } from '@/data/teams';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface Player {
   id: string;
@@ -902,6 +903,7 @@ export default function PlayerRankingsClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

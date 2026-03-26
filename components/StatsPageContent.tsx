@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface StatLeader {
   playerId: number;
@@ -233,6 +234,7 @@ export default function StatsPageContent() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

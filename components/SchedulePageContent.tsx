@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { getAllTeams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import GMSimBanner from '@/components/GMSimBanner';
 
 // Map API team slugs to our team IDs (Sportskeeda uses various formats)
 const teamSlugMapping: Record<string, string> = {
@@ -434,6 +435,7 @@ function SchedulePageInner() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

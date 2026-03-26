@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { teams } from '@/data/teams';
 import { getApiPath } from '@/utils/api';
+import GMSimBanner from '@/components/GMSimBanner';
 
 interface TeamRecord {
   teamId: string;
@@ -123,6 +124,7 @@ export default function TeamsListPageContent() {
               </p>
             </div>
           </header>
+          <GMSimBanner />
 
           {/* Raptive Header Ad */}
           <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">

@@ -23,6 +23,7 @@ import {
 import { type ContractSheet, hasContractComps, formatCompactMoney, parseMoney } from '@/utils/contractCompHelpers';
 import { teamNeeds as staticTeamNeeds, type TeamNeeds } from '@/data/team-needs';
 import { getNeedCategoryFromAbbr } from '@/utils/positionMapping';
+import GMSimBanner from '@/components/GMSimBanner';
 
 export default function FreeAgencyTrackerClient() {
   const allTeams = getAllTeams();
@@ -458,6 +459,7 @@ export default function FreeAgencyTrackerClient() {
             </p>
           </div>
         </header>
+        <GMSimBanner />
 
         {/* Raptive Header Ad */}
         <div className="container mx-auto px-4 h-[120px] flex items-center justify-center">
