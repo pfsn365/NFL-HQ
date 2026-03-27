@@ -8,6 +8,7 @@ import CanonicalURL from '@/components/CanonicalURL';
 import StructuredData from '@/components/StructuredData';
 import { WebVitals } from '@/components/WebVitals';
 import VideoPlayerScript from '@/components/VideoPlayerScript';
+import ChartbeatTracker from '@/components/ChartbeatTracker';
 // Offseason: uncomment when NFL season resumes
 // import NFLScoreTicker from '@/components/NFLScoreTicker';
 import Footer from '@/components/Footer';
@@ -143,6 +144,29 @@ export default function RootLayout({
         <VideoPlayerScript />
         <SidebarLayout>{children}</SidebarLayout>
         <Footer />
+        <ChartbeatTracker />
+        {/* Chartbeat Analytics */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            var _sf_async_config = window._sf_async_config = (window._sf_async_config || {});
+            _sf_async_config.uid = 66391;
+            _sf_async_config.domain = 'profootballnetwork.com';
+            _sf_async_config.flickerControl = false;
+            _sf_async_config.useCanonical = true;
+            _sf_async_config.useCanonicalDomain = true;
+            _sf_async_config.sections = 'NFL HQ';
+            _sf_async_config.authors = 'HQ Hubs';
+            function loadChartbeat() {
+              var e = document.createElement('script');
+              e.type = 'text/javascript';
+              e.async = true;
+              e.src = '//static.chartbeat.com/js/chartbeat.js';
+              document.getElementsByTagName('script')[0].parentNode.insertBefore(e, document.getElementsByTagName('script')[0]);
+            }
+            loadChartbeat();
+          })();
+        `}} />
+        <script async src="//static.chartbeat.com/js/chartbeat_mab.js" />
       </body>
     </html>
   );
