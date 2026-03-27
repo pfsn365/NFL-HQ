@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     description: 'Track NFL free agents, signings, and player availability. View contract details and recent free agency moves across all 32 teams.',
     images: ['https://statico.profootballnetwork.com/wp-content/uploads/2026/02/17150329/NFL-Free-Agency-Tracker-2-1.png'],
   },
+  keywords: ['NFL free agency', 'free agent tracker', 'NFL signings', 'NFL free agents 2026', 'free agency news'],
   alternates: {
     canonical: 'https://www.profootballnetwork.com/nfl-hq/free-agency-tracker',
   },

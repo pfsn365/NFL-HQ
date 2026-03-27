@@ -4,7 +4,7 @@ import "./globals.css";
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import RaptiveScript from '@/components/RaptiveScript';
 import VisiblTracking from '@/components/VisiblTracking';
-import CanonicalURL from '@/components/CanonicalURL';
+// Canonicals handled via metadata.alternates.canonical on each page
 import StructuredData from '@/components/StructuredData';
 import { WebVitals } from '@/components/WebVitals';
 import VideoPlayerScript from '@/components/VideoPlayerScript';
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://www.profootballnetwork.com/nfl-hq',
     title: 'NFL HQ - Team Pages, Standings, Stats & News',
-    description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news.',
+    description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news from PFSN.',
     siteName: 'NFL HQ',
     images: [
       {
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'NFL HQ - Team Pages, Standings, Stats & News',
-    description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news.',
+    description: 'Your complete NFL resource featuring all 32 team pages, live standings, stats, rosters, schedules, and the latest news from PFSN.',
     creator: '@PFSN365',
     site: '@PFSN365',
     images: ['https://statico.profootballnetwork.com/wp-content/uploads/2026/03/02165035/NFL-HQ.png'],
@@ -138,7 +138,6 @@ export default function RootLayout({
         </a>
         {/* Offseason: uncomment when NFL season resumes */}
         {/* <NFLScoreTicker /> */}
-        <CanonicalURL />
         <StructuredData />
         <WebVitals />
         <VideoPlayerScript />

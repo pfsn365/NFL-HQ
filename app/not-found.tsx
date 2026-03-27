@@ -69,8 +69,8 @@ export default function NotFound() {
               Player Rankings
             </Link>
             <span className="text-gray-500">•</span>
-            <Link href="/draft-order" className="text-sm text-gray-300 hover:text-[#0050A0] transition-colors">
-              Draft Order
+            <Link href="/schedule" className="text-sm text-gray-300 hover:text-[#0050A0] transition-colors">
+              Schedule
             </Link>
           </div>
         </div>

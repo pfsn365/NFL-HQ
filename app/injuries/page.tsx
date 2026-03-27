@@ -5,6 +5,11 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 export const metadata: Metadata = {
   title: 'NFL Injury Report 2025',
   description: 'Latest NFL injury reports including player status, injury details, and estimated return dates for all 32 teams.',
+  keywords: ['NFL injuries', 'NFL injury report', 'player injuries', 'injury status', 'NFL health updates'],
+  openGraph: {
+    title: 'NFL Injury Report 2025',
+    description: 'Latest NFL injury reports including player status, injury details, and estimated return dates for all 32 teams.',
+  },
   alternates: {
     canonical: 'https://www.profootballnetwork.com/nfl-hq/injuries',
   },
