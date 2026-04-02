@@ -1,34 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-interface SportsKeedaPlayer {
-  id: number;
+// --- ESPN API Types ---
+
+interface ESPNAthlete {
+  id: string;
+  uid: string;
+  guid: string;
+  displayName: string;
+  shortName: string;
+  links: { href: string; rel: string[] }[];
+  injuries: { status: string; date: string; type: { abbreviation: string } }[];
+}
+
+interface ESPNPositionEntry {
+  position: {
+    id: string;
+    name: string;
+    displayName: string;
+    abbreviation: string;
+    leaf: boolean;
+    parent?: { abbreviation: string };
+  };
+  athletes: ESPNAthlete[];
+}
+
+interface ESPNFormation {
+  id: string;
   name: string;
-  first_name: string;
-  last_name: string;
-  slug: string;
+  positions: Record<string, ESPNPositionEntry>;
 }
 
-interface SportsKeedaDepthEntry {
-  depth: number;
-  player: SportsKeedaPlayer;
+interface ESPNDepthChartResponse {
+  timestamp: string;
+  status: string;
+  season: { year: number; type: number; name: string };
+  team: { id: string; abbreviation: string; location: string; name: string };
+  depthchart: ESPNFormation[];
 }
 
-interface SportsKeedaPosition {
-  name: string;
-  abbreviation: string;
-  depth_chart: SportsKeedaDepthEntry[];
-}
-
-interface SportsKeedaDepthChartResponse {
-  team_id: number;
-  team_nickname: string;
-  team_location: string;
-  team_abbreviation: string;
-  team_slug: string;
-  season: number;
-  positions: SportsKeedaPosition[];
-  updated_at: number;
-}
+// --- Output Types ---
 
 interface DepthChartPlayer {
   name: string;
@@ -37,7 +47,51 @@ interface DepthChartPlayer {
   impactScore: number;
 }
 
-// Google Sheets configuration for PFSN Impact Grades (same as roster API)
+interface DepthChartPosition {
+  name: string;
+  abbreviation: string;
+  players: DepthChartPlayer[];
+}
+
+// --- ESPN Team ID Mapping (team slug → ESPN numeric ID) ---
+
+const espnTeamIdMap: Record<string, number> = {
+  'arizona-cardinals': 22,
+  'atlanta-falcons': 1,
+  'baltimore-ravens': 33,
+  'buffalo-bills': 2,
+  'carolina-panthers': 29,
+  'chicago-bears': 3,
+  'cincinnati-bengals': 4,
+  'cleveland-browns': 5,
+  'dallas-cowboys': 6,
+  'denver-broncos': 7,
+  'detroit-lions': 8,
+  'green-bay-packers': 9,
+  'houston-texans': 34,
+  'indianapolis-colts': 11,
+  'jacksonville-jaguars': 30,
+  'kansas-city-chiefs': 12,
+  'las-vegas-raiders': 13,
+  'los-angeles-chargers': 24,
+  'los-angeles-rams': 14,
+  'miami-dolphins': 15,
+  'minnesota-vikings': 16,
+  'new-england-patriots': 17,
+  'new-orleans-saints': 18,
+  'new-york-giants': 19,
+  'new-york-jets': 20,
+  'philadelphia-eagles': 21,
+  'pittsburgh-steelers': 23,
+  'san-francisco-49ers': 25,
+  'seattle-seahawks': 26,
+  'tampa-bay-buccaneers': 27,
+  'tennessee-titans': 10,
+  'washington-commanders': 28,
+};
+
+// --- PFSN Impact Grades (Google Sheets) ---
+
 const GOOGLE_SHEETS_CONFIG: Record<string, { spreadsheetId: string; gid: string }> = {
   QB: { spreadsheetId: '17d7EIFBHLChlSoi6vRFArwviQRTJn0P0TOvQUNx8hU8', gid: '1456950409' },
   SAF: { spreadsheetId: '1SKr25H4brSE4dRf7JGpkytwLAKvt4jH-_wlCoqbFPXE', gid: '1216441503' },
@@ -148,47 +202,76 @@ async function getAllImpactGrades(): Promise<Map<string, number>> {
   return gradesMap;
 }
 
-interface DepthChartPosition {
-  name: string;
-  abbreviation: string;
-  players: DepthChartPlayer[];
+// --- Helpers ---
+
+/** Extract player slug from ESPN link URL (e.g. "kirk-cousins" from ".../id/14880/kirk-cousins") */
+function extractSlugFromESPN(athlete: ESPNAthlete): string {
+  if (athlete.links && athlete.links.length > 0) {
+    const href = athlete.links[0].href;
+    const match = href.match(/\/id\/\d+\/(.+)$/);
+    if (match) return match[1];
+  }
+  // Fallback: generate slug from display name
+  return athlete.displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-// Team ID to Sportskeeda team ID mapping - Same as schedule API
-const teamIdMap: Record<string, number> = {
-  'arizona-cardinals': 355,
-  'atlanta-falcons': 323,
-  'baltimore-ravens': 366,
-  'buffalo-bills': 324,
-  'carolina-panthers': 364,
-  'chicago-bears': 326,
-  'cincinnati-bengals': 327,
-  'cleveland-browns': 329,
-  'dallas-cowboys': 331,
-  'denver-broncos': 332,
-  'detroit-lions': 334,
-  'green-bay-packers': 335,
-  'houston-texans': 325,
-  'indianapolis-colts': 338,
-  'jacksonville-jaguars': 365,
-  'kansas-city-chiefs': 339,
-  'las-vegas-raiders': 341,
-  'los-angeles-chargers': 357,
-  'los-angeles-rams': 343,
-  'miami-dolphins': 345,
-  'minnesota-vikings': 347,
-  'new-england-patriots': 348,
-  'new-orleans-saints': 350,
-  'new-york-giants': 351,
-  'new-york-jets': 352,
-  'philadelphia-eagles': 354,
-  'pittsburgh-steelers': 356,
-  'san-francisco-49ers': 359,
-  'seattle-seahawks': 361,
-  'tampa-bay-buccaneers': 362,
-  'tennessee-titans': 336,
-  'washington-commanders': 363,
-};
+function getPlayerImpactScore(playerName: string, impactGrades: Map<string, number>): number {
+  const normalizedName = normalizePlayerName(playerName);
+  let score = impactGrades.get(normalizedName) || 0;
+  if (!score) {
+    for (const variant of generateNameVariations(playerName)) {
+      const variantScore = impactGrades.get(variant);
+      if (variantScore && variantScore > 0) {
+        score = variantScore;
+        break;
+      }
+    }
+  }
+  return score;
+}
+
+/** Map ESPN formation name to our category */
+function classifyFormation(name: string): 'offense' | 'defense' | 'specialTeams' {
+  const lower = name.toLowerCase();
+  if (lower.includes('special')) return 'specialTeams';
+  if (lower.includes('wr') || lower.includes('te') || lower.includes('rb') || lower.includes('offense') || lower.includes('shotgun') || lower.includes('pistol') || lower.includes('i-form') || lower.includes('singleback')) return 'offense';
+  return 'defense';
+}
+
+// --- Position display normalization ---
+
+/** Normalize ESPN position key to display abbreviation */
+function normalizeAbbreviation(key: string, posEntry: ESPNPositionEntry): string {
+  const abbr = posEntry.position.abbreviation;
+  const keyUpper = key.toUpperCase();
+
+  // ESPN uses lowercase keys like 'wr1', 'wr2' etc. — preserve the number suffix
+  if (/^wr\d$/i.test(key)) return keyUpper;
+
+  // Map common ESPN keys
+  switch (keyUpper) {
+    case 'PK': return 'K';
+    default: return abbr || keyUpper;
+  }
+}
+
+// Position ordering
+const offenseOrder = ['QB', 'RB', 'FB', 'WR1', 'WR2', 'WR3', 'TE', 'LT', 'LG', 'C', 'RG', 'RT'];
+const defenseOrder = ['LDE', 'NT', 'RDE', 'LDT', 'RDT', 'DT', 'DE', 'WLB', 'LILB', 'RILB', 'SLB', 'LOLB', 'ROLB', 'MLB', 'LLB', 'RLB', 'LCB', 'RCB', 'NB', 'FS', 'SS'];
+const specialTeamsOrder = ['K', 'P', 'LS', 'H', 'KR', 'PR'];
+
+function sortByOrder(positions: DepthChartPosition[], order: string[]) {
+  return positions.sort((a, b) => {
+    const aIndex = order.indexOf(a.abbreviation);
+    const bIndex = order.indexOf(b.abbreviation);
+    if (aIndex === -1 && bIndex === -1) return 0;
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
+}
+
+// --- Main handler ---
 
 export async function GET(
   request: NextRequest,
@@ -197,198 +280,83 @@ export async function GET(
   try {
     const { teamId } = await params;
 
-    // Get Sportskeeda team ID
-    const sportsKeedaTeamId = teamIdMap[teamId];
-
-    if (!sportsKeedaTeamId) {
-      return NextResponse.json(
-        { error: 'Team not found or not yet mapped' },
-        { status: 404 }
-      );
+    const espnId = espnTeamIdMap[teamId];
+    if (!espnId) {
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
     }
 
-    // Fetch data from Sportskeeda API
-    const response = await fetch(
-      `https://cf-gotham.sportskeeda.com/taxonomy/sport/nfl/depth-chart/2025?team=${sportsKeedaTeamId}`,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; NFL-Team-Pages/1.0)',
-        },
-        next: { revalidate: 86400 } // Cache for 24 hours
-      }
-    );
+    // Fetch ESPN depth chart and PFSN impact grades in parallel
+    const [espnResponse, impactGrades] = await Promise.all([
+      fetch(
+        `https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${espnId}/depthcharts`,
+        { next: { revalidate: 86400 } } // Cache for 24 hours
+      ),
+      getAllImpactGrades()
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`Sportskeeda API error: ${response.status}`);
+    if (!espnResponse.ok) {
+      throw new Error(`ESPN API error: ${espnResponse.status}`);
     }
 
-    const responseData: SportsKeedaDepthChartResponse[] = await response.json();
+    const espnData: ESPNDepthChartResponse = await espnResponse.json();
+    const formations = espnData.depthchart;
 
-    if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
-      return NextResponse.json(
-        { error: 'No depth chart data found' },
-        { status: 404 }
-      );
+    if (!formations || !Array.isArray(formations) || formations.length === 0) {
+      return NextResponse.json({ error: 'No depth chart data found' }, { status: 404 });
     }
 
-    const data = responseData[0]; // Get the first (and only) team data
-
-    if (!data.positions || !Array.isArray(data.positions)) {
-      return NextResponse.json(
-        { error: 'No depth chart data found' },
-        { status: 404 }
-      );
-    }
-
-    // Fetch impact grades
-    const impactGrades = await getAllImpactGrades();
-
-    // Helper to get player's impact score
-    const getPlayerImpactScore = (playerName: string): number => {
-      const normalizedName = normalizePlayerName(playerName);
-      let score = impactGrades.get(normalizedName) || 0;
-      if (!score) {
-        for (const variant of generateNameVariations(playerName)) {
-          const variantScore = impactGrades.get(variant);
-          if (variantScore && variantScore > 0) {
-            score = variantScore;
-            break;
-          }
-        }
-      }
-      return score;
+    // Pick the best formation for each category
+    // ESPN returns separate formations for offense, defense, special teams
+    const grouped: { offense: DepthChartPosition[]; defense: DepthChartPosition[]; specialTeams: DepthChartPosition[] } = {
+      offense: [],
+      defense: [],
+      specialTeams: [],
     };
 
-    // Transform the data to our format
-    const transformedPositions: DepthChartPosition[] = data.positions.map(position => {
-      const players: DepthChartPlayer[] = [];
+    const allPositions: DepthChartPosition[] = [];
 
-      // Extract all players with their depth from the depth chart entries
-      position.depth_chart.forEach(depthEntry => {
-        players.push({
-          name: depthEntry.player.name,
-          slug: depthEntry.player.slug,
-          depth: depthEntry.depth,
-          impactScore: getPlayerImpactScore(depthEntry.player.name)
-        });
-      });
+    for (const formation of formations) {
+      const category = classifyFormation(formation.name);
+      const positions = formation.positions;
 
-      // Sort players by depth (1 = starter, 2 = backup, etc.)
-      players.sort((a, b) => a.depth - b.depth);
+      for (const [key, posEntry] of Object.entries(positions)) {
+        const abbreviation = normalizeAbbreviation(key, posEntry);
+        const players: DepthChartPlayer[] = posEntry.athletes.map((athlete, index) => ({
+          name: athlete.displayName,
+          slug: extractSlugFromESPN(athlete),
+          depth: index + 1, // ESPN array order = depth
+          impactScore: getPlayerImpactScore(athlete.displayName, impactGrades),
+        }));
 
-      // Normalize position abbreviations for display
-      let displayAbbreviation = position.abbreviation;
-      switch (position.abbreviation) {
-        case 'LOG':
-          displayAbbreviation = 'LG';
-          break;
-        case 'ROG':
-          displayAbbreviation = 'RG';
-          break;
-        case 'LOT':
-          displayAbbreviation = 'LT';
-          break;
-        case 'ROT':
-          displayAbbreviation = 'RT';
-          break;
+        const position: DepthChartPosition = {
+          name: posEntry.position.displayName,
+          abbreviation,
+          players,
+        };
+
+        grouped[category].push(position);
+        allPositions.push(position);
       }
+    }
 
-      return {
-        name: position.name,
-        abbreviation: displayAbbreviation,
-        players
-      };
-    });
-
-    // Group positions by category for easier frontend consumption
-    const groupedPositions = {
-      offense: transformedPositions.filter(pos => {
-        const name = pos.name.toLowerCase();
-        const abbr = pos.abbreviation.toLowerCase();
-        return name.includes('quarterback') ||
-               name.includes('running back') ||
-               name.startsWith('wr') || name.includes('wide receiver') ||
-               name.includes('tight end') ||
-               name.includes('fullback') ||
-               (name.includes('tackle') && name.includes('offensive')) ||
-               (name.includes('guard') && name.includes('offensive')) ||
-               name.includes('center') ||
-               abbr === 'qb' || abbr === 'rb' || abbr === 'rb2' || abbr === 'te' || abbr === 'te2' || abbr === 'fb' ||
-               abbr.startsWith('wr') ||
-               abbr === 'c' || abbr === 'log' || abbr === 'rog' ||
-               abbr === 'lot' || abbr === 'rot';
-      }),
-      defense: transformedPositions.filter(pos => {
-        const name = pos.name.toLowerCase();
-        const abbr = pos.abbreviation.toLowerCase();
-        return name.includes('nose tackle') ||
-               name.includes('defensive end') ||
-               name.includes('linebacker') ||
-               name.includes('cornerback') ||
-               name.includes('safety') ||
-               name.includes('defensive tackle') ||
-               abbr === 'nt' || abbr === 'lde' || abbr === 'rde' ||
-               abbr.includes('olb') || abbr.includes('ilb') ||
-               abbr.includes('cb') || abbr === 'fs' || abbr === 'ss';
-      }),
-      specialTeams: transformedPositions.filter(pos => {
-        const name = pos.name.toLowerCase();
-        const abbr = pos.abbreviation.toLowerCase();
-        return name.includes('punter') ||
-               name.includes('kicker') ||
-               name.includes('k-') ||
-               name.includes('long snapper') ||
-               name.includes('holder') ||
-               name === 'h' ||
-               name.includes('punt returner') ||
-               name.includes('kick returner') ||
-               abbr === 'p' || abbr === 'k-fg' || abbr === 'k-ko' ||
-               abbr === 'ls' || abbr === 'h' ||
-               abbr === 'pr' || abbr === 'kr';
-      })
-    };
-
-    // Define position ordering
-    const offenseOrder = ['QB', 'RB', 'WR1', 'WR2', 'WR3', 'FB', 'TE2', 'TE', 'LT', 'LG', 'C', 'RG', 'RT'];
-    const defenseOrder = ['NT', 'LDT', 'RDT', 'DT', 'LDE', 'RDE', 'DE', 'LOLB', 'ROLB', 'LLB', 'RLB', 'SLB', 'WLB', 'LILB', 'RILB', 'MLB', 'LCB', 'RCB', 'FS', 'SS'];
-    const specialTeamsOrder = ['LS', 'H', 'K-FG', 'K-KO', 'P', 'KR', 'PR'];
-
-    // Helper function to sort positions by defined order
-    const sortByOrder = (positions: DepthChartPosition[], order: string[]) => {
-      return positions.sort((a, b) => {
-        const aIndex = order.indexOf(a.abbreviation);
-        const bIndex = order.indexOf(b.abbreviation);
-
-        // If position not in order, put it at the end
-        if (aIndex === -1 && bIndex === -1) return 0;
-        if (aIndex === -1) return 1;
-        if (bIndex === -1) return -1;
-
-        return aIndex - bIndex;
-      });
-    };
-
-    // Sort and take the positions each team actually has
+    // Sort and limit
     const orderedPositions = {
-      offense: sortByOrder(groupedPositions.offense, offenseOrder).slice(0, 11),
-      defense: sortByOrder(groupedPositions.defense, defenseOrder).slice(0, 11),
-      specialTeams: sortByOrder(groupedPositions.specialTeams, specialTeamsOrder)
+      offense: sortByOrder(grouped.offense, offenseOrder).slice(0, 12),
+      defense: sortByOrder(grouped.defense, defenseOrder).slice(0, 12),
+      specialTeams: sortByOrder(grouped.specialTeams, specialTeamsOrder),
     };
 
     return NextResponse.json({
       teamId,
       positions: orderedPositions,
-      allPositions: transformedPositions,
-      totalPositions: transformedPositions.length,
+      allPositions,
+      totalPositions: allPositions.length,
       lastUpdated: new Date().toISOString(),
-      season: data.season
+      season: espnData.season?.year ?? 2026,
     });
 
   } catch (error) {
     console.error('Depth Chart API error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch depth chart data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch depth chart data' }, { status: 500 });
   }
 }

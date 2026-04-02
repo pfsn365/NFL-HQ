@@ -139,7 +139,7 @@ export default function DepthChartTab({ team }: DepthChartTabProps) {
         <div className="h-1 rounded-full" style={{ backgroundColor: team.primaryColor, width: 'fit-content', minWidth: '270px' }}></div>
       </div>
       <div className="text-sm text-gray-600">
-        2025 Season
+        2026 Season
       </div>
     </div>
   );
